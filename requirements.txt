@@ -1,0 +1,7 @@
+twilio~=8.2.0
+Flask~=2.2.3
+configparser~=5.3.0
+pandas~=1.4.4
+pyodbc~=4.0.35
+SQLAlchemy~=1.4.46
+requests~=2.28.2
