@@ -1,3 +1,8 @@
+import os, sys
+
+print(os.path.dirname(sys.executable))
+
+quit()
 from flask import Flask, render_template
 from core.twilio_requests import TwilioRequests
 from utils.database.datapuller import DataPuller
