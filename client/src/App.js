@@ -1,5 +1,5 @@
-import Header from './components/Header';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './components/Header';
 import { useEffect, useState } from "react";
 
 function App() {
