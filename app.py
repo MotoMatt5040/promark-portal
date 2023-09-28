@@ -1,14 +1,19 @@
-import os, sys
-
-print(os.path.dirname(sys.executable))
-
-quit()
+from config import Config
 from flask import Flask, render_template
-from core.twilio_requests import TwilioRequests
+from flask_login import LoginManager
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
 from utils.database.datapuller import DataPuller
 
-twilio_requests = TwilioRequests()
+
 app = Flask(__name__)
+# TODO This was added to test login and permissions (user authentication)
+app.config.from_object(Config)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+login = loginManager(app)
+# TODO This was added to test login and permissions (user authentication)
 
 data_puller = DataPuller()
 
@@ -20,17 +25,6 @@ def home():
     # return render_template('home.html')
     # print("connection found")
     return {"test Data": "1"}
-
-
-@app.route('/send-message', methods=['GET', 'POST'])
-def background_text_loading():
-    """Background text loading tester"""
-    print('sent message')
-    # print(data_puller.promark_phone_numbers()["phone_number"][0])
-    # TODO cycle the phone numbers
-    twilio_requests.send_sms(from_=data_puller.promark_phone_numbers()["phone_number"][0], to="8325853212")
-    print(twilio_requests.get_message_data())
-    return "nothing"
 
 
 if __name__ == '__main__':
