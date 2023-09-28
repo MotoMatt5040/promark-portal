@@ -3,7 +3,7 @@ import sys
 import traceback
 
 
-class TwilioLogin:
+class Login:
     '''
     Twilio Login
     '''
