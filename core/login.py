@@ -1,10 +1,9 @@
 import os
 import sys
 import traceback
-from twilio.rest import Client
 
 
-class TwilioLogin:
+class Login:
     '''
     Twilio Login
     '''
