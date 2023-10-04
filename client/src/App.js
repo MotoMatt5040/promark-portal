@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
+import SampleUpload from "./texting-platform/SampleUpload";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -7,6 +8,7 @@ function App() {
     return (
         <div>
             <Header title="React Navbar Component"/>
+            <SampleUpload title="sss" />
         </div>
     )
 }
