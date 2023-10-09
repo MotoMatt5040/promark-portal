@@ -1,5 +1,4 @@
-from .core.server_routes import defaultRoutes
-
+from server.defaults.core.server_routes import defaultRoutes
 
 if __name__ == '__main__':
     # app.run(debug=True)

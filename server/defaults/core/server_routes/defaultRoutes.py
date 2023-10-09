@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-from utils.database.datapuller import DataPuller
+from server.defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
 
