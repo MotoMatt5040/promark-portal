@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Home() {
-    return (<div></div>)
+    return (<main>This is the home page</main>)
 }
 
 export default Home;

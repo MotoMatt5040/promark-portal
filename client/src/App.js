@@ -1,16 +1,25 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
+import Home from './Home';
 import SampleUpload from "./texting-platform/SampleUpload";
-import { useEffect, useState } from "react";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 function App() {
 
-    return (
-        <div>
-            <Header title="React Navbar Component"/>
-            <SampleUpload title="sss" />
-        </div>
-    )
+return (
+  <BrowserRouter>
+    <main>
+
+      <Header title="React Navbar Component"/>
+
+      <Routes>
+
+        <Route index element={<Home />} />
+        <Route path="/texting_platform/sample_upload" element={<SampleUpload />} />
+      </Routes>
+    </main>
+  </BrowserRouter>
+)
 }
 export default App;
 //
