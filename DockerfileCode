@@ -1,3 +1,0 @@
-FROM mattpromark/twilio
-COPY .. ./
-CMD ["python", "app.py"]
