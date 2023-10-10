@@ -1,18 +1,18 @@
+# from config import Config
 from flask import Flask
-from config import Config
-from flask_login import LoginManager
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
+# from flask_login import LoginManager
+# from flask_migrate import Migrate
+# from flask_sqlalchemy import SQLAlchemy
 
 from server.defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
 
 # TODO This was added to test login and permissions (user authentication)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-login = LoginManager(app)
+# app.config.from_object(Config)
+# db = SQLAlchemy(app)
+# migrate = Migrate(app, db)
+# login = LoginManager(app)
 # TODO This was added to test login and permissions (user authentication)
 
 data_puller = DataPuller()
