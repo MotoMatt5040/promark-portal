@@ -1,14 +1,14 @@
-from configparser import ConfigParser
 import os
+from configparser import ConfigParser
+from pathlib import Path
 
 
 class Database:
     '''Database Accessor'''
     # region constants for server info
     config_object = ConfigParser()
-    config_path = f"utils/config.ini"
+    config_path = Path(f"defaults/utils/config.ini")
     config_object.read(config_path)
-
 
     info = config_object["DATABASE ACCESS INFO"]
 
