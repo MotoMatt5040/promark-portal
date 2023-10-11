@@ -24,4 +24,14 @@ def home():
     # return render_template('')
     # return render_template('home.html')
     # print("connection found")
+    print("test")
+    return {"test Data": "1"}
+
+@app.route('/texting_platform/sample_upload', methods=['GET', 'POST'])
+def testthingy():
+    """App home page"""
+    # return render_template('')
+    # return render_template('home.html')
+    # print("connection found")
+    print("IM WORKING")
     return {"test Data": "1"}

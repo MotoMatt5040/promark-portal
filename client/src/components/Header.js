@@ -8,7 +8,7 @@ const Header = (props) => {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="/">Promark Research</Navbar.Brand>
+        <Navbar.Brand href="/home">Promark Research</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

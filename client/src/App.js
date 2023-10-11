@@ -3,10 +3,14 @@ import Header from './components/Header';
 import Home from './Home';
 import SampleUpload from "./texting-platform/SampleUpload";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
+import { useState, useEffect } from 'react';
 
 function App() {
 
+
+
 return (
+
   <BrowserRouter>
     <main>
 
@@ -21,6 +25,40 @@ return (
   </BrowserRouter>
 )
 }
+
+//   const [currentNumber, newNumber] = useState();
+//
+//   const [currentData, setData] = useState([{}])
+//
+//     useEffect(() => {
+//         fetch("/home").then(
+//             res => res.json()
+//         ).then(
+//             data => {
+//                 setData(data)
+//                 console.log(data, currentNumber, newNumber, currentData)
+//             }
+//         )
+//     }, [])
+//
+//   return (
+//     <div className="App">
+//       <div className="jumbotron">
+//         <h1 id="phone_number" className="display-4">Texting Platform Landing Page</h1>
+//         <p className="lead">This page will be our portal for texting components with our twilio application</p>
+//         <hr className="my-4"/>
+//           <p>Press the button below to send a test message.</p>
+//         {/*form will be replaced with a useState*/}
+//           <form>
+//             <a href="#" id="test">
+//               <button className="btn btn-primary btn-lg">Send Test Message</button>
+//             </a>
+//           </form>
+//           {/*<p>this.state.setData</p>*/}
+//       </div>
+//     </div>
+//   );
+// }
 export default App;
 //
 // import logo from './logo.svg';
