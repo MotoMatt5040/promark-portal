@@ -1,8 +1,11 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 import os
+
+import redis
+from dotenv import load_dotenv
+
 from ...utils.database.database import Database
+
+load_dotenv()
 
 #  initialize database access info to connect to database
 dbai = Database()
@@ -23,3 +26,8 @@ class ApplicationConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = dbcon
+
+    SESSION_TYPE = "redis"
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")

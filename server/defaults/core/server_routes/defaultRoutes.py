@@ -1,14 +1,17 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
+from flask_session import Session
 
 from .config import ApplicationConfig
 from ..auth.models import db, User
+
 # from defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
+server_session = Session(app)
 db.init_app(app)
 
 with app.app_context():
@@ -73,6 +76,8 @@ def login():
 
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Unauthorized"}), 401
+
+    session["user_id"] = user.id
 
     return jsonify({
         "id": user.id,
