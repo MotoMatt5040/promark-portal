@@ -1,19 +1,14 @@
-# from config import Config
 from flask import Flask
-# from flask_login import LoginManager
-# from flask_migrate import Migrate
-# from flask_sqlalchemy import SQLAlchemy
-
-from server.defaults.utils.database.datapuller import DataPuller
+from ....defaults.utils.database.datapuller import DataPuller
+from .config import ApplicationConfig
+from ..auth.models import db
 
 app = Flask(__name__)
+app.config.from_object(ApplicationConfig)
 
-# TODO This was added to test login and permissions (user authentication)
-# app.config.from_object(Config)
-# db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
-# login = LoginManager(app)
-# TODO This was added to test login and permissions (user authentication)
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 data_puller = DataPuller()
 
@@ -35,3 +30,8 @@ def testthingy():
     # print("connection found")
     print("IM WORKING")
     return {"test Data": "1"}
+
+@app.route('/login', methods=['POST'])
+def login():
+    token = None
+    return {"token": token}

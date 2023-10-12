@@ -1,26 +1,13 @@
-from .. import db
-from werkzug.security import generate_password_hash, check_password_hash
-from .. import login
-from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from uuid import uuid4
 
+db = SQLAlchemy()
 
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
-    todo = db.relationship('Todo', backref='author', lazy='dynamic')
+def get_uuid():
+    return uuid4().hex
 
-    def __repr__(self):
-        return f'<User {self.username}>'
-
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.String(32), primary_key=True, unique=True, default=get_uuid())
+    email = db.Column(db.String(345), unique=True)
+    password = db.Column(db.Text, nullable=False)
