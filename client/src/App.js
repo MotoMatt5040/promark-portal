@@ -1,12 +1,18 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
-import Home from './Home';
-import SampleUpload from "./texting-platform/SampleUpload";
+import Home from './pages/Home';
+import SampleUpload from "./pages/texting-platform/SampleUpload";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import { useState, useEffect } from 'react';
+import Login from "./pages/login/Login";
+import { useState } from 'react';
 
 function App() {
+  const [token, setToken] = useState();
 
+  if(!token) {
+    return <Login setToken={setToken} />;
+  }
+  console.log(token);
 
 
 return (
@@ -17,8 +23,8 @@ return (
       <Header title="React Navbar Component"/>
 
       <Routes>
-
         <Route index element={<Home />} />
+        {/*<Route path="/home" element={<Home />} />*/}
         <Route path="/texting_platform/sample_upload" element={<SampleUpload />} />
       </Routes>
     </main>
