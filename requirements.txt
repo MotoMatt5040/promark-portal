@@ -1,0 +1,11 @@
+flask
+configparser
+pandas
+pyodbc
+SQLAlchemy
+flask-sqlalchemy
+flask-bcrypt
+python-dotenv
+flask-session
+redis
+Werkzeug~=2.3.7
