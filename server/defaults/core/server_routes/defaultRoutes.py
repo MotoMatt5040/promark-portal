@@ -27,20 +27,28 @@ def index():
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     """App home page"""
-    # return render_template('')
-    # return render_template('home.html')
-    # print("connection found")
     print("test")
     return {"test Data": "1"}
 
 @app.route('/texting_platform/sample_upload', methods=['GET', 'POST'])
 def testthingy():
     """App home page"""
-    # return render_template('')
-    # return render_template('home.html')
-    # print("connection found")
     print("IM WORKING")
     return {"test Data": "1"}
+
+@app.route("/@me")
+def get_current_user():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user = User.query.filter_by(id=user_id).first()
+
+    return jsonify({
+        "id": user.id,
+        "email": user.email
+    })
 
 @app.route("/register", methods=["POST"])
 def register():
