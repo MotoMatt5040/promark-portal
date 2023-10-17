@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import SampleUpload from "./pages/texting-platform/SampleUpload";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import Login from "./pages/login/Login";
+import Login from "./pages/auth/Login";
 import { useState } from 'react';
 
 function App() {

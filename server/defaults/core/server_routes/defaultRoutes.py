@@ -52,8 +52,8 @@ def get_current_user():
 
 @app.route("/register", methods=["POST"])
 def register():
-    email = request.json['email']
-    password = request.json['password']
+    email = request.form['email']
+    password = request.form['password']
 
     user_exists = User.query.filter_by(email=email).first() is not None
 
@@ -74,11 +74,11 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    email = request.json['email']
-    password = request.json['password']
+    email = request.form['email']
+    password = request.form['password']
 
     user = User.query.filter_by(email=email).first()
-
+    print('here')
     if user is None:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -86,6 +86,7 @@ def login():
         return jsonify({"error": "Unauthorized"}), 401
 
     session["user_id"] = user.id
+
 
     return jsonify({
         "id": user.id,
