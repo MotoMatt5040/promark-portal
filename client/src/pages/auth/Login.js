@@ -1,44 +1,32 @@
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import axios from '../../api/axios';
 
-const EMAIL_REGEX = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/
-const PASSWORD_REGEX = /(?=.{7,15}$)(?=\w{7,15})(?=.*[A-Z])(?=.*\d)/
+const EMAIL_REGEX = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
+const PASSWORD_REGEX = /(?=.{7,15}$)(?=\w{7,15})(?=.*[A-Z])(?=.*\d)/;
+const LOGIN_URL = '/login';
 
 function Login() {
 
   const [validated, setValidated] = useState(false);
-  const [login, setLogin] = useState([]);
-
-  const emailRef = useRef();
-  const errorRef = useRef();
 
   const [email, setEmail] = useState('');
   const [validEmail, setValidEmail] = useState(false);
-  const [emailFocus, setEmailFocus] = useState(false);
 
   const [password, setPassword] = useState('');
   const [validPassword, setValidPassword] = useState(false);
-  const [passwordFocus, setPasswordFocus] = useState(false);
 
   const [errorMessage, setErrorMesssage] = useState('');
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    emailRef.current.focus();
-  }, []);
-
-  useEffect(() => {
     const result = EMAIL_REGEX.test(email)
-    console.log(result);
-    console.log(email);
     setValidEmail(result);
   }, [email]);
 
   useEffect(() => {
     const result = PASSWORD_REGEX.test(password)
-    console.log(result);
-    console.log(password);
     setValidPassword(result);
   }, [password]);
 
@@ -57,19 +45,40 @@ function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setSuccess(true)
+    try {
+      var config = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        }
+      const response = await axios.post(
+        LOGIN_URL,
+        { email, password },
+        config
+      );
+
+      // const response = await axios.post(LOGIN_URL,
+      //      { email : email , password : password}  , config
+      //   )
+      //   .then(function (response) {
+      //     console.log(response);
+      //   })
+      //   .catch(function (error) {
+      //     console.log(error);
+      //   });
+      // console.log(response.data);
+      console.log(JSON.stringify(response));
+      // setSuccess(true)
+    } catch (error) {
+      if (!error?.response) {
+        setErrorMesssage('No Server Response')
+      } else {
+        setErrorMesssage('Login Failed')
+      }
+    }
   };
 
-  useEffect( ()=> {
-    if(validated) {
-      fetch("/login")
-        .then(res => res.json()
-          .then(data => {
-            setLogin(data);
-          })
-        );
-    }
-  }, []);
 
   return (
     <>
@@ -83,24 +92,20 @@ function Login() {
       ) : (
       <section className="login-div" style={stylesheet}>
         <div className="login-width" style={{"maxWidth": "50%"}}>
-          <p ref={errorRef} className={errorMessage ? "error message": "offscreen"} aria-live="assertive">{errorMessage}</p>
+          <p className={errorMessage ? "error message": "offscreen"} aria-live="assertive">{errorMessage}</p>
           <h1>Login</h1>
           <Form noValidate validated={validated} onChange={handleValidation} onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="formGroupEmail">
             <Form.Label>Email address</Form.Label>
             <Form.Control
               type="email"
-              ref={emailRef}
               autoComplete="off"
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter email"
               required
-              aria-invalid={validEmail ? "false": "true"}
-              aria-describedby="uidnote"
-              onFocus={() => setEmailFocus(true)}
-              onBlur={() => setEmailFocus(false)}
+              autoFocus
             />
-            <Form.Text id="uidnote" className={emailFocus && email && !validEmail ? "instructions": "offscreen"} muted>
+            <Form.Text id="uidnote" className={email && !validEmail ? "instructions": "offscreen"} muted>
               Must not contain special characters or symbols.
             </Form.Text>
             <Form.Control.Feedback>Good!</Form.Control.Feedback>
@@ -113,12 +118,8 @@ function Login() {
               placeholder="Password"
               required
               minLength="8"
-              aria-invalid={validPassword ? "false": "true"}
-              aria-describedby="pwdnote"
-              onFocus={() => setPasswordFocus(true)}
-              onBlur={() => setPasswordFocus(false)}
             />
-            <Form.Text id="pwdnote"  className={passwordFocus && password && !validPassword ? "instructions": "offscreen"} muted>
+            <Form.Text id="pwdnote"  className={password && !validPassword ? "instructions": "offscreen"} muted>
               Your password must be at least 8 characters long, contain letters and numbers,
               and must not contain spaces, special characters(', ", &, |), or emoji.
             </Form.Text>

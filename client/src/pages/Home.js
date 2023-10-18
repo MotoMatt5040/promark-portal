@@ -14,7 +14,7 @@ function Home() {
                 console.log(data, currentData)
             }
         )
-    }, [])
+    }, )
 
     return (
       <main>
