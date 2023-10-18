@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from flask_session import Session
+from flask_cors import CORS
 
 from .config import ApplicationConfig
 from ..auth.models import db, User
@@ -8,6 +9,7 @@ from ..auth.models import db, User
 # from defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
@@ -74,11 +76,15 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    email = request.form['email']
-    password = request.form['password']
+    # if request.method == "OPTIONS":
+    #     # print(request.json)
+    #     return {'options': 'some stuff'}
+    print(request.json)
+    email = request.json['email']
+    password = request.json['password']
+
 
     user = User.query.filter_by(email=email).first()
-    print('here')
     if user is None:
         return jsonify({"error": "Unauthorized"}), 401
 
