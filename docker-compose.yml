@@ -1,8 +1,69 @@
-version: '3'
+version: '3.1'
 services:
+  nginx:
+    image: nginx:1.15-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - client
+    networks:
+      - my-network
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - my-network
+  redis:
+    image: redis:7-alpine
+    restart: always
+    environment:
+       SECRET_KEY: /run/secrets/redis-secret
+    ports:
+      - "6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass SECRET_KEY
+    networks:
+      - my-network
+    secrets:
+      - redis-secret
   client:
     build: ./client
     container_name: promark-portal-c
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - ./client:/app
+      - ./app/node_modules
+    networks:
+      - my-network
+  flask_server:
+    build: ./server
+    container_name: flask_server
+    restart: always
+    environment:
+       SECRET_KEY: /run/secrets/redis-secret
+    ports:
+      - "5000"
+    volumes:
+      - ./server:/code
+    networks:
+      - my-network
+    secrets:
+      - redis-secret
+
+networks:
+  my-network:
+
+secrets:
+  redis-secret:
+    file: ./redispass.txt  
