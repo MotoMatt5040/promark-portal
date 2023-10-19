@@ -2,7 +2,10 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://flask_server:5000/",
+  "options": {
+    "allowedHosts": ["localhost", ".localhost", "flask_server"],
+    "proxy": "https://flask_server:5000/"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
