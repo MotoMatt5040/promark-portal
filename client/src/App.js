@@ -2,34 +2,31 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
 import Home from './pages/Home';
 import SampleUpload from "./pages/texting-platform/SampleUpload";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import Login from "./pages/auth/Login";
-import { useState } from 'react';
+import DataProcessing from "./pages/data-processing/DataProcessing";
+import {BrowserRouter, Route, Routes } from "react-router-dom";
+// import Login from "./pages/auth/Login";
+// import { useState, useEffect } from 'react';
+// import UserInterface from './pages/auth/userInterface.ts';
+// import axios from './api/axios';
 
 function App() {
-  const [token, setToken] = useState();
-
-  if(!token) {
-    return <Login setToken={setToken} />;
-  }
-  console.log(token);
 
 
-return (
+  return (
 
-  <BrowserRouter>
-    <main>
+      <BrowserRouter>
+        <main>
+          <Header title="React Navbar Component"/>
+          <Routes>
+            <Route index element={<Home/>}/>
+            {/*<Route path="/home" element={<Home />} />*/}
+            {/*<Route path="texting_platform/sample_upload" element={<SampleUpload/>}/>*/}
+            <Route path="data_processing" element={<DataProcessing />}/>
+          </Routes>
+        </main>
+      </BrowserRouter>
 
-      <Header title="React Navbar Component"/>
-
-      <Routes>
-        <Route index element={<Home />} />
-        {/*<Route path="/home" element={<Home />} />*/}
-        <Route path="/texting_platform/sample_upload" element={<SampleUpload />} />
-      </Routes>
-    </main>
-  </BrowserRouter>
-)
+  )
 }
 
 //   const [currentNumber, newNumber] = useState();
