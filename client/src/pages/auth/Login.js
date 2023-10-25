@@ -49,7 +49,7 @@ function Login() {
       var config = {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': '*',
           }
         }
       const response = await axios.post(
@@ -57,6 +57,12 @@ function Login() {
         { email, password },
         config
       );
+
+      if (response.status === 200) {
+        // window.location.href="/home"
+        console.log('logged in successfully')
+      }
+
 
       // const response = await axios.post(LOGIN_URL,
       //      { email : email , password : password}  , config
@@ -73,6 +79,8 @@ function Login() {
     } catch (error) {
       if (!error?.response) {
         setErrorMesssage('No Server Response')
+      } else if (error.response.status === 401) {
+        setErrorMesssage('Invalid Credentials')
       } else {
         setErrorMesssage('Login Failed')
       }
