@@ -1,9 +1,10 @@
-import requests
 import json
-import os
 from configparser import ConfigParser
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
+import requests
 
 
 class AcuityData:
@@ -378,11 +379,10 @@ class AcuityData:
 
     def requestData(self, sid):
 
-        # __config_path = f'C:/Users/{os.getlogin()}/PycharmProjects/auto-data-processing/api/config.ini'
-        # __config_object = ConfigParser()
-        # __config_object.read(__config_path)
-        # __access_token = __config_object['ACCESS TOKEN']['access token']
-        __access_token = "TMQ6w4d+FjoxPCYfswxJ+t5p636Fi4tWpfjlHjN48M3FKC7Yprj0EtU5sQF2ezTqd1fXotqK+FY7HZ02TSZNdp5nAp7E2Ph4K/6TqAMSBcYGCf/kqvVFiA=="
+        __config_path = Path(r'config.ini')
+        __config_object = ConfigParser()
+        __config_object.read(__config_path)
+        __access_token = __config_object['ACCESS TOKEN']['access token']
 
         __questions_json_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{sid}?deployed=true"
         __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{sid}"
