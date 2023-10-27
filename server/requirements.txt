@@ -10,3 +10,4 @@ flask-session
 redis
 flask-cors
 Werkzeug~=2.3.7
+requests

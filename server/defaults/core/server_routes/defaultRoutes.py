@@ -12,7 +12,7 @@ from ..auth.models import db, User
 # from defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=['http://localhost:3001'])
+# CORS(app, supports_credentials=True, origins=['*'])
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
@@ -33,12 +33,6 @@ def index():
 def home():
     """App home page"""
     print("test")
-    return {"test Data": "1"}
-
-@app.route('/texting_platform/sample_upload', methods=['GET', 'POST'])
-def testthingy():
-    """App home page"""
-    print("IM WORKING")
     return {"test Data": "1"}
 
 @app.route("/@me", methods=['GET'])
