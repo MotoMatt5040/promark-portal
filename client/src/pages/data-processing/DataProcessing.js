@@ -136,13 +136,13 @@ function SampleUpload() {
                   It is important that this file is named <b>order.csv</b> exactly as specified. <br/>
                   The project directory should have the following format. <br/>
                   &ensp; <b>&lt;project id&gt;</b> <br/>
-                  &emsp;&emsp;&emsp;.<br/>
+                  &emsp;&emsp;&emsp;|<br/>
                   &emsp;&emsp;&emsp; <b>[DATAPROC]</b> <br/>
-                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;.<br/>
+                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|<br/>
                   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<b>[DATABASE]</b><br/>
                   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;. . .<br/>
                   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<b>[UNCLE]</b><br/>
-                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;.<br/>
+                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|<br/>
                   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<b>[OUTPUT]</b><br/>
                 </p>
               </Accordion.Body>
