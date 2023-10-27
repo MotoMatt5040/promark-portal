@@ -2,5 +2,5 @@ import axios from 'axios';
 
 export default axios.create({
   withCredentials: true,
-  baseURL: 'https://flask_server:5000/'
+  baseURL: process.env.REACT_APP_API_URL
 })
