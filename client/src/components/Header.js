@@ -12,7 +12,7 @@ const Header = (props) => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="https://https://dashapp.promarkresearch.com/">Dashboard</Nav.Link>
+            <Nav.Link href="https://dashapp.promarkresearch.com/">Dashboard</Nav.Link>
             <Nav.Link href="production_report">Production Report</Nav.Link>
             <Nav.Link href="data_processing">Data Processing</Nav.Link>
             {/*<NavDropdown title="Texting Platform" id="basic-nav-dropdown">*/}
