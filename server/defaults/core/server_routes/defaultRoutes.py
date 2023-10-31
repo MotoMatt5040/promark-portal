@@ -12,7 +12,7 @@ from ..auth.models import db, User
 # from defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
-# CORS(app, supports_credentials=True, origins=['*'])
+CORS(app, supports_credentials=True, origins=['*'])
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
@@ -29,14 +29,18 @@ db.init_app(app)
 def index():
     return {"Working": "Code"}
 
+
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     """App home page"""
     print("test")
     return {"test Data": "1"}
 
+
 @app.route("/@me", methods=['GET'])
 def get_current_user():
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
     user_id = session.get("user_id")
     print('\n')
     print(session)
@@ -81,6 +85,9 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
+
     email = request.json['email']
     password = request.json['password']
 
@@ -116,5 +123,13 @@ def data_processing():
     return Path(rf"{origin_path}\UNCLE\{project_id} tables"), \
         Path(f"{origin_path}{database_path} layout.xlsx"), \
         Path(f"{origin_path}{database_path} xfile.xlsx")
+
+
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
 
 
