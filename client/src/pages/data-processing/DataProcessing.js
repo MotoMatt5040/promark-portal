@@ -230,18 +230,7 @@ function DataProcessing() {
                   <Accordion.Body>
                     <Accordion>
                       <Accordion.Item  eventKey="7-1-1">
-                        <Accordion.Header>Create Uncle file&nbsp;<b>(Recommended)</b></Accordion.Header>
-                        <Accordion.Body>
-                          <p>
-                            Press <b>Windows Key</b> and type Uncle<br/>
-                            Press <b>Enter</b><br/>
-                            Browse to the project folder and save the uncle file as the project number.<br/>
-
-                          </p>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item  eventKey="7-1-2">
-                        <Accordion.Header>Copy Uncle file&nbsp;<b>(Not Recommended)</b></Accordion.Header>
+                        <Accordion.Header>Copy Uncle file:&nbsp;<i>Recommended for projects with standardized tables and processes (core/os, double weights)</i></Accordion.Header>
                         <Accordion.Body>
                           <p>
                             Navigate to an earlier project and copy the <b>.j</b> and <b>.t</b> files.<br />
@@ -249,7 +238,16 @@ function DataProcessing() {
                           </p>
                         </Accordion.Body>
                       </Accordion.Item>
-
+                      <Accordion.Item  eventKey="7-1-2">
+                        <Accordion.Header>Create Uncle file:&nbsp;<i>Recommended for simple projects</i></Accordion.Header>
+                        <Accordion.Body>
+                          <p>
+                            Press <b>Windows Key</b> and type Uncle<br/>
+                            Press <b>Enter</b><br/>
+                            Browse to the project folder and save the uncle file as the project number.<br/>
+                          </p>
+                        </Accordion.Body>
+                      </Accordion.Item>
                     </Accordion>
                   </Accordion.Body>
                 </Accordion.Item>

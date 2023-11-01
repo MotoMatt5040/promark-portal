@@ -1,13 +1,13 @@
 export default function TableBody() {
   return (
 
-    <p>
+    <pre>
       *
       <br/>TABLE 900
       <br/>T / / BANNER 0
       <br/>O FORMAT 25 6 1 0 ZC'-' ZPC'-' PCTS PDP0 HB1
       <br/>C &CE TOTAL  ;ALL
-      <br/>F &CP <b>&lt; C O M P A N Y&emsp;L O G O &gt;</b>
+      <br/>F &CP <b>&lt; C O M P A N Y  L O G O &gt;</b>
       <br/>*
       <br/>TABLE 992
       <br/>T RUN STREAM FOR CHECKING STUBS
@@ -112,22 +112,22 @@ export default function TableBody() {
       <br/>R &AI2 HISPANIC                     ;<b>&lt;COL&gt;</b>-2
       <br/>R &AI2 BALANCE                      ;73N1:2 ;SZR
       <br/>R &UT- DMA                          ;NONE   ;NOVP NOHP NOFREQ PAGINATE 9
-      <br/>R &AI2 AMARILLO                     ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 FT SMITH-/FAYETTEVILLE       ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 JOPLIN-PITTSBURG             ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 OKLAHOMA CITY                ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 SHERMAN-ADA                  ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 SHREVEPORT                   ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 TULSA                        ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 WICHITA FALLS-LAWTON         ;<b>;COL></b>
-      <br/>R &UT- COUNTY &gt; 10                  ;NONE   ;NOVP NOHP NOFREQ PAGINATE 8
-      <br/>R &AI2 OKLAHOMA                     ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 TULSA                        ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 CLEVELAND                    ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 CANADIAN                     ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 COMANCHE                     ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 ROGERS                       ;<b>&lt;COL&gt;</b>
-      <br/>R &AI2 COUNTY &lt; 10                  ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 1                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 2                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 3                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 4                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 5                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 6                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 7                        ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 DMA 8                        ;<b>&lt;COL&gt;</b>
+      <br/>R &UT- COUNTY                       ;NONE   ;NOVP NOHP NOFREQ PAGINATE 8
+      <br/>R &AI2 COUNTY 1                     ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 COUNTY 2                     ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 COUNTY 3                     ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 COUNTY 4                     ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 COUNTY 5                     ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 COUNTY 6                     ;<b>&lt;COL&gt;</b>
+      <br/>R &AI2 COUNTY 7                     ;<b>&lt;COL&gt;</b>
       <br/>R &UT- PARTY                        ;NONE   ;NOVP NOHP NOFREQ PAGINATE 5
       <br/>R &AI2 GOP                          ;<b>&lt;COL&gt;</b>-1:2
       <br/>R &AI2 IND                          ;<b>&lt;COL&gt;</b>-3:5
@@ -141,7 +141,7 @@ export default function TableBody() {
       <br/>R &AI2 POST GRAD                    ;<b>&lt;COL&gt;</b>-5
       <br/>R &AI2 DON'T KNOW                   ;<b>&lt;COL&gt;</b>-6   ;SZR
       <br/>R &AI2 REFUSED                      ;<b>&lt;COL&gt;</b>-7   ;SZR
-      <br/> *
+      <br/>*
       <br/>TABLE 9205
       <br/>X RUN <b>&lt;FIRST&gt;</b> TH <b>&lt;LAST&gt;</b> B 9001 EXCEL (FILE'<b>&lt;PROJECT ID&gt;</b>TABS' SHEET 'ALL' REPLACE TN 'Table: &t-&q' COMBINE TC NOMERGE NMRT) TCONE
       <br/>*
@@ -156,6 +156,6 @@ export default function TableBody() {
       <br/>C &CE CONS       ;<b>&lt;COL&gt;</b>-1:2  ;NOFREQ
       <br/>C &CE MOD        ;<b>&lt;COL&gt;</b>-3    ;NOFREQ
       <br/>C &CE LIB        ;<b>&lt;COL&gt;</b>-4:5  ;NOFREQ
-    </p>
+    </pre>
   )
 }
