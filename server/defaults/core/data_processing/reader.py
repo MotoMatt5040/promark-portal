@@ -29,6 +29,7 @@ class Reader:
         self.project_id = project_id
 
     def setUrl(self, survey_id: str):
+        print("INCOMING DATA")
         self.api.requestData(survey_id)
         self.run()
 
@@ -111,7 +112,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         builder = pd.read_excel('builder.xlsx')
         # layout = pd.read_excel('DATABASE/layout.xlsx')
         order = builder.dropna()
-        with open(rf'i:\PROJ\{self.project_id}\UNCLE\{self.project_id} tables.txt', 'w') as f:
+        with open(rf'{self.project_id} tables.txt', 'w') as f:
             for qname in order['Field']:
                 print(qname)
                 try:
