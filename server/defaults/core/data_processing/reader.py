@@ -30,7 +30,7 @@ class Reader:
 
     def setUrl(self, survey_id: str):
         print("INCOMING DATA")
-        self.api.requestData(survey_id)
+        self.api.request_data(survey_id)
         self.run()
 
     def run(self):

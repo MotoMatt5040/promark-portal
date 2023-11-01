@@ -211,35 +211,45 @@ class AcuityData:
 
     def __init__(self):
         self.__variables = None
-        self.__questions_json = None
+        self.__questions = None
+        self.__extraction_task = None
+        self.__extraction_id = None
+        self.__extraction_file_id = None
 
-    def requestData(self, sid):
+    def request_data(self, sid):
 
         __config_path = Path(r'defaults\core\data_processing\api\config.ini')
         __config_object = ConfigParser()
         __config_object.read(__config_path)
         __access_token = __config_object['ACCESS TOKEN']['access token']
 
-        __questions_json_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{sid}?deployed=true"
+        __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{sid}?deployed=true"
         __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{sid}"
+        __extraction_task_url = f"https://prcmmweb.promarkresearch.com/api/results/extract?surveyId={sid}"
+
         # print(__questions_json_url, "\n", __variables_url)
         print(requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}))
 
         __variables_req = json.dumps(
             requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
-        __questions_json_req = json.dumps(
-            requests.get(__questions_json_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
+        __questions_req = json.dumps(
+            requests.get(__questions_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
+        __extraction_req = json.dumps(
+            requests.get(__extraction_task_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
 
         self.__variables = json.loads(__variables_req)
-        self.__questions_json = json.loads(__questions_json_req)
+        self.__questions = json.loads(__questions_req)
+        self.__extraction_task = json.loads(__extraction_req)
 
-        # print(json.dumps(self.__variables, indent=4))
-        # print(json.dumps(self.__questions_json, indent=4))
+        for items in self.__extraction_task['Extractions']:
+            # print(json.dumps(items, indent=4))
+            if items["Name"] == "order":
+                self.__extraction_id = items["ExtractionId"]
 
-        for items in self.__questions_json:
-            print(items, self.__questions_json[items])
-
-        print("\n")
+        __extraction_res_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/{self.__extraction_id}"
+        __extraction_file_id_req = json.dumps(
+            requests.get(__extraction_res_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
+        self.__extraction_file_id = json.loads(__extraction_file_id_req)["FileId"]
 
     def blocks(self):
         __blocks = []
