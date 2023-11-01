@@ -115,20 +115,16 @@ def data_processing():
     # if request.method == "OPTIONS":  # CORS preflight
     response = _build_cors_preflight_response()
     # response.headers.add("Content-Disposition", "attachment;filename=file.txt")
-    print(request.json)
+
     survey_id = request.json['surveyID']
     project_id = request.json['projectID']
-    print(survey_id, project_id)
 
     reader = Reader(project_id)
     reader.setUrl(survey_id)
     reader.run()
 
-
-
     # origin_path = Path(rf"i:\PROJ\{project_id}")
     # database_path = Path(rf"\DATABASE\{project_id}")
-
 
     return response
     # return Path(rf"{origin_path}\UNCLE\{project_id} tables"), \

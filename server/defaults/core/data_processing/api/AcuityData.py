@@ -2,10 +2,12 @@ import json
 from configparser import ConfigParser
 from pathlib import Path
 import os
+import csv
 
 import numpy as np
 import pandas as pd
 import requests
+from chardet.universaldetector import UniversalDetector
 
 
 class AcuityData:
@@ -217,7 +219,6 @@ class AcuityData:
         self.__extraction_file_id = None
 
     def request_data(self, sid):
-
         __config_path = Path(r'defaults\core\data_processing\api\config.ini')
         __config_object = ConfigParser()
         __config_object.read(__config_path)
@@ -226,9 +227,6 @@ class AcuityData:
         __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{sid}?deployed=true"
         __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{sid}"
         __extraction_task_url = f"https://prcmmweb.promarkresearch.com/api/results/extract?surveyId={sid}"
-
-        # print(__questions_json_url, "\n", __variables_url)
-        print(requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}))
 
         __variables_req = json.dumps(
             requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
@@ -250,6 +248,21 @@ class AcuityData:
         __extraction_file_id_req = json.dumps(
             requests.get(__extraction_res_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
         self.__extraction_file_id = json.loads(__extraction_file_id_req)["FileId"]
+
+        __order_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/file" \
+                      f"?extractionId={self.__extraction_id}&fileId={self.__extraction_file_id}"
+
+        __order_req = requests.get(__order_url, headers={"Authorization": f"Client {__access_token}"})
+
+        # stuff = __order_req.content.decode("ISO-8859-16")
+        # print(stuff)
+
+        decoded = __order_req.content.decode("ISO-8859-16")
+        cr = csv.reader(decoded.splitlines())
+
+        my_data = list(cr)
+        for row in my_data:
+            print(row)
 
     def blocks(self):
         __blocks = []
@@ -376,7 +389,7 @@ class AcuityData:
     def fills_skips(self):
         __fills = {}
         __skip = {}
-        for __block in self.__questions_json['blocks']:
+        for __block in self.__questions['blocks']:
             for __item in __block['questions']:
                 try:
                     __item['name'] = __item['name'].replace("II", "")
@@ -541,4 +554,3 @@ class AcuityData:
         xfile.to_excel('DATABASE/xfile.xlsx', index=False)
         layout.to_excel('DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
-

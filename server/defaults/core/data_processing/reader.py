@@ -29,7 +29,6 @@ class Reader:
         self.project_id = project_id
 
     def setUrl(self, survey_id: str):
-        print("INCOMING DATA")
         self.api.request_data(survey_id)
         self.run()
 
