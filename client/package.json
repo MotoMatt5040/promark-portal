@@ -4,7 +4,7 @@
   "private": true,
   "options": {
     "allowedHosts": ["localhost", ".localhost", "flask_server"],
-    "proxy": "https://flask_server:5000/"
+    "proxy": "http://localhost:5000/"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
