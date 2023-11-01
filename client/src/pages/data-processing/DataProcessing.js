@@ -7,6 +7,7 @@ import surveyDropdown from "./assets/survey_dropdown.PNG";
 import surveyIdImage from './assets/survey_id.png';
 import jt from './assets/j-t.png';
 import TableBody from './tableBody.js'
+import projTitle from "./assets/project-title-caseid.png"
 
 import AccordionItem from "react-bootstrap/AccordionItem";
 
@@ -222,29 +223,53 @@ function DataProcessing() {
           <Accordion.Item eventKey="7">
             <Accordion.Header>Step 8: Uncle setup</Accordion.Header>
             <Accordion.Body>
-              <p><i>Note: There are 2 ways to do this.</i></p>
+              <p><i>Note: There are 2 ways to do this. Copying the project from an older file and editing the data, or creating a new file from scratch.</i></p>
               <Accordion>
-                <Accordion.Item  eventKey="7-1">
-                  <Accordion.Header>Copy Uncle file&nbsp;<b>(Recommended)</b></Accordion.Header>
+                <Accordion.Item eventKey="7-1">
+                  <Accordion.Header>Step 1: Copy/Create</Accordion.Header>
                   <Accordion.Body>
-                    <p>
-                      Navigate to an earlier project and copy the <b>.j</b> and <b>.t</b> files.<br />
-                      <img src={jt} alt="jt" />
-                    </p>
+                    <Accordion>
+                      <Accordion.Item  eventKey="7-1-1">
+                        <Accordion.Header>Create Uncle file&nbsp;<b>(Recommended)</b></Accordion.Header>
+                        <Accordion.Body>
+                          <p>
+                            Press <b>Windows Key</b> and type Uncle<br/>
+                            Press <b>Enter</b><br/>
+                            Browse to the project folder and save the uncle file as the project number.<br/>
+
+                          </p>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item  eventKey="7-1-2">
+                        <Accordion.Header>Copy Uncle file&nbsp;<b>(Not Recommended)</b></Accordion.Header>
+                        <Accordion.Body>
+                          <p>
+                            Navigate to an earlier project and copy the <b>.j</b> and <b>.t</b> files.<br />
+                            <img src={jt} alt="jt" /><br/>
+                          </p>
+                        </Accordion.Body>
+                      </Accordion.Item>
+
+                    </Accordion>
                   </Accordion.Body>
                 </Accordion.Item>
-                <Accordion.Item  eventKey="7-2">
-                  <Accordion.Header>Create Uncle file&nbsp;<b>(Not Recommended)</b></Accordion.Header>
-                  <Accordion.Body>
-                    <p>
-                      Press <b>Windows Key</b> and type Uncle<br/>
-                      Press <b>Enter</b><br/>
-                      Browse to the project folder and save the uncle file as the project number.<br/>
-                    </p>
-                  </Accordion.Body>
-                </Accordion.Item>
+                  <Accordion.Item eventKey="7-2">
+                    <Accordion.Header>Step 2: Adjust&nbsp;<b>Title</b>&nbsp;and&nbsp;<b>CaseID Position</b></Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        Open the uncle file (<b>.j</b>)<br/>
+                        Click <b>[Project]</b> in the middle section of the ribbon.<br/>
+                        Edit the title text do the respective project name and date. <br/>
+                        <b>Title:</b> &CP <b>&lt;SURVEY NAME&gt;</b> // <b>&lt;MMM&gt;</b>. <b>&lt;DD&gt;</b> - <b>&lt;DD&gt;</b>, <b>&lt;YYYY&gt;</b> &RJ PAGE &PS<br/>
+                        <b>Case ID Position</b><br/>
+                        &ensp;<b>First:</b> 1<br/>
+                        &ensp;<b>Last</b> 10<br/>
+                        <img src={projTitle} alt="Project/Title" /><br/>
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
                 <Accordion.Item  eventKey="7-3">
-                  <Accordion.Header>Copy main tables</Accordion.Header>
+                  <Accordion.Header>Format of default tables</Accordion.Header>
                   <Accordion.Body>
                    <TableBody />
                   </Accordion.Body>
