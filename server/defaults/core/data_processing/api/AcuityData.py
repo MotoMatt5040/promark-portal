@@ -1,6 +1,7 @@
 import json
 from configparser import ConfigParser
 from pathlib import Path
+import os
 
 import numpy as np
 import pandas as pd
@@ -120,170 +121,6 @@ class AcuityData:
         "STRONGLY CREATED": {'DETERMINED BY PEOPLE': [1, 2], 'CREATED IN CONSTITUTION': [3, 4]},
     }
 
-    __REMOVE = [
-        # 'ACTAG',
-        '1PARTYP2',
-        'AID',
-        'ANIMAL',
-        'ARTS',
-        'BATCH',
-        'BCK',
-        'BDATE',
-        'CALLID',
-        'CALLID2',
-        'CB',
-        'CDESC',
-        'CELL',
-        # 'CFIPS',
-        'CFLN',
-        'CHARITY',
-        'CHILD',
-        'CHK',
-        'CLUST',
-        'CONSERVATIVE',
-        'CREL',
-        'CVID',
-        'D1',
-        'D1_1',
-        'D3P1',
-        'D3P2',
-        'D3P3',
-        'D8_1',
-        'D8_2',
-        'D8_3',
-        'D9X',
-        'DEL',
-        'DEMOS',
-        'DISCL',
-        'DISCX',
-        'DMASHOW',
-        'DONT',
-        'DUM01',
-        'DUM02',
-        'DUM03',
-        'DUM04',
-        'EMAIL',
-        'ENV',
-        'ESCAN',
-        'ETHNIC',
-        'FNAME',
-        'GEND',
-        'GOP1OS',
-        'HEALTH',
-        'IN44',
-        'INCENT',
-        'INCENTO',
-        'INGEN',
-        'INT',
-        'INT02',
-        'INT03',
-        'INT12',
-        'INT20',
-        'INT21',
-        'INT40',
-        'INT41',
-        'INT42',
-        'INT43',
-        'INT45',
-        'INT99',
-        'INTRO',
-        'INTRO2',
-        'INTRO3',
-        'INTRO4',
-        'LAND',
-        'LIBERAL',
-        'LNAME',
-        'LOCAL',
-        'LREL',
-        'LVID',
-        'MNAME',
-        'NAME',
-        # 'OFLAG',
-        'OTYPE',
-        'PARTY',
-        'PARTYSHOW',
-        'PHONE',
-        'PID',
-        'PIN',
-        'PRACE',
-        'PREL',
-        'PREL12',
-        'PRTY',
-        'PSID',
-        'Q17II',
-        'Q17R',
-        'Q18R',
-        'Q19_1',
-        'Q19_2',
-        'Q19OE',
-        'Q1DUM',
-        'Q1II',
-        # 'Q1OS',
-        'Q20CODE',
-        'Q22II',
-        'Q27FX',
-        'Q27III',
-        'Q6INTRO',
-        'Q9FX',
-        'Q9III',
-        'QA',
-        'QAGE_1',
-        'QAGESH',
-        'QB',
-        'QPARTYP1',
-        'QUAL',
-        'QUAL01',
-        'QUAL02',
-        'QUAL03',
-        'QUAL13',
-        'QUAL19',
-        'QUAL2',
-        'QUAL8',
-        'QUALB',
-        'QUALP',
-        'STR8Q19',
-        'STR8Q5',
-        'QX',
-        'QYOE',
-        'RDATE',
-        'RID2',
-        'ROTAT',
-        'RSHOW',
-        'SENT',
-        'SEQ',
-        'SHOW',
-        'SPEEDER',
-        'STR8',
-        'STUDY',
-        'SUFFIX',
-        'SURLEN',
-        'SVID',
-        'T1',
-        'T2',
-        'T3',
-        'T4',
-        'T6',
-        'TARGETCOMM',
-        'TARGETSH',
-        'TFLAG',
-        'THANK',
-        'THNKD',
-        'TIMER_CLICKCOUNT',
-        'TIMER_FIRSTCLICK',
-        'TIMER_LASTCLICK',
-        'TIMER_TOTALTIME',
-        'TZONE',
-        'VACTIVE',
-        'VAGE',
-        'VEND',
-        'VETERAN',
-        'VGEND',
-        'VTYPE',
-        'WILDLIFE',
-        'WKDAY',
-
-    ]
-
     __SKIP_TABLE = [
         'GEN22',
         'GEN20',
@@ -378,7 +215,7 @@ class AcuityData:
 
     def requestData(self, sid):
 
-        __config_path = Path(r'config.ini')
+        __config_path = Path(r'defaults\core\data_processing\api\config.ini')
         __config_object = ConfigParser()
         __config_object.read(__config_path)
         __access_token = __config_object['ACCESS TOKEN']['access token']
@@ -386,6 +223,7 @@ class AcuityData:
         __questions_json_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{sid}?deployed=true"
         __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{sid}"
         # print(__questions_json_url, "\n", __variables_url)
+        print(requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}))
 
         __variables_req = json.dumps(
             requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
@@ -395,8 +233,8 @@ class AcuityData:
         self.__variables = json.loads(__variables_req)
         self.__questions_json = json.loads(__questions_json_req)
 
-        print(json.dumps(self.__variables, indent=4))
-        print(json.dumps(self.__questions_json, indent=4))
+        # print(json.dumps(self.__variables, indent=4))
+        # print(json.dumps(self.__questions_json, indent=4))
 
         for items in self.__questions_json:
             print(items, self.__questions_json[items])
@@ -547,7 +385,7 @@ class AcuityData:
         for __key in list(__data):
             if __key[-2:] == 'F1' or __key[-2:] == 'F2' or 'SKP' in __key:
                 del __data[__key]
-            if __key in self.__REMOVE:
+            if __key not in __data:
                 del __data[__key]
 
         for __qname in __data:
