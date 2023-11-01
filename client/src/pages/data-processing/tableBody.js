@@ -96,21 +96,21 @@ export default function TableBody() {
       <br/>TABLE 1000
       <br/>T *** FOR CHECKING WEIGHTING
       <br/>R BASE==TOTAL SAMPLE                ;ALL    ;HP NOVP
-      <br/>R &UT- GENDER                       ;NONE   ;NOVP NOHP NOFREQ
+      <br/>R &UT- GENDER                       ;NONE   ;NOVP NOHP NOFREQ PAGINATE 4
       <br/>R &AI2 MEN                          ;<b>&lt;COL&gt;</b>-1
       <br/>R &AI2 WOMEN                        ;<b>&lt;COL&gt;</b>-2
       <br/>R &AI2 NON-BINARY                   ;<b>&lt;COL&gt;</b>-3   ;SZR
-      <br/>R &UT- AGE                          ;NONE   ;NOVP NOHP NOFREQ
+      <br/>R &UT- AGE                          ;NONE   ;NOVP NOHP NOFREQ PAGINATE 7
       <br/>R &AI2 18-34                        ;<b>&lt;COL&gt;</b>-1:2
       <br/>R &AI2 35-44                        ;<b>&lt;COL&gt;</b>-3
       <br/>R &AI2 45-54                        ;<b>&lt;COL&gt;</b>-4
       <br/>R &AI2 55-64                        ;<b>&lt;COL&gt;</b>-5
       <br/>R &AI2 65+                          ;<b>&lt;COL&gt;</b>-6
       <br/>R &AI2 REFUSED                      ;<b>&lt;COL&gt;</b>-7   ;SZR
-      <br/>R &UT- RACE                         ;NONE   ;NOVP NOHP NOFREQ
+      <br/>R &UT- RACE                         ;NONE   ;NOVP NOHP NOFREQ PAGINATE 4
       <br/>R &AI2 WHITE                        ;<b>&lt;COL&gt;</b>-1
       <br/>R &AI2 HISPANIC                     ;<b>&lt;COL&gt;</b>-2
-      <br/>R &AI2 BALANCE                      ;73N1:2 ;SZR
+      <br/>R &AI2 BALANCE                      ;<b>&lt;COL&gt;</b>N1:2 ;SZR
       <br/>R &UT- DMA                          ;NONE   ;NOVP NOHP NOFREQ PAGINATE 9
       <br/>R &AI2 DMA 1                        ;<b>&lt;COL&gt;</b>
       <br/>R &AI2 DMA 2                        ;<b>&lt;COL&gt;</b>
