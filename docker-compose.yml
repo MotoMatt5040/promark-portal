@@ -53,7 +53,7 @@ services:
     environment:
        SECRET_KEY: /run/secrets/redis-secret
     ports:
-      - "5000"
+      - "5000:5000"
     volumes:
       - ./server:/code
     networks:
