@@ -1,13 +1,13 @@
 import json
 from configparser import ConfigParser
 from pathlib import Path
-import os
-import csv
 
 import numpy as np
 import pandas as pd
 import requests
-from chardet.universaldetector import UniversalDetector
+import os
+import time
+from sys import platform
 
 
 class AcuityData:
@@ -219,7 +219,15 @@ class AcuityData:
         self.__extraction_file_id = None
 
     def request_data(self, sid):
-        __config_path = Path(r'defaults\core\data_processing\api\config.ini')
+        print("\n")
+        print(os.getcwd())
+        time.sleep(3)
+
+        if platform == "linux" or platform == "linux2":
+            __config_path = Path(r'./config.ini')
+        else:
+
+            __config_path = Path(r'defaults\core\data_processing\api\config.ini')
         __config_object = ConfigParser()
         __config_object.read(__config_path)
         __access_token = __config_object['ACCESS TOKEN']['access token']
@@ -257,12 +265,23 @@ class AcuityData:
         # stuff = __order_req.content.decode("ISO-8859-16")
         # print(stuff)
 
-        decoded = __order_req.content.decode("ISO-8859-16")
-        cr = csv.reader(decoded.splitlines())
+        # decoded = __order_req.content.decode("Windows-1252")
+        # cr = csv.reader(decoded.splitlines())
+        #
+        # my_data = list(cr)
+        # for row in my_data:
+        #     print(row)
 
-        my_data = list(cr)
-        for row in my_data:
-            print(row)
+        self.question_names()
+
+    def question_names(self):
+        __name = []
+        for item in self.__variables:
+            __name.append(item["Name"])
+        #     print(item["Name"])
+        #
+        # print(__name)
+        return __name
 
     def blocks(self):
         __blocks = []
