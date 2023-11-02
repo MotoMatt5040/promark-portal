@@ -1,13 +1,11 @@
 from flask import Flask, request, jsonify, session, make_response
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS, cross_origin
 from flask_session import Session
-from flask_cors import CORS
-from ..data_processing.reader import Reader
-# from flask-redis import Redis
-from pathlib import Path
 
 from .config import ApplicationConfig
 from ..auth.models import db, User
+from ..data_processing.reader import Reader
 
 # from defaults.utils.database.datapuller import DataPuller
 
@@ -121,7 +119,8 @@ def data_processing():
 
     reader = Reader(project_id)
     reader.setUrl(survey_id)
-    reader.run()
+
+    # reader.run()
 
     # origin_path = Path(rf"i:\PROJ\{project_id}")
     # database_path = Path(rf"\DATABASE\{project_id}")
@@ -130,6 +129,23 @@ def data_processing():
     # return Path(rf"{origin_path}\UNCLE\{project_id} tables"), \
     #     Path(f"{origin_path}{database_path} layout.xlsx"), \
     #     Path(f"{origin_path}{database_path} xfile.xlsx")
+
+
+@app.route('/data_processing/questions', methods=['POST', 'GET'])
+@cross_origin()
+def data_processing_questions():
+    response = _build_cors_preflight_response()
+    survey_id = request.json['surveyID']
+    project_id = request.json['projectID']
+
+    reader = Reader(project_id)
+    reader.setUrl(survey_id)
+
+    questions = jsonify(reader.get_questions())
+
+    print(questions.json)
+
+    return questions
 
 
 def _build_cors_preflight_response():
