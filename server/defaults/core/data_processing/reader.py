@@ -30,7 +30,10 @@ class Reader:
 
     def setUrl(self, survey_id: str):
         self.api.request_data(survey_id)
-        self.run()
+        # self.run()
+
+    def get_questions(self):
+        return self.api.question_names()
 
     def run(self):
         data = self.api.data()
