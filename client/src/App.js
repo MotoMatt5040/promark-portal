@@ -11,19 +11,19 @@ import DataProcessing from "./pages/data-processing/DataProcessing";
 
 function App() {
   // const [session , setSession] = useState();
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await axios.get("/@me");
-        setUser(response.data);
-      } catch (error) {
-        console.log("Not Authenticated");
-        console.log(error);
-      }
-    })();
-  }, [setUser]);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const response = await axios.get("/@me");
+  //       setUser(response.data);
+  //     } catch (error) {
+  //       console.log("Not Authenticated");
+  //       console.log(error);
+  //     }
+  //   })();
+  // }, [setUser]);
 
   // if(!session) {
   //   return <Login setSession={setSession} />;
@@ -32,6 +32,7 @@ function App() {
 
 
   return (
+
     <BrowserRouter>
       <main>
         <Header title="React Navbar Component"/>
