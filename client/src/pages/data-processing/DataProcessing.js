@@ -23,28 +23,25 @@ function DataProcessing() {
    const [errorMessage, setErrorMesssage] = useState('');
    const [questions, setQuestions] = useState([]);
 
-   const [checkedTable, setCheckedTable] = useState(new Map());
-   const [checkedSkip, setCheckedSkip] = useState(new Map());
+   const [checkedTable, setCheckedTable] = useState(true);
+   const [checkedSkip, setCheckedSkip] = useState(false);
 
    const [show, setShow] = useState(false);
    const handleClose = () => setShow(false);
 
    const handleChangeTable = (e) => {
-     console.log(e.target.checked);
-     setCheckedSkip(e.target.checked);
-     // setCheckedTable(checkedTable => checkedTable.set(e.target.id, !e.target.checked));
-     // if (checkedSkip) {
-     //   setCheckedSkip(checkedSkip => checkedSkip.set(e.target.id, !e.target.checked))
-     // }
+     console.log(e.target)
+     setCheckedTable(!checkedTable);
+     if (checkedSkip) {
+       setCheckedSkip(!checkedSkip)
+     }
    }
 
    const handleChangeSkip = (e) => {
-     console.log(e.target.checked);
-     setCheckedTable(!e.target.checked);
-     // setCheckedSkip(checkedSkip => checkedSkip.set(e.target.id, !e.target.checked));
-     // if (checkedTable) {
-     //   setCheckedTable(checkedTable => checkedTable.set(e.target.id, !e.target.checked))
-     // }
+     setCheckedSkip(!checkedSkip);
+     if (checkedTable) {
+       setCheckedTable(!checkedTable)
+     }
    }
 
   const handleShow = async (event) => {
@@ -219,7 +216,6 @@ function DataProcessing() {
                   ))
               )}
             </tbody>
-
           </Table>
 
         </Offcanvas.Body>
