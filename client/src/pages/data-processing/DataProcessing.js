@@ -9,16 +9,79 @@ import jt from './assets/j-t.png';
 import TableBody from './tableBody.js'
 import projTitle from "./assets/project-title-caseid.png"
 
-import AccordionItem from "react-bootstrap/AccordionItem";
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import Table from 'react-bootstrap/Table';
 
 
 const DATA_PROCESSING_URL = '/data_processing';
+const QUESTIONS_URL = '/questions'
 function DataProcessing() {
 
    const [validated, setValidated] = useState(false);
    const [surveyID, setSurveyID] = useState(false);
    const [projectID, setProjectID] = useState(false);
    const [errorMessage, setErrorMesssage] = useState('');
+   const [questions, setQuestions] = useState([]);
+
+   const [checkedTable, setCheckedTable] = useState(new Map());
+   const [checkedSkip, setCheckedSkip] = useState(new Map());
+
+   const [show, setShow] = useState(false);
+   const handleClose = () => setShow(false);
+
+   const handleChangeTable = (e) => {
+     console.log(e.target.checked);
+     setCheckedSkip(e.target.checked);
+     // setCheckedTable(checkedTable => checkedTable.set(e.target.id, !e.target.checked));
+     // if (checkedSkip) {
+     //   setCheckedSkip(checkedSkip => checkedSkip.set(e.target.id, !e.target.checked))
+     // }
+   }
+
+   const handleChangeSkip = (e) => {
+     console.log(e.target.checked);
+     setCheckedTable(!e.target.checked);
+     // setCheckedSkip(checkedSkip => checkedSkip.set(e.target.id, !e.target.checked));
+     // if (checkedTable) {
+     //   setCheckedTable(checkedTable => checkedTable.set(e.target.id, !e.target.checked))
+     // }
+   }
+
+  const handleShow = async (event) => {
+    event.preventDefault();
+    try {
+      var config = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          }
+        }
+      const response = await axios.post(
+        DATA_PROCESSING_URL + QUESTIONS_URL,
+        { surveyID, projectID },
+        config
+      );
+
+      if (response.status === 200) {
+        window.location.href="#"
+        console.log('Request sent for data processing')
+      }
+        // console.log(JSON.stringify(response));
+        setQuestions(JSON.parse(JSON.stringify(response.data)));
+        // console.log(questions.map)
+      // setSuccess(true)
+    } catch (error) {
+      if (!error?.response) {
+        setErrorMesssage('No Server Response')
+      } else if (error.response.status === 401) {
+        setErrorMesssage('Invalid Credentials')
+      } else {
+        setErrorMesssage('Login Failed')
+      }
+    }
+    setShow(true)
+  };
+
 
    const handleValidation = (event) => {
     const form = event.currentTarget;
@@ -29,13 +92,13 @@ function DataProcessing() {
     setValidated(true);
   };
 
-  const handleSubmit = async (event) => {
+  const handleRun = async (event) => {
     event.preventDefault();
     try {
       var config = {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            // 'Access-Control-Allow-Origin': '*',
           }
         }
       const response = await axios.post(
@@ -69,42 +132,98 @@ function DataProcessing() {
               noValidate
               validated={validated}
               onChange={handleValidation}
-              onSubmit={handleSubmit}
+              onSubmit={handleRun}
               style={formStyle}>
-              <Form.Group className="mb-3" controlId="formGroupSruveryId">
-                <Form.Label>Survey ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  autoComplete="off"
-                  onChange={(e) => setSurveyID(e.target.value)}
-                  placeholder="Survey ID"
-                  required
-                />
-                <Form.Text id="SurveyIDnote" muted>
-                  Step 3
-                </Form.Text>
-                <Form.Control.Feedback>Good!</Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formGroupProjectId">
-                <Form.Label>Project ID</Form.Label>
-                <Form.Control
-                  type="text"
-                  autoComplete="off"
-                  onChange={(e) => setProjectID(e.target.value)}
-                  placeholder="Project ID"
-                  required
-                />
-                <Form.Text id="SurveyIDnote" muted>
-                  Project to data process
-                </Form.Text>
-                <Form.Control.Feedback>Good!</Form.Control.Feedback>
-              </Form.Group>
-              <Button type="submit">Run</Button>
+              <div style={formTextBox}>
+                <Form.Group className="mb-3" controlId="formGroupSruveryId">
+                  <Form.Label>Survey ID</Form.Label>
+                  <Form.Control
+                    type="text"
+                    autoComplete="off"
+                    onChange={(e) => setSurveyID(e.target.value)}
+                    placeholder="Survey ID"
+                    required
+                  />
+                  <Form.Text id="SurveyIDnote" muted>
+                    Step 3
+                  </Form.Text>
+                  <Form.Control.Feedback>Good!</Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formGroupProjectId">
+                  <Form.Label>Project ID</Form.Label>
+                  <Form.Control
+                    type="text"
+                    autoComplete="off"
+                    onChange={(e) => setProjectID(e.target.value)}
+                    placeholder="Project ID"
+                    required
+                  />
+                  <Form.Text id="SurveyIDnote" muted>
+                    Project to data process
+                  </Form.Text>
+                  <Form.Control.Feedback>Good!</Form.Control.Feedback>
+                </Form.Group>
+              </div>
+              <div style={formButtons}>
+                <Button variant="primary" onClick={handleShow}>Questions/Fills</Button>
+                <Button type="submit">Update</Button>
+              </div>
+
             </Form>
           </div>
             <p>Use the drop downs below for further explanations</p>
           </div>
         <br/>
+
+        <Offcanvas show={show} onHide={handleClose}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Question/Fills</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <Table style={{width: "100%"}} striped>
+            <thead>
+              <tr>
+                <th>QNAME</th>
+                <th>Table</th>
+                <th>Fills/Skips</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              {(typeof questions === 'undefined') ? (
+                  <p>Loading...</p>
+                ) : (
+                  questions.map((question ,i) => (
+                    <tr key={i}>
+                      <td>{question}</td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            name={question}
+                            id={question + " table"}
+                            checked={checkedTable}
+                            onChange={handleChangeTable}
+
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            name={question}
+                            id={question + " skip"}
+                            checked={checkedSkip}
+                            onChange={handleChangeSkip}
+                          />
+                        </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
+
+          </Table>
+
+        </Offcanvas.Body>
+      </Offcanvas>
         <div className="checkbox-div">
 
         </div>
@@ -305,11 +424,20 @@ const formDiv = {
 
 const formStyle = {
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
   alignContent: 'center',
   flexGrow: '1',
+}
+
+const formTextBox = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  alignContent: 'center',
+  flexGrow: '1'
 }
 
 const headerStyle = {
@@ -318,4 +446,21 @@ const headerStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   alignContent: 'center',
+}
+
+const formButtons = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-evenly',
+  alignContent: 'center',
+  width: "100%"
+}
+const checkboxTable = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-evenly',
+  alignContent: 'center',
+  width: "100%"
 }
