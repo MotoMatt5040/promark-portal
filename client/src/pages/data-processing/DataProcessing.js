@@ -23,26 +23,22 @@ function DataProcessing() {
    const [errorMessage, setErrorMesssage] = useState('');
    const [questions, setQuestions] = useState([]);
 
-   const [checkedTable, setCheckedTable] = useState(true);
-   const [checkedSkip, setCheckedSkip] = useState(false);
+   const [checkedTable, setCheckedTable] = useState({});
+   const [checkedSkip, setCheckedSkip] = useState({});
 
    const [show, setShow] = useState(false);
    const handleClose = () => setShow(false);
 
-   const handleChangeTable = (e) => {
-     console.log(e.target)
-     setCheckedTable(!checkedTable);
-     if (checkedSkip) {
-       setCheckedSkip(!checkedSkip)
-     }
-   }
-
-   const handleChangeSkip = (e) => {
-     setCheckedSkip(!checkedSkip);
-     if (checkedTable) {
-       setCheckedTable(!checkedTable)
-     }
-   }
+   const handleChangeCheckbox = (question, type) => {
+     setCheckedTable((prev) => ({
+       ...prev,
+       [question]: type ==="table"
+     }));
+     setCheckedSkip((prev) => ({
+       ...prev,
+       [question]: type === "skip"
+     }));
+   };
 
   const handleShow = async (event) => {
     event.preventDefault();
@@ -198,9 +194,8 @@ function DataProcessing() {
                             type="checkbox"
                             name={question}
                             id={question + " table"}
-                            checked={checkedTable}
-                            onChange={handleChangeTable}
-
+                            checked={checkedTable[question]}
+                            onChange={() => handleChangeCheckbox(question, "table")}
                           />
                         </td>
                         <td>
@@ -208,8 +203,8 @@ function DataProcessing() {
                             type="checkbox"
                             name={question}
                             id={question + " skip"}
-                            checked={checkedSkip}
-                            onChange={handleChangeSkip}
+                            checked={checkedSkip[question]}
+                            onChange={() => handleChangeCheckbox(question, "skip")}
                           />
                         </td>
                     </tr>
