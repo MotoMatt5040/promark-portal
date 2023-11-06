@@ -30,13 +30,14 @@ function DataProcessing() {
    const handleClose = () => setShow(false);
 
    const handleChangeCheckbox = (question, type) => {
+     console.log(question, type);
      setCheckedTable((prev) => ({
        ...prev,
-       [question]: type ==="table"
+       [question]: type === "table" ? !prev[question] : false
      }));
      setCheckedSkip((prev) => ({
        ...prev,
-       [question]: type === "skip"
+       [question]: type === "skip" ? !prev[question] : false
      }));
    };
 
