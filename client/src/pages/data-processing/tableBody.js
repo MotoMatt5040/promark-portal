@@ -7,7 +7,7 @@ export default function TableBody() {
       <br/>T / / BANNER 0
       <br/>O FORMAT 25 6 1 0 ZC'-' ZPC'-' PCTS PDP0 HB1
       <br/>C &CE TOTAL  ;ALL
-      <br/>F &CP <b>&lt; C O M P A N Y  L O G O &gt;</b>
+      <br/>F &CP <b>&lt; C O M P A N Y  N A M E &gt;</b>
       <br/>*
       <br/>TABLE 992
       <br/>T RUN STREAM FOR CHECKING STUBS
