@@ -146,5 +146,5 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                     print("Main loop:", writer.get_qname(), err)
 
 
-if __name__ == "__main__":
-    r = Reader()
+# if __name__ == "__main__":
+#     r = Reader()
