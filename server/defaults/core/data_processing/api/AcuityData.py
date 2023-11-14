@@ -272,6 +272,17 @@ class AcuityData:
         # for row in my_data:
         #     print(row)
 
+        # print("first task")
+        # print(json.dumps(self.__extraction_id, indent=4))
+        # print("second task")
+        # print(json.dumps(self.__extraction_task, indent=4))
+        # print("third task")
+        # print(json.dumps(self.__extraction_file_id, indent=4))
+
+        # print(json.dumps(self.__variables, indent=4))
+        # print('\n\n\n')
+        # print('control f')
+        # print(json.dumps(self.__questions, indent=4))
         self.question_names()
 
     def question_names(self):
