@@ -32,32 +32,41 @@ function DataProcessing() {
     setSelectedValues((prevSelectedValues) => {
       const newSelectedValues = { ...prevSelectedValues };
 
+      // Check the current state of the checkbox
+      const currentState = newSelectedValues[question]?.[key];
+
       // Uncheck all checkboxes for the same question
-      Object.keys(prevSelectedValues).forEach((prevKey) => {
-        if (prevKey.startsWith(question)) {
-          newSelectedValues[prevKey] = false;
+      Object.keys(prevSelectedValues).forEach((prevQuestion) => {
+        if (prevQuestion === question) {
+          newSelectedValues[prevQuestion] = {
+            table: false,
+            skip: false,
+          };
         }
       });
 
-      // Toggle the current checkbox
-      newSelectedValues[question + key] = !prevSelectedValues[question + key];
+      // Toggle the current checkbox or uncheck if it was already checked
+      newSelectedValues[question] = {
+        ...newSelectedValues[question],
+        [key]: !currentState,
+      };
 
       return newSelectedValues;
     });
   };
 
-  // Initialize the state with the first checkbox checked for each question
   useEffect(() => {
     if (questions && questions.length > 0) {
       const initialSelectedValues = {};
       questions.forEach((question) => {
-        initialSelectedValues[question + ' table'] = true;
-        initialSelectedValues[question + ' skip'] = false;
+        initialSelectedValues[question] = {
+          table: true,
+          skip: false,
+        };
       });
       setSelectedValues(initialSelectedValues);
     }
   }, [questions]);
-
 
   const handleShow = async (event) => {
     event.preventDefault();
@@ -97,7 +106,6 @@ function DataProcessing() {
     }
     setShow(true)
   };
-
 
   const handleValidation = (event) => {
     const form = event.currentTarget;
@@ -149,6 +157,8 @@ function DataProcessing() {
           // 'Access-Control-Allow-Origin': '*',
         }
       }
+      console.log("data")
+      console.log(selectedValues);
       // const response = await axios.post(
       // DATA_PROCESSING_URL,
       // { checkedTable, checkedSkip },
@@ -251,24 +261,24 @@ function DataProcessing() {
                   questions.map((question ,i) => (
                     <tr key={i}>
                       <td>{question}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            name={question + ' table'}
-                            id={question + ' table'}
-                            checked={selectedValues[question + ' table']}
-                            onChange={() => handleCheckboxChange(question, ' table')}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            name={question + ' skip'}
-                            id={question + ' skip'}
-                            checked={selectedValues[question + ' skip']}
-                            onChange={() => handleCheckboxChange(question, ' skip')}
-                          />
-                        </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          name={question + ' table'}
+                          id={question + ' table'}
+                          checked={selectedValues[question]?.table}
+                          onChange={() => handleCheckboxChange(question, 'table')}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          name={question + ' skip'}
+                          id={question + ' skip'}
+                          checked={selectedValues[question]?.skip}
+                          onChange={() => handleCheckboxChange(question, 'skip')}
+                        />
+                      </td>
                     </tr>
                   ))
               )}
