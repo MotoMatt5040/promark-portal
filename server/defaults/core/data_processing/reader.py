@@ -116,7 +116,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         order = builder.dropna()
         with open(rf'{self.project_id} tables.txt', 'w') as f:
             for qname in order['Field']:
-                print(qname)
+                # print(qname)
                 try:
                     # print()
                     writer.set_code_width(data[qname]['codewidth'])

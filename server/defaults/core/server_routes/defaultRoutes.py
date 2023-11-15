@@ -143,7 +143,7 @@ def data_processing_questions():
 
     questions = jsonify(reader.get_questions())
 
-    print(questions.json)
+    # print(questions.json)
 
     return questions
 

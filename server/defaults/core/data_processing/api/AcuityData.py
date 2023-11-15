@@ -219,8 +219,8 @@ class AcuityData:
         self.__extraction_file_id = None
 
     def request_data(self, sid):
-        print("\n")
-        print(os.getcwd())
+        # print("\n")
+        # print(os.getcwd())
         time.sleep(3)
 
         if platform == "linux" or platform == "linux2":
