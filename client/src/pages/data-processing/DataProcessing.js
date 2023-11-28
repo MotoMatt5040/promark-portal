@@ -23,8 +23,6 @@ function DataProcessing() {
 
   const [selectedValues, setSelectedValues] = useState({});
 
-  // var row;
-
   const handleCheckboxChange = (question) => {
     setSelectedValues((prevValues) => ({
       ...prevValues,
@@ -45,7 +43,7 @@ function DataProcessing() {
   const handleShow = async (event) => {
     event.preventDefault();
     try {
-      var config = {
+      let config = {
           headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
@@ -63,11 +61,7 @@ function DataProcessing() {
       }
         // console.log(JSON.stringify(response));
       setQuestions(JSON.parse(JSON.stringify(response.data)));
-      // console.log("testing for data info")
-      // var info = {que: {"table": true, "skip": false}};
-      // console.log(info)
-      // console.log(Object.keys(questions.map));
-      // console.log(questions.map)
+
 
     } catch (error) {
       if (!error?.response) {
@@ -93,7 +87,7 @@ function DataProcessing() {
   const handleSelection = async (event) => {
     event.preventDefault();
     try {
-      var config = {
+      let config = {
           headers: {
             'Content-Type': 'application/json',
             // 'Access-Control-Allow-Origin': '*',
@@ -125,7 +119,7 @@ function DataProcessing() {
   const handleRun = async (event) => {
     event.preventDefault();
     try {
-      var config = {
+      let config = {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
@@ -219,7 +213,7 @@ function DataProcessing() {
               onSubmit={handleRun}
             >
               <Table style={{width: "100%"}} striped>
-form                <thead>
+                <thead>
                   <tr>
                     <th>QNAME</th>
                     <th>Table</th>
