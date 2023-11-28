@@ -8,6 +8,11 @@ import requests
 import os
 import time
 from sys import platform
+import zipfile
+import io
+
+
+
 
 
 class AcuityData:
@@ -211,6 +216,10 @@ class AcuityData:
 
     ]
 
+    @staticmethod
+    def order():
+        return list(pd.read_csv("order.csv").columns[4:])
+
     def __init__(self):
         self.__variables = None
         self.__questions = None
@@ -261,6 +270,12 @@ class AcuityData:
                       f"?extractionId={self.__extraction_id}&fileId={self.__extraction_file_id}"
 
         __order_req = requests.get(__order_url, headers={"Authorization": f"Client {__access_token}"})
+
+        if __order_req.ok:
+            z = zipfile.ZipFile(io.BytesIO(__order_req.content))
+            # z.extractall(r"/")
+            print(z.extract("order.csv"))
+            z.close()
 
         # stuff = __order_req.content.decode("ISO-8859-16")
         # print(stuff)
@@ -385,7 +400,7 @@ class AcuityData:
 
             for q in __fills:
                 try:
-                    if f"[{q}F1]" in __data[qname]['question'] or f"[{q}F2]" in __data[qname]['question']:
+                    if f"[{q}F1]" in __data[qname]['question'] or f"[{q}FIL2]" in __data[qname]['question']:
                         __data[qname]['question'] = __data[qname]['question'].replace(f"[{q}F1]", __fills[q])
                         __data[qname]['question'] = __data[qname]['question'].replace(f"[{q}F2]", __fills[q])
                 except:
@@ -432,20 +447,21 @@ class AcuityData:
         return __fills, __skip
 
     def columns(self, data):
-        __column = 43
+        __column = 32
         __data = data
 
         for __key in list(__data):
             if __key[-2:] == 'F1' or __key[-2:] == 'F2' or 'SKP' in __key:
                 del __data[__key]
-            if __key not in __data:
+                continue
+            if __key not in data:
                 del __data[__key]
 
         for __qname in __data:
             # print(__qname, __column)
             maxchoice = __data[__qname]['maxchoice']
             codewidth = __data[__qname]['codewidth']
-        order = pd.read_csv("order.csv").columns[6:]
+        order = self.order()
         self.xfile_layout(__data, order)
         layout = pd.read_excel('DATABASE/layout.xlsx')
         for __qname in order:
@@ -505,32 +521,28 @@ class AcuityData:
     def xfile_layout(self, data, order):
         __data = data
         __xfile = [
-            ['CASEID', 'PIN', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)', 'VEND'],
-            ['xxxxxxxxxx', 'xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx', 'x']
+            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
         ]
+        __builder = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
+        }
         __layout = {
-            'Table': [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'PIN', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)',
-                      'VEND'],
-            'Start': [1, 11, 21, 29, 37, 42],
-            'End': [10, 20, 28, 36, 41, 42],
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            'Start': [1, 11, 19, 27],
+            'End': [10, 18, 26, 31],
             'Width': [
                 len(__xfile[1][0]),
                 len(__xfile[1][1]),
                 len(__xfile[1][2]),
-                len(__xfile[1][3]),
-                len(__xfile[1][4]),
-                len(__xfile[1][5])],
-            'Description': ['', '', '', '', '', '']
-        }
-        __builder = {
-            'Table': [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'PIN', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)',
-                      'VEND'],
+                len(__xfile[1][3])],
+            'Description': ['', '', '', '']
         }
 
         __table = 1
-        __column = 43
+        __column = 32
         __codes = ""
         # print(json.dumps(__data, indent=4))
         for __qname in order:
@@ -584,3 +596,6 @@ class AcuityData:
         xfile.to_excel('DATABASE/xfile.xlsx', index=False)
         layout.to_excel('DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
+
+        print(layout.to_string())
+

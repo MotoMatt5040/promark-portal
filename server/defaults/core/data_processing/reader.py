@@ -23,10 +23,10 @@ class Reader:
           |                                                              |
           ----------------------------------------------------------------
       '''
+    project_id = None
 
-    def __init__(self, project_id):
+    def __init__(self):
         self.api = AcuityData.AcuityData()
-        self.project_id = project_id
 
     def setUrl(self, survey_id: str):
         self.api.request_data(survey_id)
@@ -34,6 +34,9 @@ class Reader:
 
     def get_questions(self):
         return self.api.question_names()
+
+    def get_order(self):
+        return self.api.order()
 
     def run(self):
         data = self.api.data()

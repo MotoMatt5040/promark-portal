@@ -21,6 +21,8 @@ db.init_app(app)
 #     db.create_all()
 
 # data_puller = DataPuller()
+reader = Reader()
+
 
 
 @app.route('/', methods=['GET'])
@@ -117,7 +119,7 @@ def data_processing():
     survey_id = request.json['surveyID']
     project_id = request.json['projectID']
 
-    reader = Reader(project_id)
+    Reader.project_id = project_id
     reader.setUrl(survey_id)
 
     # reader.run()
@@ -131,21 +133,27 @@ def data_processing():
     #     Path(f"{origin_path}{database_path} xfile.xlsx")
 
 
-@app.route('/data_processing/questions', methods=['POST', 'GET'])
+@app.route('/data_processing/questions', methods=['POST'])
 @cross_origin()
 def data_processing_questions():
     response = _build_cors_preflight_response()
     survey_id = request.json['surveyID']
     project_id = request.json['projectID']
 
-    reader = Reader(project_id)
-    reader.setUrl(survey_id)
-
-    questions = jsonify(reader.get_questions())
+    # questions = jsonify(reader.get_questions())
+    Reader.project_id = project_id
+    questions = reader.get_order()
 
     # print(questions.json)
 
     return questions
+
+@app.route('/data_processing/questions/process_data', methods=['POST'])
+@cross_origin()
+def process_this_data_as_fast_as_you_possible_can():
+    response = _build_cors_preflight_response()
+
+    return reader.get_order()
 
 
 def _build_cors_preflight_response():
