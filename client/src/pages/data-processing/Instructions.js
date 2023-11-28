@@ -157,9 +157,9 @@ function Instructions() {
                       Click <b>[Project]</b> in the middle section of the ribbon.<br/>
                       Edit the title text do the respective project name and date. <br/>
                       <b>Title:</b> &CP <b>&lt;SURVEY NAME&gt;</b> // <b>&lt;MMM&gt;</b>. <b>&lt;DD&gt;</b> - <b>&lt;DD&gt;</b>, <b>&lt;YYYY&gt;</b> &RJ PAGE &PS<br/>
-                      <b>Case ID Position</b><br/>
+                      <b>Case ID Position:</b><br/>
                       &ensp;<b>First:</b> 1<br/>
-                      &ensp;<b>Last</b> 10<br/>
+                      &ensp;<b>Last:</b> 10<br/>
                       <img src={projTitle} alt="Project/Title" /><br/>
                     </p>
                   </Accordion.Body>
