@@ -273,8 +273,7 @@ class AcuityData:
 
         if __order_req.ok:
             z = zipfile.ZipFile(io.BytesIO(__order_req.content))
-            # z.extractall(r"/")
-            print(z.extract("order.csv"))
+            z.extract("order.csv")
             z.close()
 
         # stuff = __order_req.content.decode("ISO-8859-16")
