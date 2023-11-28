@@ -142,6 +142,7 @@ def data_processing_questions():
 
     # questions = jsonify(reader.get_questions())
     Reader.project_id = project_id
+    reader.setUrl(survey_id)
     questions = reader.get_order()
 
     # print(questions.json)

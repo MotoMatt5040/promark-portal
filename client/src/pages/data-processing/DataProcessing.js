@@ -252,8 +252,8 @@ function DataProcessing() {
                 </Form.Group>
               </div>
               <div style={formButtons}>
-                <Button variant="primary" onClick={handleShow}>Questions/Fills</Button>
-                <Button type="submit">Update</Button>
+              <Button variant="primary" onClick={handleShow}>Questions/Fills</Button>
+              <Button type="submit">Update</Button>
               </div>
 
             </Form>
