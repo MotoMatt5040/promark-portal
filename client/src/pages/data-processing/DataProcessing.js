@@ -9,6 +9,7 @@ import Instructions from "./Instructions";
 
 const DATA_PROCESSING_URL = '/data_processing';
 const QUESTIONS_URL = '/questions'
+const PROCESS_DATA_URL = '/questions/process_data'
 function DataProcessing() {
 
   const [validated, setValidated] = useState(false);
@@ -24,41 +25,18 @@ function DataProcessing() {
 
   // var row;
 
-  const handleCheckboxChange = (question, key) => {
-    setSelectedValues((prevSelectedValues) => {
-      const newSelectedValues = { ...prevSelectedValues };
-
-      // Check the current state of the checkbox
-      const currentState = newSelectedValues[question]?.[key];
-
-      // Uncheck all checkboxes for the same question
-      Object.keys(prevSelectedValues).forEach((prevQuestion) => {
-        if (prevQuestion === question) {
-          newSelectedValues[prevQuestion] = {
-            table: false,
-            skip: false,
-          };
-        }
-      });
-
-      // Toggle the current checkbox or uncheck if it was already checked
-      newSelectedValues[question] = {
-        ...newSelectedValues[question],
-        [key]: !currentState,
-      };
-
-      return newSelectedValues;
-    });
+  const handleCheckboxChange = (question) => {
+    setSelectedValues((prevValues) => ({
+      ...prevValues,
+      [question]: !prevValues[question], // Toggle the boolean value
+    }));
   };
 
   useEffect(() => {
     if (questions && questions.length > 0) {
       const initialSelectedValues = {};
       questions.forEach((question) => {
-        initialSelectedValues[question] = {
-          table: true,
-          skip: false,
-        };
+        initialSelectedValues[question] = true;
       });
       setSelectedValues(initialSelectedValues);
     }
@@ -88,8 +66,8 @@ function DataProcessing() {
       // console.log("testing for data info")
       // var info = {que: {"table": true, "skip": false}};
       // console.log(info)
-      console.log(Object.keys(questions.map));
-      console.log(questions.map)
+      // console.log(Object.keys(questions.map));
+      // console.log(questions.map)
 
     } catch (error) {
       if (!error?.response) {
@@ -144,30 +122,30 @@ function DataProcessing() {
     }
   };
 
-  const handleRun = (event) => {
+  const handleRun = async (event) => {
     event.preventDefault();
     try {
       var config = {
         headers: {
           'Content-Type': 'application/json',
-          // 'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': '*',
         }
       }
       console.log("data")
       console.log(selectedValues);
-      // const response = await axios.post(
-      // DATA_PROCESSING_URL,
-      // { checkedTable, checkedSkip },
-      // config
-      // );
-      //
-      // if (response.status === 200) {
-      //   window.location.href="#"
-      //   console.log('Request sent for data processing')
-      // }
-      //
-      //
-      // console.log(JSON.stringify(response));
+      const response = await axios.post(
+      DATA_PROCESSING_URL + PROCESS_DATA_URL,
+      { selectedValues },
+      config
+      );
+
+      if (response.status === 200) {
+        window.location.href="#"
+        console.log('Request sent for data processing')
+      }
+
+
+      console.log(JSON.stringify(response));
     } catch (error) {
        if (!error?.response) {
         setErrorMesssage('No Server Response')
@@ -179,38 +157,6 @@ function DataProcessing() {
     }
   }
 
-    const handleCreate = async (event) => {
-      event.preventDefault();
-      try {
-        var config = {
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Access-Control-Allow-Origin': '*',
-          }
-        }
-        const response = await axios.post(
-          DATA_PROCESSING_URL,
-          { surveyID, projectID },
-          config
-        );
-
-        if (response.status === 200) {
-          window.location.href="#"
-          console.log('Request sent for data processing')
-        }
-        console.log(JSON.stringify(response));
-        // setSuccess(true)
-      } catch (error) {
-        if (!error?.response) {
-          setErrorMesssage('No Server Response')
-        } else if (error.response.status === 401) {
-          setErrorMesssage('Invalid Credentials')
-        } else {
-          setErrorMesssage('Requast Failed')
-        }
-      }
-    };
-
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
@@ -219,7 +165,6 @@ function DataProcessing() {
               noValidate
               validated={validated}
               onChange={handleValidation}
-              onSubmit={handleCreate}
               style={formStyle}>
               <div style={formTextBox}>
                 <Form.Group className="mb-3" controlId="formGroupSruveryId">
@@ -278,7 +223,6 @@ function DataProcessing() {
                 <tr>
                   <th>QNAME</th>
                   <th>Table</th>
-                  <th>Fills/Skips</th>
                 </tr>
               </thead>
               <tbody>
@@ -292,19 +236,10 @@ function DataProcessing() {
                         <td>
                           <input
                             type="checkbox"
-                            name={question + ' table'}
-                            id={question + ' table'}
-                            checked={selectedValues[question]?.table}
-                            onChange={() => handleCheckboxChange(question, 'table')}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            name={question + ' skip'}
-                            id={question + ' skip'}
-                            checked={selectedValues[question]?.skip}
-                            onChange={() => handleCheckboxChange(question, 'skip')}
+                            name={question}
+                            id={question}
+                            checked={selectedValues[question]}
+                            onChange={() => handleCheckboxChange(question)}
                           />
                         </td>
                       </tr>
