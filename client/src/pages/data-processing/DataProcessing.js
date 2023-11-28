@@ -219,34 +219,33 @@ function DataProcessing() {
               onSubmit={handleRun}
             >
               <Table style={{width: "100%"}} striped>
-              <thead>
-                <tr>
-                  <th>QNAME</th>
-                  <th>Table</th>
-                </tr>
-              </thead>
-              <tbody>
-
-                {(typeof questions === 'undefined') ? (
-                    <p>Loading...</p>
-                  ) : (
-                    questions.map((question ,i) => (
-                      <tr key={i}>
-                        <td>{question}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            name={question}
-                            id={question}
-                            checked={selectedValues[question]}
-                            onChange={() => handleCheckboxChange(question)}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                )}
-              </tbody>
-            </Table>
+form                <thead>
+                  <tr>
+                    <th>QNAME</th>
+                    <th>Table</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(typeof questions === 'undefined') ? (
+                      <p>Loading...</p>
+                    ) : (
+                      questions.map((question ,i) => (
+                        <tr key={i}>
+                          <td>{question}</td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              name={question}
+                              id={question}
+                              checked={selectedValues[question]}
+                              onChange={() => handleCheckboxChange(question)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                  )}
+                </tbody>
+              </Table>
               <Button type="submit">Run</Button>
             </Form>
           </Offcanvas.Body>
