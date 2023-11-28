@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, make_response
+from flask import Flask, request, jsonify, session, make_response, send_file
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_session import Session
@@ -6,6 +6,8 @@ from flask_session import Session
 from .config import ApplicationConfig
 from ..auth.models import db, User
 from ..data_processing.reader import Reader
+import shutil
+import json
 
 # from defaults.utils.database.datapuller import DataPuller
 
@@ -151,10 +153,20 @@ def data_processing_questions():
 
 @app.route('/data_processing/questions/process_data', methods=['POST'])
 @cross_origin()
-def process_this_data_as_fast_as_you_possible_can():
+def process_data():
     response = _build_cors_preflight_response()
+    reader.set_skips(request.json)
+    reader.run()
 
-    return reader.get_order()
+    shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
+
+    return "Zip created"
+
+@app.route("/data_processing/download", methods=["GET"])
+@cross_origin()
+def download():
+    response = _build_cors_preflight_response()
+    return send_file(r"EXTRACTION.zip", as_attachment=True)
 
 
 def _build_cors_preflight_response():

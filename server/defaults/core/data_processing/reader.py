@@ -1,4 +1,5 @@
 import pandas as pd
+import traceback
 
 from .Writer import Writer
 from .api import AcuityData
@@ -29,7 +30,8 @@ class Reader:
         self.api = AcuityData.AcuityData()
 
     def setUrl(self, survey_id: str):
-        self.api.request_data(survey_id)
+        self.api.set_sid(survey_id)
+        self.api.request_data()
         # self.run()
 
     def get_questions(self):
@@ -37,6 +39,13 @@ class Reader:
 
     def get_order(self):
         return self.api.order()
+
+    def set_skips(self, data):
+        skip = []
+        for question in data['selectedValues']:
+            if not data['selectedValues'][question]:
+                skip.append(question)
+        self.api.set_skips(skip)
 
     def run(self):
         data = self.api.data()
@@ -117,7 +126,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         builder = pd.read_excel('builder.xlsx')
         # layout = pd.read_excel('DATABASE/layout.xlsx')
         order = builder.dropna()
-        with open(rf'{self.project_id} tables.txt', 'w') as f:
+        with open(rf'EXTRACTION/UNCLE/{self.project_id} tables.txt', 'w') as f:
             for qname in order['Field']:
                 # print(qname)
                 try:
@@ -143,8 +152,9 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                     writer.set_choice_labels(list(data[qname]['choices'].values()))
                     f.write(writer.create_table())
                     tnum += 1
-                    # print(qname, writer.get_start_column())
+                    print(qname, writer.get_start_column())
                 except Exception as err:
+                    print(traceback.format_exc())
 
                     print("Main loop:", writer.get_qname(), err)
 

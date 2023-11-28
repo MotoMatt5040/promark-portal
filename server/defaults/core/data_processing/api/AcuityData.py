@@ -1,18 +1,14 @@
+import io
 import json
-from configparser import ConfigParser
+import time
+import zipfile
 from pathlib import Path
+from sys import platform
 
 import numpy as np
 import pandas as pd
 import requests
-import os
-import time
-from sys import platform
-import zipfile
-import io
-
-
-
+from configparser import ConfigParser
 
 
 class AcuityData:
@@ -128,93 +124,7 @@ class AcuityData:
         "STRONGLY CREATED": {'DETERMINED BY PEOPLE': [1, 2], 'CREATED IN CONSTITUTION': [3, 4]},
     }
 
-    __SKIP_TABLE = [
-        'GEN22',
-        'GEN20',
-        'GEN18',
-        'GEN16',
-        'RPRIM22',
-        'RPRIM20',
-        'RPRIM18',
-        'RPRIM16',
-        'PR22',
-        'PR20',
-        'PR19',
-        'PR09',
-        'PR15',
-        'PR11',
-        'PR18',
-        'PR16',
-        'PPR20',
-        'CFIPS',
-        'CD',
-        'QAGE',
-        'ACTAG',
-        'QZIP',
-        'Q32X',
-        'Q33X',
-        'Q34X',
-        'Q35X',
-        'Q36X',
-        'Q36BX',
-        'Q36CX',
-        'Q37X',
-        'Q38X',
-        'Q39X',
-        'Q40X',
-        'Q41X',
-        'Q42X',
-        'Q43X',
-        'Q44X',
-        'Q45X',
-        'Q46X',
-        'Q47X',
-        'Q48X',
-        'Q49X',
-        'Q50X',
-        'Q51X',
-        'Q52X',
-        'Q53X',
-        'Q54X',
-        'Q55X',
-        'Q55BX',
-        'Q55CX',
-        'Q55DX',
-        'Q55EX',
-        'Q55FX',
-        'Q55GX',
-        'Q55HX',
-        'Q55JX',
-        'Q55KX',
-        'Q55NX',
-
-        'QEDU_REC',
-        'QINCOME_CODE',
-        'Q24X',
-        'Q25X',
-        'Q26X',
-        'Q27X',
-        'Q31BX',
-        'Q36NX',
-        'Q23X',
-
-        'QRACE_ETHN',
-        "SAMP",
-        "DMAN",
-        "PR22",
-        "PR20",
-        "PR18",
-        "PR16",
-        "Q1OS",
-        "Q3OS",
-        "Q4OS",
-        "Q11OS",
-        "Q19C",
-        "CD",
-        "DMAN",
-        "COUNTY"
-
-    ]
+    SKIP_TABLE = []
 
     @staticmethod
     def order():
@@ -226,8 +136,17 @@ class AcuityData:
         self.__extraction_task = None
         self.__extraction_id = None
         self.__extraction_file_id = None
+        self.sid = None
 
-    def request_data(self, sid):
+    def set_sid(self, sid):
+        self.sid = sid
+        return sid
+
+    def set_skips(self, skips):
+        self.SKIP_TABLE = skips
+        print(self.SKIP_TABLE)
+
+    def request_data(self):
         # print("\n")
         # print(os.getcwd())
         time.sleep(3)
@@ -241,9 +160,9 @@ class AcuityData:
         __config_object.read(__config_path)
         __access_token = __config_object['ACCESS TOKEN']['access token']
 
-        __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{sid}?deployed=true"
-        __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{sid}"
-        __extraction_task_url = f"https://prcmmweb.promarkresearch.com/api/results/extract?surveyId={sid}"
+        __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{self.sid}?deployed=true"
+        __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{self.sid}"
+        __extraction_task_url = f"https://prcmmweb.promarkresearch.com/api/results/extract?surveyId={self.sid}"
 
         __variables_req = json.dumps(
             requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
@@ -462,7 +381,7 @@ class AcuityData:
             codewidth = __data[__qname]['codewidth']
         order = self.order()
         self.xfile_layout(__data, order)
-        layout = pd.read_excel('DATABASE/layout.xlsx')
+        layout = pd.read_excel('EXTRACTION/DATABASE/layout.xlsx')
         for __qname in order:
             # print(__qname, __column)
             maxchoice = __data[__qname]['maxchoice']
@@ -553,7 +472,7 @@ class AcuityData:
             #     __codewidth = 4
             tableNumber = True
 
-            if __qname in self.__SKIP_TABLE:
+            if __qname in self.SKIP_TABLE:
                 __builder['Table'].append(np.nan)
             else:
                 __builder['Table'].append(__table)
@@ -571,7 +490,7 @@ class AcuityData:
                     x += 'x'
                 __xfile[1].append(x)
 
-                if __qname in self.__SKIP_TABLE or not tableNumber:
+                if __qname in self.SKIP_TABLE or not tableNumber:
                     __layout['Table'].append(np.nan)
                 else:
                     __layout['Table'].append(__table)
@@ -592,8 +511,8 @@ class AcuityData:
         layout = pd.DataFrame(__layout)
         builder = pd.DataFrame(__builder)
 
-        xfile.to_excel('DATABASE/xfile.xlsx', index=False)
-        layout.to_excel('DATABASE/layout.xlsx', index=False)
+        xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
+        layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
 
         print(layout.to_string())
