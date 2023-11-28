@@ -179,6 +179,37 @@ function DataProcessing() {
     }
   }
 
+    const handleCreate = async (event) => {
+      event.preventDefault();
+      try {
+        var config = {
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Access-Control-Allow-Origin': '*',
+          }
+        }
+        const response = await axios.post(
+          DATA_PROCESSING_URL,
+          { surveyID, projectID },
+          config
+        );
+
+        if (response.status === 200) {
+          window.location.href="#"
+          console.log('Request sent for data processing')
+        }
+        console.log(JSON.stringify(response));
+        // setSuccess(true)
+      } catch (error) {
+        if (!error?.response) {
+          setErrorMesssage('No Server Response')
+        } else if (error.response.status === 401) {
+          setErrorMesssage('Invalid Credentials')
+        } else {
+          setErrorMesssage('Requast Failed')
+        }
+      }
+    };
 
     return (
       <div>
@@ -188,7 +219,7 @@ function DataProcessing() {
               noValidate
               validated={validated}
               onChange={handleValidation}
-              onSubmit={handleSelection}
+              onSubmit={handleCreate}
               style={formStyle}>
               <div style={formTextBox}>
                 <Form.Group className="mb-3" controlId="formGroupSruveryId">
