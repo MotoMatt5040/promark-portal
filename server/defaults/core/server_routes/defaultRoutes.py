@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify, session, make_response, send_file
+import os
+
+from flask import Flask, request, jsonify, session, make_response, send_file, after_this_request
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_session import Session
@@ -12,7 +14,7 @@ import json
 # from defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=['*'])
+CORS(app, supports_credentials=True, origins=['*'], expose_headers=["Content-Disposition"])
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
@@ -166,7 +168,20 @@ def process_data():
 @cross_origin()
 def download():
     response = _build_cors_preflight_response()
-    return send_file(r"EXTRACTION.zip", as_attachment=True)
+    sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
+
+    # @after_this_request
+    # def add_close_action(response):
+    #     @response.call_on_close
+    #     def process_after_request():
+    #         try:
+    #             print("file sent, deleting...")
+    #             print(os.getcwd())
+    #             os.remove(r"./defaults/core/server_routes/EXTRACTION.zip")
+    #             print("done.")
+    #         except Exception as e:
+    #             print(str(e))
+    return sendfile
 
 
 def _build_cors_preflight_response():

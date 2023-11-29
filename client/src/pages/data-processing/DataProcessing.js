@@ -6,10 +6,12 @@ import axios from "../../api/axios";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Table from 'react-bootstrap/Table';
 import Instructions from "./Instructions";
+import { saveAs } from 'file-saver';
 
 const DATA_PROCESSING_URL = '/data_processing';
-const QUESTIONS_URL = '/questions'
-const PROCESS_DATA_URL = '/questions/process_data'
+const QUESTIONS_URL = '/questions';
+const PROCESS_DATA_URL = '/questions/process_data';
+const DOWNLOAD_URL = '/download';
 function DataProcessing() {
 
   const [validated, setValidated] = useState(false);
@@ -84,38 +86,6 @@ function DataProcessing() {
     setValidated(true);
   };
 
-  const handleSelection = async (event) => {
-    event.preventDefault();
-    try {
-      let config = {
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Access-Control-Allow-Origin': '*',
-          }
-        }
-      const response = await axios.post(
-        DATA_PROCESSING_URL,
-        { surveyID, projectID },
-        config
-      );
-
-      if (response.status === 200) {
-        window.location.href="#"
-        console.log('Request sent for data processing')
-      }
-        // console.log(JSON.stringify(response));
-      // setSuccess(true)
-    } catch (error) {
-      if (!error?.response) {
-        setErrorMesssage('No Server Response')
-      } else if (error.response.status === 401) {
-        setErrorMesssage('Invalid Credentials')
-      } else {
-        setErrorMesssage('Requast Failed')
-      }
-    }
-  };
-
   const handleRun = async (event) => {
     event.preventDefault();
     try {
@@ -147,6 +117,29 @@ function DataProcessing() {
         setErrorMesssage('Request Failed')
       }
     }
+  }
+
+  const handleDownload = async () => {
+    const response = axios.get('/data_processing/download', {
+      responseType: 'blob',
+      headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          }
+    })
+      .then((obj) => {
+        console.log(obj.data)
+        const url = URL.createObjectURL(obj.data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'file.zip';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      })
+      .catch(error => console.error(error))
   }
 
     return (
@@ -198,6 +191,7 @@ function DataProcessing() {
             <p>Use the drop downs below for further explanations</p>
           </div>
           <br/>
+        <Button onClick={handleDownload}>Download</Button>
 
           <Offcanvas show={show} onHide={handleClose}>
           <Offcanvas.Header closeButton>
