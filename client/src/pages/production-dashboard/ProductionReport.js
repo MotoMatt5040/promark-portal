@@ -19,16 +19,26 @@ function ProductionReport() {
 
   return (
     <div className="container" id="production-report-container" style={containerStyle}>
-      <Dropdown>
-        <Dropdown.Toggle variant="success" id="location-dropdown">
-          Location
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item href="#/loc1">Location 1</Dropdown.Item>
-          <Dropdown.Item href="#/loc2">Location 2</Dropdown.Item>
-          <Dropdown.Item href="#/loc3">Location 3</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+      <div className="dropdowns" id="dropdowns" style={dropdownStyle}>
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id="location-dropdown">
+            Location
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item>Location 1</Dropdown.Item>
+            <Dropdown.Item>Location 2</Dropdown.Item>
+            <Dropdown.Item>Location 3</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id="interviewers">Interviewers</Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item>Name 1</Dropdown.Item>
+            <Dropdown.Item>Name 2</Dropdown.Item>
+            <Dropdown.Item>Name 3</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
     </div>
   )
 }
@@ -36,6 +46,15 @@ function ProductionReport() {
 export default ProductionReport;
 
 const containerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'space-evenly',
+  alignContent: 'center',
+  width: '100%'
+}
+
+const dropdownStyle = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
