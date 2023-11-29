@@ -6,7 +6,6 @@ import axios from "../../api/axios";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Table from 'react-bootstrap/Table';
 import Instructions from "./Instructions";
-import { saveAs } from 'file-saver';
 
 const DATA_PROCESSING_URL = '/data_processing';
 const QUESTIONS_URL = '/questions';
@@ -182,58 +181,49 @@ function DataProcessing() {
                 </Form.Group>
               </div>
               <div style={formButtons}>
-              <Button variant="primary" onClick={handleShow}>Questions/Fills</Button>
-              <Button type="submit">Update</Button>
+              <Button variant="primary" onClick={handleShow}>Layout</Button>
+              {/*<Button type="submit">Update</Button>*/}
               </div>
-
             </Form>
           </div>
             <p>Use the drop downs below for further explanations</p>
+            <Button onClick={handleDownload}>Download</Button>
           </div>
           <br/>
-        <Button onClick={handleDownload}>Download</Button>
-
           <Offcanvas show={show} onHide={handleClose}>
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Question/Fills</Offcanvas.Title>
+            <Offcanvas.Title>Layout</Offcanvas.Title>
+            <Button type="submit" onClick={handleRun}>Run</Button>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <Form
-              noValidate
-              validated={validated}
-              onChange={handleValidation}
-              onSubmit={handleRun}
-            >
-              <Table style={{width: "100%"}} striped>
-                <thead>
-                  <tr>
-                    <th>QNAME</th>
-                    <th>Table</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(typeof questions === 'undefined') ? (
-                      <p>Loading...</p>
-                    ) : (
-                      questions.map((question ,i) => (
-                        <tr key={i}>
-                          <td>{question}</td>
-                          <td>
-                            <input
-                              type="checkbox"
-                              name={question}
-                              id={question}
-                              checked={selectedValues[question]}
-                              onChange={() => handleCheckboxChange(question)}
-                            />
-                          </td>
-                        </tr>
-                      ))
-                  )}
-                </tbody>
-              </Table>
-              <Button type="submit">Run</Button>
-            </Form>
+            <Table style={{width: "100%"}} striped>
+              <thead>
+                <tr>
+                  <th>QNAME</th>
+                  <th>Table</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(typeof questions === 'undefined') ? (
+                    <p>Loading...</p>
+                  ) : (
+                    questions.map((question ,i) => (
+                      <tr key={i}>
+                        <td>{question}</td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            name={question}
+                            id={question}
+                            checked={selectedValues[question]}
+                            onChange={() => handleCheckboxChange(question)}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                )}
+              </tbody>
+            </Table>
           </Offcanvas.Body>
         </Offcanvas>
         <Instructions/>
