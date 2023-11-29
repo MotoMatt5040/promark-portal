@@ -2,6 +2,8 @@ import axios from "../../api/axios";
 import Dropdown from 'react-bootstrap/Dropdown';
 import Table from 'react-bootstrap/Table';
 import {useState} from 'react'
+import Button from 'react-bootstrap/Button';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
@@ -9,6 +11,11 @@ import { DateRange } from 'react-date-range';
 import { Calendar } from 'react-date-range';
 
 function ProductionReport() {
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const [state, setState] = useState([
     {
@@ -61,12 +68,20 @@ function ProductionReport() {
         {/*  <button>Date Range</button>*/}
         {/*</DateRangePicker>*/}
         {/*<DateRangePicker ranges={['startDate': new Date()]} onChange={handleSelect} />*/}
-        <DateRange
-          editableDateInputs={true}
-          onChange={item => setState([item.selection])}
-          moveRangeOnFirstSelection={false}
-          ranges={state}
-        />
+        <Button variant="primary" onClick={handleShow} className="me-2">Date</Button>
+        <Offcanvas show={show} onHide={handleClose} placement={'top'}>
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body>
+            <DateRange
+              editableDateInputs={true}
+              onChange={item => setState([item.selection])}
+              moveRangeOnFirstSelection={false}
+              ranges={state}
+            />
+          </Offcanvas.Body>
+        </Offcanvas>
       </div>
       <br/>
       <Table>
