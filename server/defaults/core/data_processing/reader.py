@@ -126,7 +126,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         builder = pd.read_excel('builder.xlsx')
         # layout = pd.read_excel('DATABASE/layout.xlsx')
         order = builder.dropna()
-        with open(rf'EXTRACTION/UNCLE/{self.project_id} tables.txt', 'w') as f:
+        with open(rf'EXTRACTION/UNCLE/tables.txt', 'w') as f:
             for qname in order['Field']:
                 # print(qname)
                 try:
