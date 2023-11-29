@@ -34,14 +34,12 @@ function Instructions() {
             </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
-          <Accordion.Header>Step 2: Download order.csv</Accordion.Header>
+          <Accordion.Header>Step 2: Create directories</Accordion.Header>
             <Accordion.Body>
               <p>
                 Create a folder called <b>[DATAPROC]</b> inside the project folder. <br/>
                 Create a folder called <b>[DATABASE]</b> and <b>[UNCLE]</b> inside the <b>[DATAPROC]</b> folder. <br/>
                 Create a folder called <b>[OUTPUT]</b> inside the <b>[UNCLE]</b> folder. <br/>
-                Save <b>order.csv</b> in the <b>[DATABASE]</b> folder for the project you are working on.<br />
-                It is important that this file is named <b>order.csv</b> exactly as specified. <br/>
                 The project directories should have the following format. <br/>
                 &ensp; <b>&lt;project id&gt;</b> <br/>
                 &emsp;&emsp;&emsp;|<br/>
@@ -67,16 +65,16 @@ function Instructions() {
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="3">
-          <Accordion.Header>Step 4: Press Run</Accordion.Header>
+          <Accordion.Header>Step 4: Press Layout</Accordion.Header>
           <Accordion.Body>
-            <p>After filling out the fields from the previous step you can run the program.</p>
+            <p>Uncheck the boxes for tables that will be skipped. These will include fills, computations, OS, OE, etc...</p>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="4">
-          <Accordion.Header>Step 5: Verify the created files</Accordion.Header>
+          <Accordion.Header>Step 5: Press Download</Accordion.Header>
           <Accordion.Body>
             <p>
-              Verify the following files have been created in the following directories: <br/>
+              Download the zip file and copy the files into the following directories: <br/>
               &ensp;<b>[DATABASE]</b><br/>
               &emsp;<b>layout.csv</b><br/>
               &emsp;<b>x-file.csv</b><br/>
