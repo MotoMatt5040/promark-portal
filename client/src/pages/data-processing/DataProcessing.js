@@ -119,7 +119,7 @@ function DataProcessing() {
   }
 
   const handleDownload = async () => {
-    const response = axios.get('/data_processing/download', {
+    axios.get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
       responseType: 'blob',
       headers: {
             'Content-Type': 'application/json',
@@ -182,15 +182,14 @@ function DataProcessing() {
               </div>
               <div style={formButtons}>
               <Button variant="primary" onClick={handleShow}>Layout</Button>
-              {/*<Button type="submit">Update</Button>*/}
               </div>
             </Form>
           </div>
             <p>Use the drop downs below for further explanations</p>
             <Button onClick={handleDownload}>Download</Button>
           </div>
-          <br/>
-          <Offcanvas show={show} onHide={handleClose}>
+        <br/>
+        <Offcanvas show={show} onHide={handleClose}>
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Layout</Offcanvas.Title>
             <Button type="submit" onClick={handleRun}>Run</Button>
@@ -269,14 +268,6 @@ const headerStyle = {
 }
 
 const formButtons = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-evenly',
-  alignContent: 'center',
-  width: "100%"
-}
-const checkboxTable = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
