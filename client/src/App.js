@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import UserInterface from './pages/auth/userInterface.ts';
 import axios from './api/axios';
 import DataProcessing from "./pages/data-processing/DataProcessing";
+import ProductionReport from "./pages/production-dashboard/ProductionReport";
 
 function App() {
   // const [session , setSession] = useState();
@@ -40,6 +41,7 @@ function App() {
           <Route index element={<Home/>}/>
           {/*<Route path="/home" element={<Home />} />*/}
           <Route path="data_processing" element={<DataProcessing />}/>
+          <Route path="production_report" element={<ProductionReport />}/>
         </Routes>
       </main>
     </BrowserRouter>
