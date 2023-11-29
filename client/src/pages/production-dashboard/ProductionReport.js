@@ -73,7 +73,7 @@ function ProductionReport() {
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Offcanvas</Offcanvas.Title>
           </Offcanvas.Header>
-          <Offcanvas.Body>
+          <Offcanvas.Body  style={dateCanvasStyle}>
             <DateRange
               editableDateInputs={true}
               onChange={item => setState([item.selection])}
@@ -131,4 +131,13 @@ const dropdownStyle = {
 
 const dateButtonStyle = {
   backgroundColor: 'green !important'
+}
+
+const dateCanvasStyle = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-evenly',
+  alignContent: 'center',
+  width: '100%'
 }
