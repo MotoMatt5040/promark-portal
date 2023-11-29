@@ -13,7 +13,11 @@ const Header = (props) => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="https://dashapp.promarkresearch.com/">Dashboard</Nav.Link>
-            <Nav.Link href="production_report">Production Report</Nav.Link>
+            <NavDropdown title="Production Dashboard" id="dash">
+              <NavDropdown.Item href="/production_report">Production Report</NavDropdown.Item>
+              <NavDropdown.Item href="/periodic_update">Periodic Update</NavDropdown.Item>
+              <NavDropdown.Item href="/interviewer_breakdown">Interviewer Breakdown</NavDropdown.Item>
+            </NavDropdown>
             <Nav.Link href="data_processing">Data Processing</Nav.Link>
             {/*<NavDropdown title="Texting Platform" id="basic-nav-dropdown">*/}
             {/*  <NavDropdown.Item href="texting_platform/sample_upload">Sample Upload</NavDropdown.Item>*/}
