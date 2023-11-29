@@ -1,6 +1,6 @@
-import os
+import shutil
 
-from flask import Flask, request, jsonify, session, make_response, send_file, after_this_request
+from flask import Flask, request, jsonify, session, make_response, send_file
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_session import Session
@@ -8,10 +8,6 @@ from flask_session import Session
 from .config import ApplicationConfig
 from ..auth.models import db, User
 from ..data_processing.reader import Reader
-import shutil
-import json
-
-# from defaults.utils.database.datapuller import DataPuller
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=['*'], expose_headers=["Content-Disposition"])
@@ -21,12 +17,54 @@ bcrypt = Bcrypt(app)
 server_session = Session(app)
 db.init_app(app)
 
-# with app.app_context():
-#     db.create_all()
-
-# data_puller = DataPuller()
 reader = Reader()
 
+
+@app.route('/data_processing', methods=['POST', 'GET'])
+def data_processing():
+    response = _build_cors_preflight_response()
+
+    survey_id = request.json['surveyID']
+    project_id = request.json['projectID']
+
+    Reader.project_id = project_id
+    reader.setUrl(survey_id)
+
+    return response
+
+
+@app.route('/data_processing/questions', methods=['POST'])
+@cross_origin()
+def data_processing_questions():
+    response = _build_cors_preflight_response()
+    survey_id = request.json['surveyID']
+    project_id = request.json['projectID']
+
+    Reader.project_id = project_id
+    reader.setUrl(survey_id)
+    questions = reader.get_order()
+
+    return questions
+
+
+@app.route('/data_processing/questions/process_data', methods=['POST'])
+@cross_origin()
+def process_data():
+    response = _build_cors_preflight_response()
+    reader.set_skips(request.json)
+    reader.run()
+
+    shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
+
+    return "Zip created"
+
+
+@app.route("/data_processing/download", methods=["GET"])
+@cross_origin()
+def download():
+    response = _build_cors_preflight_response()
+    sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
+    return sendfile
 
 
 @app.route('/', methods=['GET'])
@@ -112,76 +150,6 @@ def login():
         "id": user.id,
         "email": user.email
     })
-
-
-@app.route('/data_processing', methods=['POST', 'GET'])
-def data_processing():
-    # if request.method == "OPTIONS":  # CORS preflight
-    response = _build_cors_preflight_response()
-    # response.headers.add("Content-Disposition", "attachment;filename=file.txt")
-
-    survey_id = request.json['surveyID']
-    project_id = request.json['projectID']
-
-    Reader.project_id = project_id
-    reader.setUrl(survey_id)
-
-    # reader.run()
-
-    # origin_path = Path(rf"i:\PROJ\{project_id}")
-    # database_path = Path(rf"\DATABASE\{project_id}")
-
-    return response
-    # return Path(rf"{origin_path}\UNCLE\{project_id} tables"), \
-    #     Path(f"{origin_path}{database_path} layout.xlsx"), \
-    #     Path(f"{origin_path}{database_path} xfile.xlsx")
-
-
-@app.route('/data_processing/questions', methods=['POST'])
-@cross_origin()
-def data_processing_questions():
-    response = _build_cors_preflight_response()
-    survey_id = request.json['surveyID']
-    project_id = request.json['projectID']
-
-    # questions = jsonify(reader.get_questions())
-    Reader.project_id = project_id
-    reader.setUrl(survey_id)
-    questions = reader.get_order()
-
-    # print(questions.json)
-
-    return questions
-
-@app.route('/data_processing/questions/process_data', methods=['POST'])
-@cross_origin()
-def process_data():
-    response = _build_cors_preflight_response()
-    reader.set_skips(request.json)
-    reader.run()
-
-    shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
-
-    return "Zip created"
-
-@app.route("/data_processing/download", methods=["GET"])
-@cross_origin()
-def download():
-    response = _build_cors_preflight_response()
-    sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
-
-    # @after_this_request
-    # def add_close_action(response):
-    #     @response.call_on_close
-    #     def process_after_request():
-    #         try:
-    #             print("file sent, deleting...")
-    #             print(os.getcwd())
-    #             os.remove(r"./defaults/core/server_routes/EXTRACTION.zip")
-    #             print("done.")
-    #         except Exception as e:
-    #             print(str(e))
-    return sendfile
 
 
 def _build_cors_preflight_response():
