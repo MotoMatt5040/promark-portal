@@ -64,10 +64,6 @@ function ProductionReport() {
             <Dropdown.Item>Name 3</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
-        {/*<DateRangePicker style={dateButtonStyle} initialSettings={{ startDate: '1/1/2014', endDate: '3/1/2014' }}>*/}
-        {/*  <button>Date Range</button>*/}
-        {/*</DateRangePicker>*/}
-        {/*<DateRangePicker ranges={['startDate': new Date()]} onChange={handleSelect} />*/}
         <Button variant="primary" onClick={handleShow} className="me-2">Date</Button>
         <Offcanvas show={show} onHide={handleClose} placement={'top'}>
           <Offcanvas.Header closeButton>
