@@ -13,7 +13,7 @@ import ProductionReport from "./pages/production-dashboard/ProductionReport";
 function App() {
   // const [session , setSession] = useState();
   // const [user, setUser] = useState(null);
-
+  //
   // useEffect(() => {
   //   (async () => {
   //     try {
@@ -25,7 +25,7 @@ function App() {
   //     }
   //   })();
   // }, [setUser]);
-
+  //
   // if(!session) {
   //   return <Login setSession={setSession} />;
   // }
@@ -33,7 +33,6 @@ function App() {
 
 
   return (
-
     <BrowserRouter>
       <main>
         <Header title="React Navbar Component"/>
