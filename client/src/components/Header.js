@@ -19,13 +19,6 @@ const Header = (props) => {
               <NavDropdown.Item href="/interviewer_breakdown">Interviewer Breakdown</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link href="data_processing">Data Processing</Nav.Link>
-            {/*<NavDropdown title="Texting Platform" id="basic-nav-dropdown">*/}
-            {/*  <NavDropdown.Item href="texting_platform/sample_upload">Sample Upload</NavDropdown.Item>*/}
-            {/*  <NavDropdown.Item href="#texting_platform/next_item">Next Item</NavDropdown.Item>*/}
-            {/*  <NavDropdown.Item href="#texting_platform/potential_third_item">Potential Third Item</NavDropdown.Item>*/}
-            {/*  <NavDropdown.Divider />*/}
-            {/*  <NavDropdown.Item href="#texting_platoform/send_message">Send Messages</NavDropdown.Item>*/}
-            {/*</NavDropdown>*/}
           </Nav>
         </Navbar.Collapse>
       </Container>
