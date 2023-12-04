@@ -191,7 +191,8 @@ function Instructions() {
               <Accordion.Header>
                 <Tooltip
                   title="All D//S scores have an indentation with &AI2, this will indent 2 spaces. This indentation
-                    should only be included on lines that have a 'Total'.">
+                    should only be included on lines that have a 'Total'."
+                  arrow>
                   Fixing Indentations and D//S scores
                 </Tooltip>
               </Accordion.Header>
@@ -218,7 +219,8 @@ function Instructions() {
                     support or oppose,
                     agree or disagree,
                     approve or disapprove,
-                    etc...">
+                    etc..."
+                    arrow>
                     &nbsp;text
                   </Tooltip>
                 </span>.<br/>
@@ -247,14 +249,16 @@ function Instructions() {
                 issue may look like
                 <span style={{"color": "#0000ff"}}>
                   <Tooltip
-                    title="R NO ANSWER ;NOTR(10:11:01,15:10,02,03,:04) ;NOR SZR">
+                    title="R NO ANSWER ;NOTR(10:11:01,15:10,02,03,:04) ;NOR SZR"
+                    arrow>
                     &nbsp;this&nbsp;
                   </Tooltip>
                 </span>
                 when it should look
                 <span style={{"color": "#0000ff"}}>
                   <Tooltip
-                    title="R NO ANSWER ;NOTR(10:11,1:15) ;NOR SZR">
+                    title="R NO ANSWER ;NOTR(10:11,1:15) ;NOR SZR"
+                    arrow>
                     &nbsp;as follows&nbsp;
                   </Tooltip>
                 </span>
@@ -265,7 +269,8 @@ function Instructions() {
                 <Accordion.Header>
                   <Tooltip
                     title="Not all qualifiers will be properly added to each table, be sure to check the survey to verify
-                    what needs a qualifier. The qualifier label may also need to be changed.">
+                    what needs a qualifier. The qualifier label may also need to be changed."
+                    arrow>
                       Fixing Qualifiers
                   </Tooltip>
                 </Accordion.Header>
@@ -275,7 +280,7 @@ function Instructions() {
                   Default tables use the following syntax: <b>R BASE==TOTAL SAMPLE ;ALL ;HP NOVP</b><br/>
                   Qualifier tables use the following syntax: <b>R BASE==TOTAL
                   <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="This may be changed to the qualifying criteria.">
+                    <Tooltip title="This may be changed to the qualifying criteria." arrow>
                       &nbsp;ASKED&nbsp;
                     </Tooltip>
                   </span>
