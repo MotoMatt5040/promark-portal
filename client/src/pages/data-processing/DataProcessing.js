@@ -152,7 +152,7 @@ function DataProcessing() {
               style={formStyle}>
               <div style={formTextBox}>
                 <Form.Group className="mb-3" controlId="formGroupSruveryId">
-                  <Form.Label>Survey ID</Form.Label>
+                  <Form.Label>Acuity Survey ID</Form.Label>
                   <Form.Control
                     type="text"
                     autoComplete="off"
@@ -166,16 +166,16 @@ function DataProcessing() {
                   <Form.Control.Feedback>Good!</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formGroupProjectId">
-                  <Form.Label>Project ID</Form.Label>
+                  <Form.Label>PRC Project Number</Form.Label>
                   <Form.Control
                     type="text"
                     autoComplete="off"
                     onChange={(e) => setProjectID(e.target.value)}
-                    placeholder="Project ID"
+                    placeholder="Project Number"
                     required
                   />
                   <Form.Text id="SurveyIDnote" muted>
-                    Project to data process
+                    Promark Project Number
                   </Form.Text>
                   <Form.Control.Feedback>Good!</Form.Control.Feedback>
                 </Form.Group>
