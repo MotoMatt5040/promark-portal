@@ -52,6 +52,8 @@ class AcuityData:
         'SOMEWHAT LESS LIKELY': {"MORE LIKELY": [1, 2], "LESS LIKELY": [3, 4]},
         'MUCH LESS LIKELY': {"MORE LIKELY": [1, 2], "LESS LIKELY": [3, 4]},
 
+        # TODO: make the code to wear it is uploaded to a webpage where we can check off how we want to see totals.
+        # TODO: The reason for this is that sometimes we may want the same totals worded differently.
         'VERY LIKELY': {"LIKELY": [1, 2], "UNLIKELY": [3, 4]},
         'SOMEWHAT LIKELY': {"LIKELY": [1, 2], "UNLIKELY": [3, 4]},
         'SOMEWHAT UNLIKELY': {"LIKELY": [1, 2], "UNLIKELY": [3, 4]},
