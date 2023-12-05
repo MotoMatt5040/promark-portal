@@ -144,7 +144,9 @@ function DataProcessing() {
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
+          <div className='invis-form-spacer' style={invisFormSpacerStyle} />
           <div className='dp-form' style={formDiv}>
+
             <Form
               noValidate
               validated={validated}
@@ -181,13 +183,15 @@ function DataProcessing() {
                 </Form.Group>
               </div>
               <div style={formButtons}>
-              <Button variant="primary" onClick={handleShow}>Layout</Button>
+                <Button variant="primary" onClick={handleShow}>Checkboxes</Button>
               </div>
             </Form>
           </div>
-            <p>Use the drop downs below for further explanations</p>
+          <div style={downloadButtonDivStyle}>
             <Button onClick={handleDownload}>Download</Button>
           </div>
+
+        </div>
         <br/>
         <Offcanvas show={show} onHide={handleClose}>
           <Offcanvas.Header closeButton>
@@ -212,6 +216,7 @@ function DataProcessing() {
                         <td>
                           <input
                             type="checkbox"
+                            type="checkbox"
                             name={question}
                             id={question}
                             checked={selectedValues[question]}
@@ -232,18 +237,34 @@ function DataProcessing() {
 
 export default DataProcessing;
 
-const formDiv = {
+const headerStyle = {
+  // border: '1px solid green',
   display: 'flex',
   flexDirection: 'row',
-  width: "30%",
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  alignContent: 'center',
+}
+
+const invisFormSpacerStyle = {
+  // border: '1px solid black',
+  display: 'flex',
+}
+
+const formDiv = {
+  // border: '1px solid blue',
+  display: 'flex',
+  flexDirection: 'row',
+  width: "40%",
   alignItems: 'center',
   justifyContent: 'center',
   alignContent: 'center',
 }
 
 const formStyle = {
+  // border: '1px solid red',
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
   alignContent: 'center',
@@ -251,27 +272,33 @@ const formStyle = {
 }
 
 const formTextBox = {
+  // border: '1px solid green',
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
+  justifyContent: 'space-evenly',
   alignItems: 'center',
   alignContent: 'center',
-  flexGrow: '1'
-}
-
-const headerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  alignContent: 'center',
+  flexGrow: '1',
+  width: '70%'
 }
 
 const formButtons = {
+  // border: '1px solid pink',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-evenly',
   alignContent: 'center',
-  width: "100%"
+  width: "30%"
+}
+
+const downloadButtonDivStyle = {
+  // border: '1px solid pink',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'right',
+  justifyContent: 'right',
+  alignContent: 'right',
+  // paddingLeft: '30%'
+  // width: "100%"
 }
