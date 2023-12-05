@@ -47,7 +47,6 @@ function DataProcessing() {
       let config = {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
           }
         }
       const response = await axios.post(
@@ -91,7 +90,6 @@ function DataProcessing() {
       let config = {
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
         }
       }
       console.log("data")
@@ -123,7 +121,6 @@ function DataProcessing() {
       responseType: 'blob',
       headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
           }
     })
       .then((obj) => {

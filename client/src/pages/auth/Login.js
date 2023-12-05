@@ -49,7 +49,6 @@ function Login() {
       var config = {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
           }
         }
       const response = await axios.post(
