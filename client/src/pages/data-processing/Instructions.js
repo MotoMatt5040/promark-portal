@@ -278,10 +278,11 @@ function Instructions() {
                 <p>
                   Qualifiers use the following syntax: <b>Q R(10:11,01)</b><br/>
                   Default tables use the following syntax: <b>R BASE==TOTAL SAMPLE ;ALL ;HP NOVP</b><br/>
-                  Qualifier tables use the following syntax: <b>R BASE==TOTAL
+                  Qualifier tables use the following syntax: <b>R BASE==
                   <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="This may be changed to the qualifying criteria." arrow>
-                      &nbsp;ASKED&nbsp;
+                    <Tooltip title="This may be changed to the qualifying criteria. e.g. PARENT==YES, Q10==1,2,
+                    Q10==AGREE" arrow>
+                      &nbsp;TOTAL ASKED&nbsp;
                     </Tooltip>
                   </span>
                   ;ALL ;HP NOVP</b>
