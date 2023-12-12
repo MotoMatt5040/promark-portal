@@ -374,22 +374,22 @@ function Instructions() {
                   </span><br/>
                   <br/>
                   <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="Column identifier">
+                    <Tooltip title="Column identifier" arrow>
                       C&nbsp;
                     </Tooltip>
                   </span>
                   <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="Centers the following title text between two print positions.">
+                    <Tooltip title="Centers the following title text between two print positions." arrow>
                       &CE&nbsp;
                     </Tooltip>
                   </span>
                   <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="Column title">
+                    <Tooltip title="Column title" arrow>
                       TOTAL&nbsp;
                     </Tooltip>
                   </span>
                   <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="Column position">
+                    <Tooltip title="Column position" arrow>
                       ;ALL&nbsp;
                     </Tooltip>
                   </span>
