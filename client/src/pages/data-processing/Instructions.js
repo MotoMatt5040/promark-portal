@@ -368,6 +368,27 @@ function Instructions() {
                     </Tooltip>
                   </span>
                   command on the row you use to write the column info. <br/>
+                  <br/>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="Column identifier">
+                      C&nbsp;
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="Centers the following title text between two print positions.">
+                      &CE&nbsp;
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="Column title">
+                      TOTAL&nbsp;
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="Column position">
+                      ;ALL&nbsp;
+                    </Tooltip>
+                  </span>
                 </p>
               </Accordion.Body>
             </Accordion.Item>
