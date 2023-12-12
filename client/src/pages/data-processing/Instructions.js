@@ -304,9 +304,74 @@ function Instructions() {
         </Accordion.Body>
       </Accordion.Item>
       <Accordion.Item eventKey="9">
-        <Accordion.Header>Step 10:</Accordion.Header>
+        <Accordion.Header>Step 10: Banner Setup</Accordion.Header>
         <Accordion.Body>
-
+          <Accordion>
+            <Accordion.Item eventKey="9-1">
+              <Accordion.Header>Banner Basics</Accordion.Header>
+              <Accordion.Body>
+                <p>
+                  Banners will be drastically different for different clients. The standard that we use at Promark is
+                  as follows: <b>O FORMAT
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="row title width" arrow>
+                      &nbsp;25
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="column width" arrow>
+                      &nbsp;5
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="column separator" arrow>
+                      &nbsp;1
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="column indentation" arrow>
+                      &nbsp;0
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="ZCELL, prints the specified string ('-' in this case) in positions where the
+                    frequency is zero." arrow>
+                      &nbsp;ZC'-'
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="ZPCELL, prints the specified string ('-' in this case) in positions where the
+                    percentage is zero." arrow>
+                      &nbsp;ZPC'-'
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="Used to print the percent sign after each percentage." arrow>
+                      &nbsp;PCTS
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="PDP controls the number of decimal printed for percentages (0 in this case)." arrow>
+                      &nbsp;PDP0
+                    </Tooltip>
+                  </span>
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="HBASE specifies that the frequencies of an indicated column will be used as the
+                    base for horizontal percentages (in this case 1)." arrow>
+                      &nbsp;HB1&nbsp;
+                    </Tooltip>
+                  </span></b> <br/>
+                  Individual columns can be adjusted using the
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="e.g. ;COLW6, ;COLW7, ;COLW8" arrow>
+                      &nbsp;;COLW#&nbsp;
+                    </Tooltip>
+                  </span>
+                  command on the row you use to write the column info. <br/>
+                </p>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
         </Accordion.Body>
       </Accordion.Item>
     </Accordion>
