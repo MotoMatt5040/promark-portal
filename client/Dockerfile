@@ -6,7 +6,8 @@ COPY package*.json .
 
 RUN npm install
 
-RUN npm install react-bootstrap bootstrap @emotion/react @emotion/styled @mui/icons-material @mui/base @mui/material
+RUN npm install react-bootstrap bootstrap @emotion/react @emotion/styled @mui/icons-material @mui/base @mui/material react-date-range date-fns
+
 
 COPY . .
 

@@ -8,9 +8,11 @@ RUN curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/so
 RUN exit
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get install -y msodbcsql17
-RUN wget https://www.openssl.org/source/openssl-1.1.1p.tar.gz -O openssl-1.1.1p.tar.gz
-RUN tar -zxvf openssl-1.1.1p.tar.gz
-RUN cd openssl-1.1.1p && ./config && make && make install && ldconfig && openssl version
+RUN wget https://www.openssl.org/source/openssl-1.1.1w.tar.gz -O openssl-1.1.1w.tar.gz
+RUN tar -zxvf openssl-1.1.1w.tar.gz
+RUN cd openssl-1.1.1w && ./config && make && make install && ldconfig && openssl version
+RUN cd ..
 COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
+COPY . .
 ENTRYPOINT ["python", "app.py"]
