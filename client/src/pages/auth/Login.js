@@ -58,8 +58,8 @@ function Login() {
       );
 
       if (response.status === 200) {
-        // window.location.href="/home"
-        console.log('logged in successfully')
+        window.location.href="/home";
+        console.log('logged in successfully');
       }
 
 
@@ -74,7 +74,7 @@ function Login() {
       //   });
       // console.log(response.data);
       console.log(JSON.stringify(response));
-      // setSuccess(true)
+      setSuccess(true)
     } catch (error) {
       if (!error?.response) {
         setErrorMesssage('No Server Response')
