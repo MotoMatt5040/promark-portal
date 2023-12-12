@@ -1,31 +1,8 @@
 version: '3.1'
 services:
-  nginx:
-    image: nginx:1.15-alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    depends_on:
-      - client
-    networks:
-      - my-network
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    networks:
-      - my-network
   redis:
     image: redis:7-alpine
-    restart: always
+    restart: on-failure
     environment:
        SECRET_KEY: /run/secrets/redis-secret
     ports:
@@ -38,9 +15,9 @@ services:
   client:
     build: ./client
     container_name: promark-portal-c
-    restart: always
+    restart: on-failure
     ports:
-      - "3000:3000"
+      - "80:3000"
     volumes:
       - ./client:/app
       - ./app/node_modules
@@ -49,7 +26,7 @@ services:
   flask_server:
     build: ./server
     container_name: flask_server
-    restart: always
+    restart: on-failure
     environment:
        SECRET_KEY: /run/secrets/redis-secret
     ports:
@@ -63,6 +40,7 @@ services:
 
 networks:
   my-network:
+    driver: bridge
 
 secrets:
   redis-secret:
