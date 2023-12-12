@@ -311,8 +311,19 @@ function Instructions() {
               <Accordion.Header>Banner Basics</Accordion.Header>
               <Accordion.Body>
                 <p>
-                  Banners will be drastically different for different clients. The standard that we use at Promark is
-                  as follows: <b>O FORMAT
+                  Banners will be drastically different for different clients. The standard format that we use at
+                  Promark is as follows: <br/>
+                  <br/>
+                  <b>T
+                  <span style={{"color": "#0000ff"}}>
+                    <Tooltip title="Centers the following title text between two table columns." arrow>
+                      &nbsp;&CC
+                    </Tooltip>
+                  </span>2:3 GENDER&CC4:6 PARTY ID&CC7:12 PARTY ID // GENDER&CC13:15 IDEOLOGY&CC16:18 PARTY ID //
+                  CONS&CC19:21 PARTY ID // MODM<br/>
+                  T &CC2:3==&CC4:6==&CC7:12==&CC13:15==&CC16:18==&CC19:21==<br/>
+                  <br/>
+                  O FORMAT
                   <span style={{"color": "#0000ff"}}>
                     <Tooltip title="row title width" arrow>
                       &nbsp;25
@@ -360,14 +371,7 @@ function Instructions() {
                     base for horizontal percentages (in this case 1)." arrow>
                       &nbsp;HB1&nbsp;
                     </Tooltip>
-                  </span></b> <br/>
-                  Individual columns can be adjusted using the
-                  <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="e.g. ;COLW6, ;COLW7, ;COLW8" arrow>
-                      &nbsp;;COLW#&nbsp;
-                    </Tooltip>
-                  </span>
-                  command on the row you use to write the column info. <br/>
+                  </span><br/>
                   <br/>
                   <span style={{"color": "#0000ff"}}>
                     <Tooltip title="Column identifier">
@@ -389,6 +393,37 @@ function Instructions() {
                       ;ALL&nbsp;
                     </Tooltip>
                   </span>
+                  </b>
+                  <br/>
+                  Individual columns can be adjusted using the
+                  <b>
+                    <span style={{"color": "#0000ff"}}>
+                      <Tooltip title="e.g. ;COLW6, ;COLW7, ;COLW8" arrow>
+                        &nbsp;;COLW#&nbsp;
+                      </Tooltip>
+                    </span>
+                  </b>
+                  <br/>
+                  <br/>
+                  Some clients will want the company name to be printed on the bottom of each banner page, to include
+                  it, use the following syntax at the bottom of the page:
+                  <b>
+                    &nbsp;F
+                    <span style={{"color": "#0000ff"}}>
+                      <Tooltip title="Centers the following title text between two print positions." arrow>
+                        &nbsp;&#38;CP;&nbsp;
+                      </Tooltip>
+                    </span>
+                    &lt; C O M P A N Y  N A M E &gt;
+                  </b>
+                </p>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="9-2">
+              <Accordion.Header></Accordion.Header>
+              <Accordion.Body>
+                <p>
+
                 </p>
               </Accordion.Body>
             </Accordion.Item>
