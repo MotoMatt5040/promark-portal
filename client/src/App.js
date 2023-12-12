@@ -1,24 +1,25 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
 import Home from './pages/Home';
-import SampleUpload from "./pages/texting-platform/SampleUpload";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Login from "./pages/auth/Login";
-import { useState, useEffect } from 'react';
-import UserInterface from './pages/auth/userInterface.ts';
+import {useEffect, useState} from 'react';
 import axios from './api/axios';
 import DataProcessing from "./pages/data-processing/DataProcessing";
 import ProductionReport from "./pages/production-dashboard/ProductionReport";
 
 function App() {
   // const [session , setSession] = useState();
-  // const [user, setUser] = useState(null);
+  // const [user, setUser] = useState({id: '', email: ''});
   //
   // useEffect(() => {
   //   (async () => {
   //     try {
   //       const response = await axios.get("/@me");
   //       setUser(response.data);
+  //       console.log(response.data, response.data.id)
+  //       setSession((response.data.id))
+  //       console.log('user authorized')
   //     } catch (error) {
   //       console.log("Not Authenticated");
   //       console.log(error);
@@ -29,7 +30,6 @@ function App() {
   // if(!session) {
   //   return <Login setSession={setSession} />;
   // }
-  // console.log(session);
 
 
   return (
