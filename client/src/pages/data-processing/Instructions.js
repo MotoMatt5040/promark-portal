@@ -311,8 +311,8 @@ function Instructions() {
               <Accordion.Header>Banner Basics</Accordion.Header>
               <Accordion.Body>
                 <p>
-                  Banners will be drastically different for different clients. The standard format that we use at
-                  Promark is as follows: <br/>
+                  Banners are part of the 900 series tables and start at 901. They will be drastically different for
+                  different clients. The standard format that we use at Promark is as follows: <br/>
                   <br/>
                   <b>T
                   <span style={{"color": "#0000ff"}}>
@@ -420,11 +420,74 @@ function Instructions() {
               </Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="9-2">
-              <Accordion.Header></Accordion.Header>
+              <Accordion.Header>Example Table 1:</Accordion.Header>
               <Accordion.Body>
-                <p>
+                <pre>
+                  *
+                  <br/>TABLE 901
+                  <br/>T / / BANNER 1
+                  <br/>T &CC2:3 GENDER&CC4:6 PARTY ID&CC7:12 PARTY ID // GENDER&CC13:15 IDEOLOGY&CC16:18 PARTY ID // CONS&CC19:21 PARTY ID // MOD
+                  <br/>T &CC2:3==&CC4:6==&CC7:12==&CC13:15==&CC16:18==&CC19:21==
+                  <br/>O FORMAT 25 5 1 0 ZC'-' ZPC'-' PCTS PDP0 HB1
+                  <br/>C &CE TOTAL     ;ALL
+                  <br/>C &CE MEN       ;36-1
+                  <br/>C &CE WOMEN     ;36-2
+                  <br/>C &CE REP       ;37-1:3
+                  <br/>C &CE IND       ;37-4
+                  <br/>C &CE DEM       ;37-5:7
+                  <br/>C &CE REP/MEN   ;36-1 37-1:3
+                  <br/>C &CE REP/WOMEN ;36-2 37-1:3
+                  <br/>C &CE IND/MEN   ;36-1 37-4
+                  <br/>C &CE IND/WOMEN ;36-2 37-4
+                  <br/>C &CE DEM/MEN   ;36-1 37-5:7
+                  <br/>C &CE DEM/WOMEN ;36-2 37-5:7
+                  <br/>C &CE CONS      ;51-1:2
+                  <br/>C &CE MOD       ;51-3
+                  <br/>C &CE LIB       ;51-4:5
+                  <br/>C &CE REP/CONS  ;51-1:2 37-1:3
+                  <br/>C &CE IND/CONS  ;51-1:2 37-4
+                  <br/>C &CE DEM/CONS  ;51-1:2 37-5:7
+                  <br/>C &CE REP/MOD   ;51-3 37-1:3
+                  <br/>C &CE IND/MOD   ;51-3 37-4
+                  <br/>C &CE DEM/MOD   ;51-3 37-5:7
+                </pre>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="9-3">
+              <Accordion.Header>Example Table 2:</Accordion.Header>
+              <Accordion.Body>
+                <pre>
+                  *
+                  <br/>TABLE 902
+                  <br/>T / / BANNER 2
+                  <br/>T &CC2:7 AGE&CC8:12 RACE&CC13:16 INCOME&CC17:19 AREA&CC20:23 REGION
+                  <br/>T &CC2:7==&CC8:12==&CC13:16==&CC17:19==&CC20:23==
+                  <br/>O FORMAT 25 5 1 0 ZC'-' ZPC'-' PCTS PDP0 HB1
+                  <br/>C &CE TOTAL       ;ALL
+                  <br/>C &CE 18-24       ;35-1
+                  <br/>C &CE 25-34       ;35-2
+                  <br/>C &CE 35-44       ;35-3
+                  <br/>C &CE 45-54       ;35-4
+                  <br/>C &CE 55-64       ;35-5
+                  <br/>C &CE 65+         ;35-6
+                  <br/>C &CE WHITE       ;39-1 38N1
+                  <br/>C &CE BLACK       ;39-2 38N1
+                  <br/>C &CE ASIAN       ;39-3 38N1
+                  <br/>C &CE HISP        ;39-4 OR 38-1
+                  <br/>C &CE OTHER       ;39-5:6 38N1
+                  <br/>C &CE &lt;$40K       ;48-1
+                  <br/>C &CE $40K-/$80K  ;48-2
+                  <br/>C &CE $80K-/$125K ;48-3
+                  <br/>C &CE &gt;$125K      ;48-4 ;COLW6
+                  <br/>C &CE URBAN       ;50-1
+                  <br/>C &CE SUBURB      ;50-2 ;COLW6
+                  <br/>C &CE RURAL       ;50-3
+                  <br/>C &CE NE          ;32-1
+                  <br/>C &CE MW          ;32-2
+                  <br/>C &CE SOUTH       ;32-3
+                  <br/>C &CE WEST        ;32-4
 
-                </p>
+                </pre>
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
