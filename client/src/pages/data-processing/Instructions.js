@@ -26,6 +26,11 @@ function Instructions() {
               &emsp; <b>Export only a subset</b> <br />
               &ensp;&emsp; Press: <b>[Select Variables]</b> <br />
               &ensp; Select all variables to include <br />
+              &ensp;&emsp;<b>Always indluce the following:</b><br/>
+              &ensp;&emsp;&ensp;<b>Case ID</b><br/>
+              &ensp;&emsp;&ensp;<b>Last Connection Date</b><br/>
+              &ensp;&emsp;&ensp;<b>Start time of last connection</b><br/>
+              &ensp;&emsp;&ensp;<b>Total Duration (sec.)</b><br/>
               &ensp; Check the following: <i>Note: these are located at the bottom</i><br />
               &emsp; <b>Include header</b> <br />
               &emsp; <b>Strip HTML from labels</b> <br />
@@ -64,7 +69,7 @@ function Instructions() {
         </Accordion.Body>
       </Accordion.Item>
       <Accordion.Item eventKey="3">
-        <Accordion.Header>Step 4: Click Layout</Accordion.Header>
+        <Accordion.Header>Step 4: Click Checkboxes</Accordion.Header>
         <Accordion.Body>
           <p>Uncheck the boxes for tables that will be skipped. These will include fills, computations, OS, OE, etc...</p>
         </Accordion.Body>
@@ -486,7 +491,6 @@ function Instructions() {
                   <br/>C &CE MW          ;32-2
                   <br/>C &CE SOUTH       ;32-3
                   <br/>C &CE WEST        ;32-4
-
                 </pre>
               </Accordion.Body>
             </Accordion.Item>
