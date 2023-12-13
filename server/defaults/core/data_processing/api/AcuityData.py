@@ -130,7 +130,7 @@ class AcuityData:
 
     @staticmethod
     def order():
-        return list(pd.read_csv("order.csv").columns[4:])
+        return list(pd.read_csv("order.csv").columns[3:])
 
     def __init__(self):
         self.__variables = None
@@ -320,14 +320,14 @@ class AcuityData:
 
             for q in __fills:
                 try:
-                    if f"[{q}F1]" in __data[qname]['question'] or f"[{q}FIL2]" in __data[qname]['question']:
-                        __data[qname]['question'] = __data[qname]['question'].replace(f"[{q}F1]", __fills[q])
-                        __data[qname]['question'] = __data[qname]['question'].replace(f"[{q}F2]", __fills[q])
+                    if f"[{q}FIL1]" in __data[qname]['question'] or f"[{q}FIL2]" in __data[qname]['question']:
+                        __data[qname]['question'] = __data[qname]['question'].replace(f"[{q}FIL1]", __fills[q])
+                        __data[qname]['question'] = __data[qname]['question'].replace(f"[{q}FIL2]", __fills[q])
                 except:
                     try:
-                        if f"[{q}F1]" in __data[qname]['question'] or f"[{q}F2]" in __data[qname]['question']:
-                            __data[qname]['text'] = __data[qname]['text'].replace(f"[{q}F1]", __fills[q])
-                            __data[qname]['text'] = __data[qname]['text'].replace(f"[{q}F2]", __fills[q])
+                        if f"[{q}FIL1]" in __data[qname]['question'] or f"[{q}FIL2]" in __data[qname]['question']:
+                            __data[qname]['text'] = __data[qname]['text'].replace(f"[{q}FIL1]", __fills[q])
+                            __data[qname]['text'] = __data[qname]['text'].replace(f"[{q}FIL2]", __fills[q])
                     except:
                         pass
             if __data[qname]['text'] != "":
@@ -371,7 +371,7 @@ class AcuityData:
         __data = data
 
         for __key in list(__data):
-            if __key[-2:] == 'F1' or __key[-2:] == 'F2' or 'SKP' in __key:
+            if __key[-2:] == 'FIL1' or __key[-2:] == 'FIL2' or 'SKP' in __key:
                 del __data[__key]
                 continue
             if __key not in data:
