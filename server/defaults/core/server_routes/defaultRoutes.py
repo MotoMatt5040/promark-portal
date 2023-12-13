@@ -2,7 +2,7 @@ import shutil
 
 from flask import Flask, request, jsonify, session, make_response, send_file
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from flask_session import Session
 
 from .config import ApplicationConfig
@@ -90,24 +90,19 @@ def home():
 
 
 @app.route("/@me", methods=['GET', 'OPTIONS'])
-# @cross_origin()
 def get_current_user():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
     user_id = session.get("user_id")
-    print('\n')
+    print('\nsession ')
     print(session)
-    print('\n')
+    print('\nuser id ')
+    print(user_id)
 
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     user = User.query.filter_by(id=user_id).first()
-
-    print(jsonify({
-        "id": user.id,
-        "email": user.email
-    }))
 
     return jsonify({
         "id": user.id,
