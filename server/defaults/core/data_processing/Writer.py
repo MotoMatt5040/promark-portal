@@ -2,6 +2,24 @@ from typing import Union
 
 class Writer():
 
+    def __init__(self):
+        self._tnum = None
+        self._qname = None
+        self._title_text = None
+        self._qtext = None
+        self._rank = None
+        self._qual = None
+        self._base = None
+        self._totals = None
+        self._code_width = None
+        self._start_column = None
+        self._end_column = None
+        self._column_text = None
+        self._choice_codes = None
+        self._max_choice = None
+        self._choice_labels = None
+        self._rows = None
+
     def tnum(self):
         return f"TABLE {self._tnum}\n"
 
@@ -40,10 +58,19 @@ class Writer():
         else:
             return f"R BASE=={self._base.replace('=', '==')} ;ALL ;HP NOVP\n"
 
-    def total_style(self):
-        pass
+    def total_style(self, style: int):
+        match style:
+            case 1:
+                return (
+                    f"{self.total1()}"
+                    f"{self.rows1()}"
+                )
+            case 2:
+                return "TO BE CODED"
+            case _:
+                return ""
 
-    def total(self):
+    def total1(self):
         total = ""
         if self._totals is not None:
             keys = list(self._totals.keys())
@@ -59,9 +86,10 @@ class Writer():
                     total += f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}"
                 total += "\n"
         else:
-            total = ""
+            return ""
         return total
-    def rows(self):
+
+    def rows1(self):
         rows = ""
         indent = ""
         for row in self._rows:
@@ -114,8 +142,8 @@ class Writer():
                 f"{self.qname()}" \
                 f"{self.qtext()}" \
                 f"{self.rank()}{self.qual()}{self.base()}" \
-                f"{self.total()}" \
-                f"{self.rows()}"
+                f"{self.total1()}" \
+                f"{self.rows1()}"
         return table
 
     """-----------------------------------------------Create--------------------------------------------------"""
