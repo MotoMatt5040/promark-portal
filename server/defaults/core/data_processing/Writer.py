@@ -40,6 +40,9 @@ class Writer():
         else:
             return f"R BASE=={self._base.replace('=', '==')} ;ALL ;HP NOVP\n"
 
+    def total_style(self):
+        pass
+
     def total(self):
         total = ""
         if self._totals is not None:
