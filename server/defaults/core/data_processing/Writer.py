@@ -66,10 +66,7 @@ class Writer():
                     f"{self.rows1()}"
                 )
             case 2:
-                return (
-
-
-                )
+                return self.total_inline()
             case _:
                 return ""
 
@@ -90,18 +87,31 @@ class Writer():
                 totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}"
             totals[index] += "\n"
             index += 1
+
+        index = 0
+        rows = []
+        indent = ""
+        for row in self._rows:
+            if self._totals is not None:
+                for j in self._totals:
+                    if j in row:
+                        if not "UNSURE" in row or not "NO OPINION" in row or not "NO ANSWER" in row:
+                            indent = "&AI2 "
+                        continue
+
+            rows[index] = f"R {indent}{row}\n"
+            index += 1
+        final_rows = rows[4:]
+        newline = "\n"
         return (
             f"{totals[0]}" # This is the D//S score
             f"{totals[1]}" # This is the first total header
-            # Indented row info
-            # TODO 
-            #  must determine where first total category ends. This may have problems if we dont have our 4 total 
-            #  choices inline
+            f"{rows[0]}"#  Indented row info
+            f"{rows[1]}" # Indented row info
             f"{totals[2]}" # This is the second total header
-            # Indented row info
-            # TODO
-            #  must determine where first total category ends. This may have problems if we dont have our 4 total
-            #  choices inline
+            f"{rows[2]}" # Indented row info
+            f"{rows[3]}" # Indented row info
+            f"{[x + newline for x in final_rows]}" # rows after total included rows, non-indented
         )
 
     def total1(self):
@@ -124,6 +134,8 @@ class Writer():
         return total
 
     def rows1(self):
+        row_text = []
+        index = 0
         rows = ""
         indent = ""
         for row in self._rows:
@@ -131,11 +143,13 @@ class Writer():
             if self._totals is not None:
                 for j in self._totals:
                     if j in row:
-                        if not "UNSURE" in row:
+                        if not "UNSURE" in row or not "NO OPINION" in row or not "NO ANSWER" in row:
                             indent = "&AI2 "
                         continue
 
             rows += f"R {indent}{row}\n"
+            row_text[index] = f"R {indent}{row}\n"
+            index += 1
         if self._max_choice < 2:
             pos = 0
             append = 0
@@ -164,6 +178,7 @@ class Writer():
 
             if self._code_width > 1:
                 rows += f"R NO ANSWER ;NOT{self._column_text}{not_choices}) ;NOR SZR\n"
+
             else:
                 rows += f"R NO ANSWER ;{self._column_text}N{not_choices} ;NOR SZR\n"
         return rows
