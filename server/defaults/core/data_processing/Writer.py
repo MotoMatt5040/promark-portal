@@ -66,9 +66,43 @@ class Writer():
                     f"{self.rows1()}"
                 )
             case 2:
-                return "TO BE CODED"
+                return (
+
+
+                )
             case _:
                 return ""
+
+    def total_inline(self):
+        keys = self._totals.keys()
+        totals = []
+        keys = list(self._totals.keys())
+        if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
+            totals[0] = f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n"  # NEEDS TO BE keys[2] IN SOME CASES
+        else:
+            totals[0] = f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n"
+
+        index = 1
+        for key in self._totals.keys():
+            if self._code_width > 1:
+                totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})"
+            else:
+                totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}"
+            totals[index] += "\n"
+            index += 1
+        return (
+            f"{totals[0]}" # This is the D//S score
+            f"{totals[1]}" # This is the first total header
+            # Indented row info
+            # TODO 
+            #  must determine where first total category ends. This may have problems if we dont have our 4 total 
+            #  choices inline
+            f"{totals[2]}" # This is the second total header
+            # Indented row info
+            # TODO
+            #  must determine where first total category ends. This may have problems if we dont have our 4 total
+            #  choices inline
+        )
 
     def total1(self):
         total = ""
