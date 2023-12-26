@@ -259,14 +259,7 @@ function Instructions() {
                     &nbsp;this&nbsp;
                   </Tooltip>
                 </span>
-                when it should look
-                <span style={{"color": "#0000ff"}}>
-                  <Tooltip
-                    title="R NO ANSWER ;NOTR(10:11,1:15) ;NOR SZR"
-                    arrow>
-                    &nbsp;as follows&nbsp;
-                  </Tooltip>
-                </span>
+                when it should look as follows: <b>R NO ANSWER ;NOTR(10:11,1:15) ;NOR SZR</b><br/>
               </p>
             </Accordion.Body>
           </Accordion.Item>

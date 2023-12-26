@@ -37,7 +37,7 @@ export default function TableBody() {
       <br/>X SET OUTPUT RESPONSE REQUEST FILE 'OUTPUT/<b>&lt;PROJECT ID&gt;</b>TT.LOG'
       <br/>X SET OUTPUT OFF FILE 'OUTPUT/<b>&lt;PROJECT ID&gt;</b>TT.TAB'
       <br/>X SET TITLE '/&CP NATIONAL CORE DATA ONLY'
-      <br/>X ^SET TITLE '/&CP TEST BANNER 1 / PARTIAL DATA / RUN DATE: <b>&lt;MMM&gt;</b>. <b>&lt;DD&gt;</b>, <b>&lt;YYYY&gt;</b>'
+      <br/>X ^SET TITLE '/&CP TEST BANNER 1 // PARTIAL DATA // RUN DATE: <b>&lt;MMM&gt;</b>. <b>&lt;DD&gt;</b>, <b>&lt;YYYY&gt;</b>'
       <br/>X RUN <b>&lt;tables&gt;</b> B 901 OFF PAGE 1
       <br/>X SET OUTPUT CLOSE FILE 'OUTPUT/<b>&lt;PROJECT ID&gt;</b>TT.TAB'
       <br/>X SET OUTPUT CLOSE FILE 'OUTPUT/<b>&lt;PROJECT ID&gt;</b>TT.LOG'
