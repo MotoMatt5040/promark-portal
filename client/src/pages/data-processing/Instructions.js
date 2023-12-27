@@ -309,20 +309,14 @@ function Instructions() {
               <Accordion.Header>Banner Basics</Accordion.Header>
               <Accordion.Body>
                 <p>
-                  <span style={{"color": "#0000ff"}}>
-                    <Tooltip title="Banners are typically sent from clients in the form of an excel file. They will
-                    have numbers on the side that correspond to the column position on the table. These numbers are
-                    typically 1-24, where 24 is the last column and cannot be exceeded without modification to the
-                    output file. In the case where you need to exceed 24 columns, it is recommended to verify the
-                    fitment on the output file, and adjust the output file text size as needed. A font size of 7.5 will
-                    typically allow one extra column to fit on the page, but you must verify that the margins are evens
-                    for a nice looking form factor." arrow>
-                      More Info
-                    </Tooltip>
-                  </span> <br/>
-                  <br/>
                   Banners are part of the 900 series tables and start at 901. They will be drastically different for
-                  different clients. The standard format that we use at Promark is as follows: <br/>
+                  different clients. Banners are typically sent from clients in the form of an excel file. They will
+                  have numbers on the side that correspond to the column position on the table. These numbers are
+                  typically 1-24, where 24 is the last column and cannot be exceeded without modification to the output
+                  file. In the case where you need to exceed 24 columns, it is recommended to verify the fitment on the
+                  output file, and adjust the output file text size as needed. A font size of 7.5 will typically allow
+                  one extra column to fit on the page, but you must verify that the margins are even for a nice looking
+                  form factor. The standard format that we use at Promark is as follows: <br/>
                   <br/>
                   <b>T
                   <span style={{"color": "#0000ff"}}>
@@ -330,7 +324,7 @@ function Instructions() {
                       &nbsp;&CC
                     </Tooltip>
                   </span>2:3 GENDER&CC4:6 PARTY ID&CC7:12 PARTY ID // GENDER&CC13:15 IDEOLOGY&CC16:18 PARTY ID //
-                  CONS&CC19:21 PARTY ID // MODM<br/>
+                  CONS&CC19:21 PARTY ID // MOD<br/>
                   T &CC2:3==&CC4:6==&CC7:12==&CC13:15==&CC16:18==&CC19:21==<br/>
                   <br/>
                   O FORMAT
