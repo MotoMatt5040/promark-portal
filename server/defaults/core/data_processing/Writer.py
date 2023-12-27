@@ -301,3 +301,6 @@ class Writer():
     def get_rows(self) -> list[str]:
         return self._rows
 
+    def get_totals(self) -> list[str]:
+        return self._totals.keys()
+
