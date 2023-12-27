@@ -104,14 +104,14 @@ class Writer():
         final_rows = rows[4:]
         newline = "\n"
         return (
-            f"{totals[0]}" # This is the D//S score
-            f"{totals[1]}" # This is the first total header
-            f"{rows[0]}"#  Indented row info
-            f"{rows[1]}" # Indented row info
-            f"{totals[2]}" # This is the second total header
-            f"{rows[2]}" # Indented row info
-            f"{rows[3]}" # Indented row info
-            f"{[x + newline for x in final_rows]}" # rows after total included rows, non-indented
+            f"{totals[0]}"  # This is the D//S score
+            f"{totals[1]}"  # This is the first total header
+            f"{rows[0]}"  # Indented row info
+            f"{rows[1]}"  # Indented row info
+            f"{totals[2]}"  # This is the second total header
+            f"{rows[2]}"  # Indented row info
+            f"{rows[3]}"  # Indented row info
+            f"{[x + newline for x in final_rows]}"  # rows after total included rows, non-indented
         )
 
     def total1(self):
@@ -119,7 +119,7 @@ class Writer():
         if self._totals is not None:
             keys = list(self._totals.keys())
             if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
-                total += f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n" # NEEDS TO BE keys[2] IN SOME CASES
+                total += f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n"  # NEEDS TO BE keys[2] IN SOME CASES
             else:
                 total += f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n"
 
