@@ -96,7 +96,10 @@ function DataProcessing() {
       console.log(selectedValues);
       const response = await axios.post(
       DATA_PROCESSING_URL + PROCESS_DATA_URL,
-      { selectedValues },
+      {
+        selectedValues,
+        totalStyleChecked: document.getElementById("total-style").checked
+      },
       config
       );
 
@@ -187,13 +190,15 @@ function DataProcessing() {
           <div style={downloadButtonDivStyle}>
             <Button onClick={handleDownload}>Download</Button>
           </div>
-
         </div>
         <br/>
         <Offcanvas show={show} onHide={handleClose}>
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Layout</Offcanvas.Title>
             <Button type="submit" onClick={handleRun}>Run</Button>
+            <br/>
+            <label><b>Inline Total</b></label>
+            <input type="checkbox" name="total-style" id="total-style" />
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Table style={{width: "100%"}} striped>
