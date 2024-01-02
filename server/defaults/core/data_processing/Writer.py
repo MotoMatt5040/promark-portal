@@ -148,7 +148,7 @@ class Writer():
                         continue
 
             rows += f"R {indent}{row}\n"
-            row_text[index] = f"R {indent}{row}\n"
+            row_text.append(f"R {indent}{row}\n")
             index += 1
         if self._max_choice < 2:
             pos = 0
