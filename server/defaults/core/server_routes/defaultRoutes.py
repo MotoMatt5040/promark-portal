@@ -1,3 +1,4 @@
+import json
 import shutil
 
 from flask import Flask, request, jsonify, session, make_response, send_file
@@ -55,6 +56,10 @@ def data_processing_questions():
 def process_data():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
+    print(json.dumps(request.json))
+    # print(json.dumps(request.json['selectedValues'], indent=4))
+    # for item in request.json:
+    #     print(item, request.json[item])
     reader.set_skips(request.json)
     reader.run()
 
