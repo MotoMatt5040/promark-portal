@@ -27,6 +27,7 @@ class Reader:
     project_id = None
 
     def __init__(self):
+        self.style = None
         self.api = AcuityData.AcuityData()
 
     def setUrl(self, survey_id: str):
@@ -40,12 +41,13 @@ class Reader:
     def get_order(self):
         return self.api.order()
 
-    def set_skips(self, data):
+    def set_data_layout(self, data):
         skip = []
         for question in data['selectedValues']:
             if not data['selectedValues'][question]:
                 skip.append(question)
         self.api.set_skips(skip)
+        self.style = data['totalStyleChecked']
 
     def run(self):
         data = self.api.data()
@@ -177,7 +179,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                                 f"R UNSURE // REFUSED              ;{writer.get_start_column()}-6\n"
                                 f"R NO ANSWER                      ;{writer.get_start_column()}N1:6 ;NOR SZR\n"
                             )
-                        except Exception as err:
+                        except Exception:
                             f.write(
                                 "*\n"
                                 f"TABLE {writer.get_tnum()}\n"
