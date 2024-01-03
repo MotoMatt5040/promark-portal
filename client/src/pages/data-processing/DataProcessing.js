@@ -98,7 +98,7 @@ function DataProcessing() {
       DATA_PROCESSING_URL + PROCESS_DATA_URL,
       {
         selectedValues,
-        // totalStyleChecked: document.getElementById("total-style").checked
+        totalStyleChecked: document.getElementById("total-style").checked
       },
       config
       );
