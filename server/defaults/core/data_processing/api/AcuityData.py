@@ -517,5 +517,5 @@ class AcuityData:
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
 
-        print(layout.to_string())
+        # print(layout.to_string())
 
