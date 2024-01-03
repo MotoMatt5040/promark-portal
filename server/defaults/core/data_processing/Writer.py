@@ -58,17 +58,16 @@ class Writer():
         else:
             return f"R BASE=={self._base.replace('=', '==')} ;ALL ;HP NOVP\n"
 
-    def total_style(self, style: int):
-        match style:
-            case 1:
-                return (
-                    f"{self.total1()}"
-                    f"{self.rows1()}"
-                )
-            case 2:
-                return self.total_inline()
-            case _:
-                return ""
+    def total_style(self, style: bool):
+        if self._totals is None:
+            return ""
+        if not style:
+            return (
+                f"{self.total1()}"
+                f"{self.rows1()}"
+            )
+        else:
+            return self.total_inline()
 
     def total_inline(self):
         keys = self._totals.keys()
