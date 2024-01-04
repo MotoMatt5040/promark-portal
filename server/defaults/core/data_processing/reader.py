@@ -124,6 +124,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         print("----------------------------------------------------------------")
         # print(json.dumps(data, indent=4))
         writer = Writer()
+        writer.set_style(self.style)
         tnum = 1
         builder = pd.read_excel('builder.xlsx')
         # layout = pd.read_excel('DATABASE/layout.xlsx')
