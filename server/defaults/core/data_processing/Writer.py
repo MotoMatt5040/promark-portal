@@ -19,6 +19,7 @@ class Writer():
         self._max_choice = None
         self._choice_labels = None
         self._rows = None
+        self._style = None
 
     def tnum(self):
         return f"TABLE {self._tnum}\n"
@@ -58,10 +59,10 @@ class Writer():
         else:
             return f"R BASE=={self._base.replace('=', '==')} ;ALL ;HP NOVP\n"
 
-    def total_style(self, style: bool):
+    def row_style(self):
         if self._totals is None:
-            return ""
-        if not style:
+            return self.rows1()
+        if not self._style:
             return (
                 f"{self.total1()}"
                 f"{self.rows1()}"
@@ -94,8 +95,10 @@ class Writer():
             if self._totals is not None:
                 for j in self._totals:
                     if j in row:
-                        if not "UNSURE" in row or not "NO OPINION" in row or not "NO ANSWER" in row:
+                        if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
                             indent = "&AI2 "
+                        else:
+                            indent = ""
                         continue
 
             rows[index] = f"R {indent}{row}\n"
@@ -138,12 +141,14 @@ class Writer():
         rows = ""
         indent = ""
         for row in self._rows:
-            # indent = ""
+            indent = ""
             if self._totals is not None:
                 for j in self._totals:
                     if j in row:
-                        if not "UNSURE" in row or not "NO OPINION" in row or not "NO ANSWER" in row:
+                        if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
                             indent = "&AI2 "
+                        # else:
+                        #     indent = ""
                         continue
 
             rows += f"R {indent}{row}\n"
@@ -190,8 +195,7 @@ class Writer():
                 f"{self.qname()}" \
                 f"{self.qtext()}" \
                 f"{self.rank()}{self.qual()}{self.base()}" \
-                f"{self.total1()}" \
-                f"{self.rows1()}"
+                f"{self.row_style()}"
         return table
 
     """-----------------------------------------------Create--------------------------------------------------"""
@@ -253,6 +257,9 @@ class Writer():
     def set_rows(self, rows: list[str]):
         self._rows = rows
 
+    def set_style(self, style: bool):
+        self._style = style
+
     """--------------------------------------------------GET--------------------------------------------------"""
 
     def get_tnum(self) -> int:
@@ -303,3 +310,5 @@ class Writer():
     def get_totals(self) -> list[str]:
         return self._totals.keys()
 
+    def get_styles(self) -> bool:
+        return self._style
