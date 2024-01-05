@@ -71,40 +71,38 @@ class Writer():
             return self.total_inline()
 
     def total_inline(self):
-        keys = self._totals.keys()
         totals = []
         keys = list(self._totals.keys())
         if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
-            totals[0] = f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n"  # NEEDS TO BE keys[2] IN SOME CASES
+            totals.append(f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n")  # NEEDS TO BE keys[2] IN SOME CASES
         else:
-            totals[0] = f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n"
+            totals.append(f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n")
 
         index = 1
-        for key in self._totals.keys():
+        print(keys, " KEYS____________________")
+        for key in keys:
+            print(key, "------------------")
+            print(self._totals)
+            print(self._totals[key][0], 'test')
             if self._code_width > 1:
-                totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})"
+                totals.append(f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})")
             else:
-                totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}"
+                totals.append(f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}")
             totals[index] += "\n"
             index += 1
 
-        index = 0
         rows = []
-        indent = ""
         for row in self._rows:
+            indent = ""
             if self._totals is not None:
                 for j in self._totals:
                     if j in row:
                         if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
                             indent = "&AI2 "
-                        else:
-                            indent = ""
                         continue
 
-            rows[index] = f"R {indent}{row}\n"
-            index += 1
+            rows.append(f"R {indent}{row}\n")
         final_rows = rows[4:]
-        newline = "\n"
         return (
             f"{totals[0]}"  # This is the D//S score
             f"{totals[1]}"  # This is the first total header
@@ -113,7 +111,7 @@ class Writer():
             f"{totals[2]}"  # This is the second total header
             f"{rows[2]}"  # Indented row info
             f"{rows[3]}"  # Indented row info
-            f"{[x + newline for x in final_rows]}"  # rows after total included rows, non-indented
+            + ''.join(final_rows)  # rows after total included rows, non-indented
         )
 
     def total1(self):
@@ -139,7 +137,6 @@ class Writer():
         row_text = []
         index = 0
         rows = ""
-        indent = ""
         for row in self._rows:
             indent = ""
             if self._totals is not None:
@@ -147,8 +144,6 @@ class Writer():
                     if j in row:
                         if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
                             indent = "&AI2 "
-                        # else:
-                        #     indent = ""
                         continue
 
             rows += f"R {indent}{row}\n"
