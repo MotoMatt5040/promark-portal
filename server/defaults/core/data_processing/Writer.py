@@ -19,6 +19,7 @@ class Writer():
         self._max_choice = None
         self._choice_labels = None
         self._rows = None
+        self._style = None
 
     def tnum(self):
         return f"TABLE {self._tnum}\n"
@@ -58,60 +59,59 @@ class Writer():
         else:
             return f"R BASE=={self._base.replace('=', '==')} ;ALL ;HP NOVP\n"
 
-    def total_style(self, style: int):
-        match style:
-            case 1:
-                return (
-                    f"{self.total1()}"
-                    f"{self.rows1()}"
-                )
-            case 2:
-                return self.total_inline()
-            case _:
-                return ""
+    def row_style(self):
+        if self._totals is None:
+            return self.rows1()
+        if not self._style:
+            return (
+                f"{self.total1()}"
+                f"{self.rows1()}"
+            )
+        else:
+            return self.total_inline()
 
     def total_inline(self):
-        keys = self._totals.keys()
         totals = []
         keys = list(self._totals.keys())
         if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
-            totals[0] = f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n"  # NEEDS TO BE keys[2] IN SOME CASES
+            totals.append(f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n")  # NEEDS TO BE keys[2] IN SOME CASES
         else:
-            totals[0] = f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n"
+            totals.append(f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n")
 
         index = 1
-        for key in self._totals.keys():
+        print(keys, " KEYS____________________")
+        for key in keys:
+            print(key, "------------------")
+            print(self._totals)
+            print(self._totals[key][0], 'test')
             if self._code_width > 1:
-                totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})"
+                totals.append(f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})")
             else:
-                totals[index] = f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}"
+                totals.append(f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}")
             totals[index] += "\n"
             index += 1
 
-        index = 0
         rows = []
-        indent = ""
         for row in self._rows:
+            indent = ""
             if self._totals is not None:
                 for j in self._totals:
                     if j in row:
-                        if not "UNSURE" in row or not "NO OPINION" in row or not "NO ANSWER" in row:
+                        if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
                             indent = "&AI2 "
                         continue
 
-            rows[index] = f"R {indent}{row}\n"
-            index += 1
+            rows.append(f"R {indent}{row}\n")
         final_rows = rows[4:]
-        newline = "\n"
         return (
-            f"{totals[0]}" # This is the D//S score
-            f"{totals[1]}" # This is the first total header
-            f"{rows[0]}"#  Indented row info
-            f"{rows[1]}" # Indented row info
-            f"{totals[2]}" # This is the second total header
-            f"{rows[2]}" # Indented row info
-            f"{rows[3]}" # Indented row info
-            f"{[x + newline for x in final_rows]}" # rows after total included rows, non-indented
+            f"{totals[0]}"  # This is the D//S score
+            f"{totals[1]}"  # This is the first total header
+            f"{rows[0]}"  # Indented row info
+            f"{rows[1]}"  # Indented row info
+            f"{totals[2]}"  # This is the second total header
+            f"{rows[2]}"  # Indented row info
+            f"{rows[3]}"  # Indented row info
+            + ''.join(final_rows)  # rows after total included rows, non-indented
         )
 
     def total1(self):
@@ -119,7 +119,7 @@ class Writer():
         if self._totals is not None:
             keys = list(self._totals.keys())
             if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
-                total += f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n" # NEEDS TO BE keys[2] IN SOME CASES
+                total += f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n"  # NEEDS TO BE keys[2] IN SOME CASES
             else:
                 total += f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n"
 
@@ -137,18 +137,17 @@ class Writer():
         row_text = []
         index = 0
         rows = ""
-        indent = ""
         for row in self._rows:
-            # indent = ""
+            indent = ""
             if self._totals is not None:
                 for j in self._totals:
                     if j in row:
-                        if not "UNSURE" in row or not "NO OPINION" in row or not "NO ANSWER" in row:
+                        if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
                             indent = "&AI2 "
                         continue
 
             rows += f"R {indent}{row}\n"
-            row_text[index] = f"R {indent}{row}\n"
+            row_text.append(f"R {indent}{row}\n")
             index += 1
         if self._max_choice < 2:
             pos = 0
@@ -191,8 +190,7 @@ class Writer():
                 f"{self.qname()}" \
                 f"{self.qtext()}" \
                 f"{self.rank()}{self.qual()}{self.base()}" \
-                f"{self.total1()}" \
-                f"{self.rows1()}"
+                f"{self.row_style()}"
         return table
 
     """-----------------------------------------------Create--------------------------------------------------"""
@@ -254,6 +252,9 @@ class Writer():
     def set_rows(self, rows: list[str]):
         self._rows = rows
 
+    def set_style(self, style: bool):
+        self._style = style
+
     """--------------------------------------------------GET--------------------------------------------------"""
 
     def get_tnum(self) -> int:
@@ -301,3 +302,8 @@ class Writer():
     def get_rows(self) -> list[str]:
         return self._rows
 
+    def get_totals(self) -> list[str]:
+        return self._totals.keys()
+
+    def get_styles(self) -> bool:
+        return self._style

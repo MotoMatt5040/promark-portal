@@ -1,3 +1,4 @@
+import json
 import shutil
 
 from flask import Flask, request, jsonify, session, make_response, send_file
@@ -55,7 +56,12 @@ def data_processing_questions():
 def process_data():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    reader.set_skips(request.json)
+    # print(json.dumps(request.json, indent=4))
+    # print(json.dumps(request.json['selectedValues'], indent=4))
+    # for item in request.json:
+    #     print(item, request.json[item])
+    # print(request.json)
+    reader.set_data_layout(request.json)
     reader.run()
 
     shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")

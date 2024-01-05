@@ -27,6 +27,7 @@ class Reader:
     project_id = None
 
     def __init__(self):
+        self.style = None
         self.api = AcuityData.AcuityData()
 
     def setUrl(self, survey_id: str):
@@ -40,12 +41,13 @@ class Reader:
     def get_order(self):
         return self.api.order()
 
-    def set_skips(self, data):
+    def set_data_layout(self, data):
         skip = []
         for question in data['selectedValues']:
             if not data['selectedValues'][question]:
                 skip.append(question)
         self.api.set_skips(skip)
+        self.style = data['totalStyleChecked']
 
     def run(self):
         data = self.api.data()
@@ -122,6 +124,7 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         print("----------------------------------------------------------------")
         # print(json.dumps(data, indent=4))
         writer = Writer()
+        writer.set_style(self.style)
         tnum = 1
         builder = pd.read_excel('builder.xlsx')
         # layout = pd.read_excel('DATABASE/layout.xlsx')
@@ -156,26 +159,37 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                 except Exception as err:
                     print(traceback.format_exc())
                     if qname == "QIDEOLOGY":
-                        f.write(
-                            "*\n"
-                            f"TABLE {writer.get_tnum()}\n"
-                            "T QIDEOLOGY:\n"
-                            "T Would you consider your political views to be conservative, liberal, or moderate?\n"
-                            "T\n"
-                            "T /\n"
-                            "R BASE==TOTAL SAMPLE             ;ALL     ;HP NOVP\n"
-                            "R *D//S (CONSERVATIVE - LIBERAL) ;NONE    ;EX (R3-R4)\n"
-                            f"R &UT- TOTAL CONSERVATIVE        ;{writer.get_start_column()}-1:2\n"
-                            f"R &UT- TOTAL LIBERAL             ;{writer.get_start_column()}-4:5\n"
-                            f"R &AI2 STRONGLY CONSERVATIVE     ;{writer.get_start_column()}-1\n"
-                            f"R &AI2 SOMEWHAT CONSERVATIVE     ;{writer.get_start_column()}-2\n"
-                            f"R MODERATE                       ;{writer.get_start_column()}-3\n"
-                            f"R &AI2 SOMEWHAT LIBERAL          ;{writer.get_start_column()}-4\n"
-                            f"R &AI2 STRONGLY LIBERAL          ;{writer.get_start_column()}-5\n"
-                            f"R UNSURE // REFUSED              ;{writer.get_start_column()}-6\n"
-                            f"R NO ANSWER                      ;{writer.get_start_column()}N1:6 ;NOR SZR\n"
-                        )
+                        try:
 
+                            f.write(
+                                "*\n"
+                                f"TABLE {writer.get_tnum()}\n"
+                                "T QIDEOLOGY:\n"
+                                f"T {writer.get_qtext()}\n"
+                                "T\n"
+                                "T /\n"
+                                "R BASE==TOTAL SAMPLE             ;ALL     ;HP NOVP\n"
+                                f"R *D//S ({writer.get_totals()[0]} - {writer.get_totals()[1]}) ;NONE    ;EX (R3-R4)\n"
+                                f"R &UT- TOTAL {writer.get_totals()[0]}        ;{writer.get_start_column()}-1:2\n"
+                                f"R &UT- TOTAL {writer.get_totals()[1]}            ;{writer.get_start_column()}-4:5\n"
+                                f"R &AI2 STRONGLY {writer.get_totals()[0]}     ;{writer.get_start_column()}-1\n"
+                                f"R &AI2 SOMEWHAT {writer.get_totals()[0]}     ;{writer.get_start_column()}-2\n"
+                                f"R MODERATE                       ;{writer.get_start_column()}-3\n"
+                                f"R &AI2 SOMEWHAT {writer.get_totals()[1]}          ;{writer.get_start_column()}-4\n"
+                                f"R &AI2 STRONGLY {writer.get_totals()[1]}          ;{writer.get_start_column()}-5\n"
+                                f"R UNSURE // REFUSED              ;{writer.get_start_column()}-6\n"
+                                f"R NO ANSWER                      ;{writer.get_start_column()}N1:6 ;NOR SZR\n"
+                            )
+                        except Exception:
+                            f.write(
+                                "*\n"
+                                f"TABLE {writer.get_tnum()}\n"
+                                "T QIDEOLOGY:\n"
+                                f"T {writer.get_qtext()}\n"
+                                "T\n"
+                                "T /\n"
+                                "R BASE==TOTAL SAMPLE             ;ALL     ;HP NOVP\n"
+                            )
                     print("Main loop:", writer.get_qname(), err)
 
 

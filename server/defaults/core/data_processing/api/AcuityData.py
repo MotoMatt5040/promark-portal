@@ -52,6 +52,16 @@ class AcuityData:
         'SOMEWHAT LESS LIKELY': {"MORE LIKELY": [1, 2], "LESS LIKELY": [3, 4]},
         'MUCH LESS LIKELY': {"MORE LIKELY": [1, 2], "LESS LIKELY": [3, 4]},
 
+        'MUCH BETTER': {"BETTER": [1, 2], "WORSE": [3, 4]},
+        'SOMEWHAT BETTER': {"BETTER": [1, 2], "WORSE": [3, 4]},
+        'SOMEWHAT WORSE': {"BETTER": [1, 2], "WORSE": [3, 4]},
+        'MUCH WORSE': {"BETTER": [1, 2], "WORSE": [3, 4]},
+
+        'MUCH MORE CONFIDENT': {"MORE CONFIDENT": [1, 2], "LESS CONFIDENT": [3, 4]},
+        'SOMEWHAT MORE CONFIDENT': {"MORE CONFIDENT": [1, 2], "LESS CONFIDENT": [3, 4]},
+        'SOMEWHAT LESS CONFIDENT': {"MORE CONFIDENT": [1, 2], "LESS CONFIDENT": [3, 4]},
+        'MUCH LESS CONFIDENT': {"MORE CONFIDENT": [1, 2], "LESS CONFIDENT": [3, 4]},
+
         # TODO: make the code to wear it is uploaded to a webpage where we can check off how we want to see totals.
         # TODO: The reason for this is that sometimes we may want the same totals worded differently.
         'VERY LIKELY': {"LIKELY": [1, 2], "UNLIKELY": [3, 4]},
@@ -102,6 +112,11 @@ class AcuityData:
         'NOT VERY CONVINCING': {'CONVINCING': [1, 2], 'NOT CONVINCING': [3, 4]},
         'NOT AT ALL CONVINCING': {'CONVINCING': [1, 2], 'NOT CONVINCING': [3, 4]},
 
+        'VERY CONCERNED': {'CONCERNED': [1, 2], 'NOT CONCERNED': [3, 4]},
+        'SOMEWHAT CONCERNED': {'CONCERNED': [1, 2], 'NOT CONCERNED': [3, 4]},
+        'NOT VERY CONCERNED': {'CONCERNED': [1, 2], 'NOT CONCERNED': [3, 4]},
+        'NOT AT ALL CONCERNED': {'CONCERNED': [1, 2], 'NOT CONCERNED': [3, 4]},
+
         'VERY AWARE': {'AWARE': [1, 2], 'NOT AWARE': [3, 4]},
         'SOMEWHAT AWARE': {'AWARE': [1, 2], 'NOT AWARE': [3, 4]},
         'NOT VERY AWARE': {'AWARE': [1, 2], 'NOT AWARE': [3, 4]},
@@ -130,7 +145,7 @@ class AcuityData:
 
     @staticmethod
     def order():
-        return list(pd.read_csv("order.csv").columns[3:])
+        return list(pd.read_csv("order.csv").columns[4:])
 
     def __init__(self):
         self.__variables = None
@@ -331,9 +346,9 @@ class AcuityData:
                     except:
                         pass
             if __data[qname]['text'] != "":
-                text = __data[qname]['question']
-                __data[qname]['question'] = __data[qname]['text']
-                __data[qname]['text'] = text
+                text = __data[qname]['question'].replace("  ", " ")
+                __data[qname]['question'] = __data[qname]['text'].replace("  ", " ")
+                __data[qname]['text'] = text.replace("  ", " ")
 
         __data = self.columns(__data)
         for q in __skip:
@@ -517,5 +532,5 @@ class AcuityData:
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
 
-        print(layout.to_string())
+        # print(layout.to_string())
 
