@@ -379,11 +379,33 @@ function Instructions() {
               </Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="9-4">
-              <Accordion.Header>Check table order</Accordion.Header>
+              <Accordion.Header>Segmentation</Accordion.Header>
               <Accordion.Body>
-                <p>
-
-                </p>
+                <Accordion>
+                  <Accordion.Item eventKey="9-4-1">
+                    <Accordion.Header>What is segmentation?</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        Segmentation is typically a special request originating from AmyLev Strategies. This has typically
+                        been done on Meati surveys. A
+                        <span style={{"color": "#0000ff"}}>
+                          <Tooltip title="A special excel file found in the [DATABASE] folder of previous Meati projects." arrow>
+                            &nbsp;<b>Typing Tool</b>&nbsp;
+                          </Tooltip>
+                        </span>
+                        has been supplied for previous Meati projects and is usually copied over. There are a series of
+                        questions that start labeled with an "s" on the survey, those are the questions that will be
+                        copied into the typing tools box. These are typically questions coded as 1-18. A special table
+                        will need to be created with columns set aside for segmentation. For the sake of ease, this has
+                        been normalized as column 30 on projects where this will occur. <br/>
+                        <br/>
+                        The segmentation excel sheet is highly complex and should never be edited without creating a
+                        backup in each project. It may sound redundant but it is easier to restore a backup from the same
+                        file than having to go and find the backup elsewhere.
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
