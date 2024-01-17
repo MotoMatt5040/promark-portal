@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 
 from flask import Flask, request, jsonify, session, make_response, send_file
@@ -10,8 +11,10 @@ from .config import ApplicationConfig
 from ..auth.models import db, User
 from ..data_processing.reader import Reader
 
+allowed_domain = os.environ["production"]
+
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=['http://localhost:3000'], expose_headers=["Content-Disposition"])
+CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition"])
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
@@ -172,7 +175,7 @@ def login():
 
 def _build_cors_preflight_response():
     response = make_response()
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Origin', allowed_domain)
     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
     response.headers.add('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE')
     response.headers.add('Access-Control-Allow-Credentials', 'true')

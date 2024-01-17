@@ -302,10 +302,98 @@ function Instructions() {
         </Accordion.Body>
       </Accordion.Item>
       <Accordion.Item eventKey="9">
-        <Accordion.Header>Step 10: Banner Setup</Accordion.Header>
+        <Accordion.Header>Step 10: Stub Checking</Accordion.Header>
         <Accordion.Body>
+          <p>
+            After stubs have been ran, there are some basic checks that need to be made.
+          </p>
           <Accordion>
             <Accordion.Item eventKey="9-1">
+              <Accordion.Header>Check table order</Accordion.Header>
+              <Accordion.Body>
+                <p>
+                  Verify that the tables are all properly in place. The proper order should be made when the
+                  <b>order</b> extraction task is created in Acuity. Verify that the order is the same as the survey.
+                  Tables may be out of order due to programming requirements. Many questions are moved to the front in
+                  order to be used for screening.
+                </p>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="9-2">
+              <Accordion.Header>Check qualifiers</Accordion.Header>
+              <Accordion.Body>
+                <p>
+                  Check the survey to see if any questions need qualifiers. In the case that they do, make sure they
+                  are applied, and make sure that the total base line is updated so that it reflect the proper language
+                  for the qualifier.
+                </p>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="9-3">
+              <Accordion.Header>Verify numbers add up</Accordion.Header>
+              <Accordion.Body>
+                <p>
+                  Tables needs to be checked to verify that the amount of answers add up to the total. The only
+                  exception to this rule are tables that are multi-choice. <br/>
+                  <br/>
+                  Questions that have qualifiers need to have the qualifiers checked to verify that the base total for
+                  that question is equal to what the qualifier total should be.
+                </p>
+                <Accordion>
+                  <Accordion.Item eventKey="9-3-1">
+                    <Accordion.Header>Basic Tables</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        Add all the numbers for the choices and verify that they add up to the total. <br/>
+                        <br/>
+                        Do not include <b>NO ANSWER</b> in the total, however there may be an issue if you see
+                        <b>NO ANSWER</b>
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                  <Accordion.Item eventKey="9-3-2">
+                    <Accordion.Header>Total Tables</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        Add all the numbers for the choices and verify that they add up to the total. <br/>
+                        <br/>
+                        Verify all the numbers for each individual total line adds up to the qualifying total row. <br/>
+                        <br/>
+                        Verify that the total difference score math is calculated correctly by subtraction the total
+                        rows.
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                  <Accordion.Item eventKey="9-3-3">
+                    <Accordion.Header>Multi-Choice Tables</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        These tables are much harder to check proper totals on, in this instance you want to check
+                        <b>caseid's</b> to verify the proper amount of cases have an answer on this question. Verify what
+                        qualifiers are in place and check for blanks. There should not be any blanks in the first
+                        multi-choice column unless a qualifier is present.
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="9-4">
+              <Accordion.Header>Check table order</Accordion.Header>
+              <Accordion.Body>
+                <p>
+
+                </p>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        </Accordion.Body>
+      </Accordion.Item>
+      <Accordion.Item eventKey="10">
+        <Accordion.Header>Step 11: Banner Setup</Accordion.Header>
+        <Accordion.Body>
+          <Accordion>
+            <Accordion.Item eventKey="10-1">
               <Accordion.Header>Banner Basics</Accordion.Header>
               <Accordion.Body>
                 <p>
@@ -423,7 +511,7 @@ function Instructions() {
                 </p>
               </Accordion.Body>
             </Accordion.Item>
-            <Accordion.Item eventKey="9-2">
+            <Accordion.Item eventKey="10-2">
               <Accordion.Header>Example Table 1:</Accordion.Header>
               <Accordion.Body>
                 <pre>
@@ -457,7 +545,7 @@ function Instructions() {
                 </pre>
               </Accordion.Body>
             </Accordion.Item>
-            <Accordion.Item eventKey="9-3">
+            <Accordion.Item eventKey="10-3">
               <Accordion.Header>Example Table 2:</Accordion.Header>
               <Accordion.Body>
                 <pre>

@@ -61,17 +61,18 @@ class Writer():
 
     def row_style(self):
         if self._totals is None:
-            return self.rows1()
+            return self.rows()
         if not self._style:
             return (
-                f"{self.total1()}"
-                f"{self.rows1()}"
+                f"{self.rows()}"
             )
         else:
-            return self.total_inline()
+            return self.rows_inline()
 
-    def total_inline(self):
+    def total_rows(self) -> Union[list, None]:
         totals = []
+        if self._totals is None:
+            return None
         keys = list(self._totals.keys())
         if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
             totals.append(f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n")  # NEEDS TO BE keys[2] IN SOME CASES
@@ -79,18 +80,18 @@ class Writer():
             totals.append(f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n")
 
         index = 1
-        print(keys, " KEYS____________________")
         for key in keys:
-            print(key, "------------------")
-            print(self._totals)
-            print(self._totals[key][0], 'test')
             if self._code_width > 1:
                 totals.append(f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})")
             else:
                 totals.append(f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}")
             totals[index] += "\n"
             index += 1
+        return totals
 
+    def rows_list(self) -> list:
+        row_text = []
+        index = 0
         rows = []
         for row in self._rows:
             indent = ""
@@ -102,6 +103,45 @@ class Writer():
                         continue
 
             rows.append(f"R {indent}{row}\n")
+            row_text.append(f"R {indent}{row}\n")
+            index += 1
+        if self._max_choice < 2:
+            pos = 0
+            append = 0
+            not_choices = []
+            for i in range(len(self._choice_codes)):
+                if i < len(self._choice_codes) - 1:
+                    try:
+                        if int(self._choice_codes[i]) != int(self._choice_codes[i + 1]) - 1:
+                            if int(self._choice_codes[i]) - int(self._choice_codes[i + 1]) < -1:
+                                if append == 0:
+                                    not_choices.append(f"{self._choice_codes[i]}")
+                                else:
+                                    not_choices.append(f",{self._choice_codes[i]}")
+                            else:
+                                not_choices.append(f":{self._choice_codes[i]}")
+                            pos = i
+                            append += 1
+                    except:
+                        pass
+                elif i - pos > 1 and append > 0:
+                    not_choices.append(f",{self._choice_codes[pos + 1]}:{self._choice_codes[i]}")
+                elif append == 0:
+                    not_choices.append(f"{self._choice_codes[0]}:{self._choice_codes[i]}")
+                else:
+                    not_choices.append(f",{self._choice_codes[i]}")
+
+            if not not_choices == []:
+                if self._code_width > 1:
+                    rows.append(f"R NO ANSWER ;NOT{self._column_text}{not_choices[0]}) ;NOR SZR\n")
+
+                else:
+                    rows.append(f"R NO ANSWER ;{self._column_text}N{not_choices[0]} ;NOR SZR\n")
+        return rows
+
+    def rows_inline(self):
+        totals = self.total_rows()
+        rows = self.rows_list()
         final_rows = rows[4:]
         return (
             f"{totals[0]}"  # This is the D//S score
@@ -114,72 +154,13 @@ class Writer():
             + ''.join(final_rows)  # rows after total included rows, non-indented
         )
 
-    def total1(self):
-        total = ""
-        if self._totals is not None:
-            keys = list(self._totals.keys())
-            if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
-                total += f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n"  # NEEDS TO BE keys[2] IN SOME CASES
-            else:
-                total += f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n"
-
-            for key in self._totals.keys():
-                if self._code_width > 1:
-                    total += f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})"
-                else:
-                    total += f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}"
-                total += "\n"
-        else:
-            return ""
-        return total
-
-    def rows1(self):
-        row_text = []
-        index = 0
+    def rows(self):
         rows = ""
-        for row in self._rows:
-            indent = ""
-            if self._totals is not None:
-                for j in self._totals:
-                    if j in row:
-                        if not "UNSURE" in row and not "NO OPINION" in row and not "NO ANSWER" in row:
-                            indent = "&AI2 "
-                        continue
-
-            rows += f"R {indent}{row}\n"
-            row_text.append(f"R {indent}{row}\n")
-            index += 1
-        if self._max_choice < 2:
-            pos = 0
-            append = 0
-            not_choices = f""
-            for i in range(len(self._choice_codes)):
-                if i < len(self._choice_codes) - 1:
-                    try:
-                        if int(self._choice_codes[i]) != int(self._choice_codes[i+1]) - 1:
-                            if int(self._choice_codes[i]) - int(self._choice_codes[i + 1]) < -1:
-                                if append == 0:
-                                    not_choices += f"{self._choice_codes[i]}"
-                                else:
-                                    not_choices += f",{self._choice_codes[i]}"
-                            else:
-                                not_choices += f":{self._choice_codes[i]}"
-                            pos = i
-                            append += 1
-                    except:
-                        pass
-                elif i - pos > 1 and append > 0:
-                    not_choices += f",{self._choice_codes[pos+1]}:{self._choice_codes[i]}"
-                elif append == 0:
-                    not_choices += f"{self._choice_codes[0]}:{self._choice_codes[i]}"
-                else:
-                    not_choices += f",{self._choice_codes[i]}"
-
-            if self._code_width > 1:
-                rows += f"R NO ANSWER ;NOT{self._column_text}{not_choices}) ;NOR SZR\n"
-
-            else:
-                rows += f"R NO ANSWER ;{self._column_text}N{not_choices} ;NOR SZR\n"
+        if self._totals is not None:
+            for row in self.total_rows():
+                rows += row
+        for row in self.rows_list():
+            rows += row
         return rows
 
     """-----------------------------------------------Create--------------------------------------------------"""
