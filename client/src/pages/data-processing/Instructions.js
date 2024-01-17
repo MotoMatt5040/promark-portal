@@ -313,7 +313,7 @@ function Instructions() {
               <Accordion.Body>
                 <p>
                   Verify that the tables are all properly in place. The proper order should be made when the
-                  <b>order</b> extraction task is created in Acuity. Verify that the order is the same as the survey.
+                  <b> order</b> extraction task is created in Acuity. Verify that the order is the same as the survey.
                   Tables may be out of order due to programming requirements. Many questions are moved to the front in
                   order to be used for screening.
                 </p>
@@ -347,7 +347,7 @@ function Instructions() {
                         Add all the numbers for the choices and verify that they add up to the total. <br/>
                         <br/>
                         Do not include <b>NO ANSWER</b> in the total, however there may be an issue if you see
-                        <b>NO ANSWER</b>
+                        <b> NO ANSWER</b>
                       </p>
                     </Accordion.Body>
                   </Accordion.Item>
@@ -369,7 +369,7 @@ function Instructions() {
                     <Accordion.Body>
                       <p>
                         These tables are much harder to check proper totals on, in this instance you want to check
-                        <b>caseid's</b> to verify the proper amount of cases have an answer on this question. Verify what
+                        <b> caseid's</b> to verify the proper amount of cases have an answer on this question. Verify what
                         qualifiers are in place and check for blanks. There should not be any blanks in the first
                         multi-choice column unless a qualifier is present.
                       </p>
