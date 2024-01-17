@@ -11,7 +11,7 @@ from .config import ApplicationConfig
 from ..auth.models import db, User
 from ..data_processing.reader import Reader
 
-allowed_domain = os.environ["production"]
+allowed_domain = os.environ["testing"]
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition"])
