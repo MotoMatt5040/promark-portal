@@ -10,7 +10,7 @@ import React from 'react';
 function Instructions() {
   let cleanup_instructions = "The tables output by the program aren't always in the proper finalized format for output.";
   return (
-    <Accordion>
+   <Accordion style={accordionStyle}>
       <Accordion.Item eventKey="0">
         <Accordion.Header>Step 1: Create order.csv</Accordion.Header>
           <Accordion.Body>
@@ -63,8 +63,8 @@ function Instructions() {
           <p>
             Finding Survey ID: <i>Note: This can only be done while in the Surveys section.</i><br />
             &ensp; Click the dropdown in the top left corner <br />
-            &emsp; <img src={surveyDropdown} alt="Survey Dropdown"/>
-            &emsp; <img src={surveyIdImage} alt="Survey ID"/> <br />
+            &emsp; <img src={surveyDropdown} alt="Survey Dropdown" style={{maxWidth: "100%"}} />
+            &emsp; <img src={surveyIdImage} alt="Survey ID" style={{maxWidth: "100%"}} /> <br />
           </p>
         </Accordion.Body>
       </Accordion.Item>
@@ -137,7 +137,7 @@ function Instructions() {
                     <Accordion.Body>
                       <p>
                         Navigate to a previously completed project and copy the <b>.j</b> and <b>.t</b> files from the old <b>[UNCLE]</b> folder into the new <b>[UNCLE]</b> folder.<br />
-                        <img src={jt} alt="jt" /><br/>
+                        <img src={jt} alt="jt" style={{maxWidth: "100%"}} /><br/>
                       </p>
                     </Accordion.Body>
                   </Accordion.Item>
@@ -167,7 +167,7 @@ function Instructions() {
                     &emsp;&ensp;<b>First:</b> 1<br/>
                     &emsp;&ensp;<b>Last:</b> 10<br/>
                     Click <b>OK</b><br/>
-                    <img src={projTitle} alt="Project/Title" /><br/>
+                    <img src={projTitle} alt="Project/Title" style={{maxWidth: "100%"}} /><br/>
                   </p>
                 </Accordion.Body>
               </Accordion.Item>
@@ -688,3 +688,12 @@ function Instructions() {
 }
 
 export default Instructions;
+
+
+const accordionStyle = {
+  // border: '1px solid green',
+  display: 'flex',
+  flexDirection: 'column',
+  width: '49%',
+  marginLeft: "1%"
+}
