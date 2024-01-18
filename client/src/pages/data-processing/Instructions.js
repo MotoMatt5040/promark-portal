@@ -26,7 +26,7 @@ function Instructions() {
               &emsp; <b>Export only a subset</b> <br />
               &ensp;&emsp; Press: <b>[Select Variables]</b> <br />
               &ensp; Select all variables to include <br />
-              &ensp;&emsp;<b>Always indluce the following:</b><br/>
+              &ensp;&emsp;<b>Always include the following:</b><br/>
               &ensp;&emsp;&ensp;<b>Case ID</b><br/>
               &ensp;&emsp;&ensp;<b>Last Connection Date</b><br/>
               &ensp;&emsp;&ensp;<b>Start time of last connection</b><br/>
@@ -230,10 +230,10 @@ function Instructions() {
                   </Tooltip>
                 </span>.<br/>
                 <br/>
-                <br/>
                 Some tables may require D//S scores but the output may not have added or indented them. The syntax is
                 as follows:<br/>
-                <pre>
+              </p>
+              <pre>
                   &emsp;R *D//S (AGREE - DISAGREE) ;NONE      ;EX (R3-R4) ;HP<br/>
                   &emsp;R &UT- TOTAL AGREE         ;&lt;col&gt;-1:2 ;HP<br/>
                   &emsp;R &UT- TOTAL DISAGREE      ;&lt;col&gt;-3:4 ;HP<br/>
@@ -243,7 +243,6 @@ function Instructions() {
                   &emsp;R &AI2 STRONGLY DISAGREE   ;&lt;col&gt;-4   ;HP<br/>
                   &emsp;R NO ANSWER                ;&lt;col&gt;N1:4 ;NOR SZR<br/>
                 </pre>
-              </p>
             </Accordion.Body>
           </Accordion.Item>
             <Accordion.Item eventKey="8-2">
@@ -402,6 +401,84 @@ function Instructions() {
                         The segmentation excel sheet is highly complex and should never be edited without creating a
                         backup in each project. It may sound redundant but it is easier to restore a backup from the same
                         file than having to go and find the backup elsewhere.
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+
+                  <Accordion.Item eventKey="9-4-2">
+                    <Accordion.Header>Setting up extraction</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        Navigate to the survey in Acuity <b>-> Analyze -> Export Responses</b> <br />
+                        &ensp; Press: <b>[New] -> CSV</b> <br />
+                        &ensp; Name: <b>segment</b> <br />
+                        &ensp; Destination File Name: <b>segment</b> <br />
+                        &ensp; Check the following: <br />
+                        &emsp; <b>Export completed</b> <br />
+                        &emsp; <b>Export only a subset</b> <br />
+                        &ensp;&emsp; Press: <b>[Select Variables]</b> <br />
+                        &ensp; Select all variables to include <br />
+                        &ensp;&emsp;<b>Case ID</b><br/>
+                        &ensp;&emsp;<b>Q1-Q17</b><br/>
+                        &ensp; Check the following: <i>Note: these are located at the bottom</i><br />
+                        &emsp; <b>Include header</b> <br />
+                        &emsp; <b>Strip HTML from labels</b> <br />
+                        &emsp; <b>Remove curly brackets and spaces of system variables</b><br/>
+                        Once finished, click <b>[Export]</b> in the top right.<br/>
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                  <Accordion.Item eventKey="9-4-3">
+                    <Accordion.Header>Typing Tool</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        Navigate the the <b>[DATABASE]</b> folder of any previous Meati project and copy the typing tool.<br/>
+                        If not already, save it in your current project's folder with the word <b>WORKING</b> in front.<br/>
+                        Open the typing tool and clear out all the numbers in the <b>RespNum</b> and <b>Q</b> columns.<br/>
+                        <br/>
+                        Download and save the <b>segment</b> data from your extraction task. <br/>
+                        Open the segment file and the typing tool.<br/>
+                        Copy and paste all the data in the <b>caseid</b> column from the segment file into the <b>RespNum</b> column in the typing tool<br/>
+                        Copy all the data in <b>Q1-Q17</b> from teh segment file and pase it into the <b>Q</b> section of the typing tool.<br/>
+                        <br/>
+                        On the far right of the typing tool, there is a column with the following format:<br/>
+                        &emsp;<b>X ALT C'000000' 30=5</b> <br/>
+                        <br/>
+                        Extend this line, or shrink it to end at the same row number as the <b>RespNum</b> and <b>Q</b> columns data.<br/>
+                        <br/>
+                      </p>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                                    <Accordion.Item eventKey="9-4-4">
+                    <Accordion.Header>Create segmentation table</Accordion.Header>
+                    <Accordion.Body>
+                      <p>
+                        In <b>Uncle</b> type
+                        <span style={{"color": "#0000ff"}}>
+                          <Tooltip title="This is the table number typically used to input segment data." arrow>
+                            &nbsp;<b>EDIT 602</b>&nbsp;
+                          </Tooltip>
+                        </span> then copy and paste all of the the rows from the far of the typing tool into this table.<br/>
+                        <br/>
+                        A find and replace must be done in order to properly set up the data. This can be done by pressing <b>ctrl+h</b>.<br/>
+                        <i>Note: For this section, "_" will be used to denote spaces in place of " ".</i><br/>
+                        <br/>
+                        <b>Find: '00000</b><br/>
+                        <b>Replace: '_____</b> <i>(Note: The number of underlines is the same as the number of zero's above)</i><br/>
+                        <br/>
+                        <b>Find: '0000</b><br/>
+                        <b>Replace: '____</b><br/>
+                        <br/>
+                        <b>Find: '000</b><br/>
+                        <b>Replace: '___</b><br/>
+                        <br/>
+                        <b>Find: '00</b><br/>
+                        <b>Replace: '__</b><br/>
+                        <br/>
+                        <b>Find: '0</b><br/>
+                        <b>Replace: '_</b><br/>
+                        <br/>
+                        upon completion, you may close the table and type <b>EXEC 602</b>.
                       </p>
                     </Accordion.Body>
                   </Accordion.Item>
