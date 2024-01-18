@@ -145,7 +145,7 @@ function DataProcessing() {
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
-          <div className='invis-form-spacer' style={invisFormSpacerStyle} />
+          {/*<div className='invis-form-spacer' style={invisFormSpacerStyle} />*/}
           <div className='dp-form' style={formDiv}>
 
             <Form
@@ -188,9 +188,9 @@ function DataProcessing() {
               </div>
             </Form>
           </div>
-          <div style={downloadButtonDivStyle}>
-            <Button onClick={handleDownload}>Download</Button>
-          </div>
+          {/*<div style={downloadButtonDivStyle}>*/}
+          {/*  <Button onClick={handleDownload}>Download</Button>*/}
+          {/*</div>*/}
         </div>
         <br/>
         <Offcanvas show={show} onHide={handleClose}>
@@ -231,6 +231,7 @@ function DataProcessing() {
                 )}
               </tbody>
             </Table>
+            <Button onClick={handleDownload}>Download</Button>
           </Offcanvas.Body>
         </Offcanvas>
         <Instructions/>
@@ -245,12 +246,12 @@ const headerStyle = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   alignContent: 'center',
 }
 
 const invisFormSpacerStyle = {
-  // border: '1px solid black',
+  // border: '3px solid black',
   display: 'flex',
 }
 
@@ -290,7 +291,7 @@ const formButtons = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'space-evenly',
+  justifyContent: 'left',
   alignContent: 'center',
   width: "30%"
 }

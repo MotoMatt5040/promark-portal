@@ -140,6 +140,8 @@ class Writer():
         return rows
 
     def rows_inline(self):
+        if self._qname == 'QPARTYID':
+            return self.rows()
         totals = self.total_rows()
         rows = self.rows_list()
         final_rows = rows[4:]
