@@ -13,6 +13,7 @@ import { Calendar } from 'react-date-range';
 function ProductionReport() {
 
   const [show, setShow] = useState(false);
+  const [location, setLocation] = useState("Location");
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -24,6 +25,10 @@ function ProductionReport() {
       key: 'selection'
     }
   ]);
+
+  const handleLocationSelect = (selectedLocation) => {
+    setLocation(selectedLocation);
+  }
 
   const getLocations = () => {
     axios.get('/', {
@@ -39,7 +44,7 @@ function ProductionReport() {
       .catch(error => console.error(error))
   };
 
-  const handleSelect = (date) => {
+  const handleDateSelect = (date) => {
     console.log(date); // native Date object
   }
 
@@ -48,12 +53,13 @@ function ProductionReport() {
       <div className="dropdowns" id="dropdowns" style={dropdownStyle}>
         <Dropdown>
           <Dropdown.Toggle variant="success" id="location-dropdown">
-            Location
+            {location}
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item>Location 1</Dropdown.Item>
-            <Dropdown.Item>Location 2</Dropdown.Item>
-            <Dropdown.Item>Location 3</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleLocationSelect("Location")}>All</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleLocationSelect("Location 1")}>Location 1</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleLocationSelect("Location 2")}>Location 2</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleLocationSelect("Location 3")}>Location 3</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
         <Dropdown>
