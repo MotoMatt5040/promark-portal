@@ -85,7 +85,42 @@ function DataProcessing() {
     setValidated(true);
   };
 
-  const handleRun = async (event) => {
+  // const handleRun = async (event) => {
+  //   event.preventDefault();
+  //   try {
+  //     let config = {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       }
+  //     }
+  //     console.log("data")
+  //     console.log(selectedValues);
+  //     const response = await axios.post(
+  //     DATA_PROCESSING_URL + PROCESS_DATA_URL,
+  //     {
+  //       selectedValues,
+  //       totalStyleChecked: document.getElementById("total-style").checked
+  //     },
+  //     config
+  //     );
+  //
+  //     if (response.status === 200) {
+  //       window.location.href="#"
+  //       console.log('Request sent for data processing')
+  //     }
+  //     // console.log(JSON.stringify(response));
+  //   } catch (error) {
+  //      if (!error?.response) {
+  //       setErrorMesssage('No Server Response')
+  //     } else if (error.response.status === 401) {
+  //       setErrorMesssage('Invalid Credentials')
+  //     } else {
+  //       setErrorMesssage('Request Failed')
+  //     }
+  //   }
+  // }
+
+  const handleDownload = async (event) => {
     event.preventDefault();
     try {
       let config = {
@@ -118,9 +153,7 @@ function DataProcessing() {
         setErrorMesssage('Request Failed')
       }
     }
-  }
 
-  const handleDownload = async () => {
     axios.get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
       responseType: 'blob',
       headers: {
@@ -132,7 +165,7 @@ function DataProcessing() {
         const url = URL.createObjectURL(obj.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'file.zip';
+        a.download = projectID + ' data.zip';
         a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
@@ -196,7 +229,7 @@ function DataProcessing() {
         <Offcanvas show={show} onHide={handleClose}>
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Layout</Offcanvas.Title>
-            <Button type="submit" onClick={handleRun}>Run</Button>
+            {/*<Button type="submit" onClick={handleRun}>Run</Button>*/}
             <br/>
             <label><b>Inline Total</b></label>
             <input type="checkbox" name="total-style" id="total-style" />
