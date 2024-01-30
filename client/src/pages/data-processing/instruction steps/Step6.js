@@ -13,7 +13,7 @@ export default function Step6() {
           Change the name and destination file name to <b>&lt;project number&gt;dat</b><br/>
           Uncheck <b>Merge multiple mention responses and open-ends</b><br/>
           Click <b>[Export]</b> to save the task.<br/>
-          Alow the task to run until the status indicates <b>Completed</b>.<br/>
+          Allow the task to run until the status indicates <b>Completed</b>.<br/>
           Download the file to your projects <b>[DATABASE]</b> folder. <br/>
         </p>
       </Accordion.Body>
