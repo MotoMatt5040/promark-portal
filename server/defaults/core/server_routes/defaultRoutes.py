@@ -149,6 +149,8 @@ def register():
 def login():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
+    # response = make_response()
+    # response.set_cookie("session", )
 
     email = request.json['email']
     password = request.json['password']
