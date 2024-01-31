@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import requests
 from configparser import ConfigParser
+import os
 
 
 class AcuityData:
@@ -175,7 +176,8 @@ class AcuityData:
             __config_path = Path(r'defaults\core\data_processing\api\config.ini')
         __config_object = ConfigParser()
         __config_object.read(__config_path)
-        __access_token = __config_object['ACCESS TOKEN']['access token']
+        __access_token = os.environ['access_token']
+        # __access_token = __config_object['ACCESS TOKEN']['access token']
 
         __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{self.sid}?deployed=true"
         __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{self.sid}"
