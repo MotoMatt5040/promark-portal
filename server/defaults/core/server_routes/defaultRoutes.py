@@ -10,10 +10,13 @@ from flask_session import Session
 from .config import ApplicationConfig
 from ..auth.models import db, User
 from ..data_processing.reader import Reader
+from ..dashboard.periodic_update.periodicUpdate import PeriodicUpdate
+from .periodicUpdateRoutes import periodic_update
 
 allowed_domain = os.environ["testing"]
 
 app = Flask(__name__)
+app.register_blueprint(periodic_update)
 CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition"])
 app.config.from_object(ApplicationConfig)
 
