@@ -2,14 +2,14 @@ class QueryBuilder:
 
     def __init__(self):
         self._locationClause = None
-        self._projectid = None
-        self._location = None
+        self._projectid = ''
+        self._location = ''
         self._projectidclause = ''
         self._projectidclause2 = ''
         self._projectidclause3 = ''
         self._allclause = 'tblHourlyProductionDetail.projectid, '
 
-    def query(self):
+    def query(self) -> str:
         return \
             f"SELECT {self._allclause}RecLoc, tblCC3EMployeeList.EID, LastName + ', ' + FirstName AS MyName, " \
             f"Tenure, HRS, CMS, IntAVG AS IntAL, CPH, " \
@@ -52,15 +52,6 @@ class QueryBuilder:
         self._projectidclause2 = f"WHERE projectID = '{projectid}' "
         self._projectidclause3 = f" tblHourlyProductionDetail.projectID = '{projectid}' AND "
         self._allclause = ''
-
-
-    '-----getters-----'
-
-    def getLocation(self) -> str:
-        return self._location
-
-    def getProjectID(self) -> str:
-        return self._projectid
 
     '-----reset variables-----(may not be needed)'
 
