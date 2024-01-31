@@ -1,3 +1,4 @@
+import pandas
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy import text
@@ -17,16 +18,16 @@ class DataPuller:
 
     #  Build the connection string
     SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
-        dbai.get_driver(),
-        dbai.get_server(),
-        dbai.get_database(),
-        dbai.get_user_id(),
-        dbai.get_password()
+        dbai.driver,
+        dbai.server,
+        dbai.database,
+        dbai.user_id,
+        dbai.password
     )
-    del dbai
+
     dbcon = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
     engine = create_engine(dbcon)
-    del dbcon
+
 
     def promark_phone_numbers(self):
         """Used to pull Promark phone numbers"""
@@ -40,22 +41,23 @@ class DataPuller:
             self.error_log(err)
         return ['Error pulling promark phone numbers']
 
-    def message_body(self, projectid: str):
-        """used to pull text message body"""
-        try:
-            conn = self.connect()
-            df = pd.read_sql_query(text(self.sqld.message_body(projectid)), conn)
-            conn.close()
-            del conn
-            return df
-        except Exception as err:
-            self.error_log(err)
-        return ['Error pulling message body']
+    def pull(self, qry: str) -> pandas.DataFrame:
+        conn = self.connect()
+
+        if not conn:
+            return pd.DataFrame([['connection failed']])
+
+        df = pd.read_sql_query(qry, conn)
+        conn.close()
+        del conn
+        return df
 
     def connect(self):
         try:
+            # print(self.SQL_CONNECTION)
             return self.engine.connect()
-        except Exception:
+        except Exception as err:
+            print(err)
             print("No ODBC Driver detected. Please install Microsoft ODBC Driver 17 for SQL Server from "
                   "https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16#version-17")
             webbrowser.open(
@@ -67,3 +69,16 @@ class DataPuller:
         print(err)
         print(traceback.format_exc())
         input("Press Enter to continue...")
+
+    def set_database(self, database):
+        self.dbai.database = database
+        SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
+            self.dbai.driver,
+            self.dbai.server,
+            self.dbai.database,
+            self.dbai.user_id,
+            self.dbai.password
+        )
+
+        dbcon = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
+        self.engine = create_engine(dbcon)

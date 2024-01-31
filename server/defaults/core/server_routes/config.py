@@ -12,11 +12,11 @@ dbai = Database()
 
 #  Build the connection string
 SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
-    dbai.get_driver(),
-    dbai.get_server(),
-    dbai.get_database(),
-    dbai.get_user_id(),
-    dbai.get_password()
+    dbai.driver,
+    dbai.server,
+    dbai.database,
+    dbai.user_id,
+    dbai.password
 )
 del dbai
 uri = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
@@ -30,6 +30,6 @@ class ApplicationConfig:
     SESSION_TYPE = "redis"
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
-    SESSION_REDIS = redis.from_url("redis://redis:6379")
+    SESSION_REDIS = redis.from_url("redis://localhost:6379")  # DO NOT COMMIT/PUSH THIS LINE
     SESSION_COOKIE_SAMESITE = 'None'
     SESSION_COOKIE_SECURE = True
