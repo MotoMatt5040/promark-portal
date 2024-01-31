@@ -212,3 +212,6 @@ class DataManipulator:
     @df.setter
     def df(self, df):
         self._df = df
+
+    def print_data(self):
+        print(self._df.to_string())
