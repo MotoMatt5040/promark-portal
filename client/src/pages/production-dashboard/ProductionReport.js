@@ -71,7 +71,7 @@ function ProductionReport() {
           </Dropdown.Menu>
         </Dropdown>
         <Button variant="primary" onClick={handleShow} className="me-2">Date</Button>
-        <Offcanvas show={show} onHide={handleClose} placement={'top'}>
+        <Offcanvas show={show} onHide={handleClose} placement={'top'} style={{maxWidth: "30%"}}>
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Offcanvas</Offcanvas.Title>
           </Offcanvas.Header>
