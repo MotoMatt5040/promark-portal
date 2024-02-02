@@ -1,3 +1,4 @@
+from datetime import date, timedelta, datetime
 class QueryBuilder:
 
     def __init__(self):
@@ -9,7 +10,7 @@ class QueryBuilder:
         self._projectidclause3 = ''
         self._allclause = 'tblHourlyProductionDetail.projectid, '
 
-    def query(self) -> str:
+    def periodic_update_query(self) -> str:
         return \
             f"SELECT {self._allclause}RecLoc, tblCC3EMployeeList.EID, LastName + ', ' + FirstName AS MyName, " \
             f"Tenure, HRS, CMS, IntAVG AS IntAL, CPH, " \
@@ -28,7 +29,6 @@ class QueryBuilder:
             "GROUP BY VoxcoID) AS tblAvgLength ON tblAvgLength.VoxcoID = tblCC3EmployeeList.VoxcoID " \
             f"WHERE {self._projectidclause3} Code = 'TD'{self._location} " \
             f"ORDER BY CMS DESC "
-
 
     '-----setters-----'
 
