@@ -1,7 +1,7 @@
 import Accordion from "react-bootstrap/Accordion";
 import React from "react";
 
-export default function Step1 (){
+export default function Step1() {
   return (
     <Accordion.Item eventKey="0">
       <Accordion.Header>Step 1: Create order.csv</Accordion.Header>
