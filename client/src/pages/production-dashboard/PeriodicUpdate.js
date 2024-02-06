@@ -7,17 +7,30 @@ import Table from "react-bootstrap/Table";
 export default function PeriodicUpdate() {
   const [show, setShow] = useState(false);
   const [location, setLocation] = useState("Location");
-  const [locations, setLocations] = useState([]);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [locations, setLocations] = useState({});
+  const [locationID, setLocationID] = useState('Location ID');
+  const [projectID, setProjectID] = useState("Project ID");
+  const [projectIDs, setProjectIDs] = useState([]);
+  const [data, setData] = useState([]);
+  const [errorMessage, setErrorMesssage] = useState('');
 
   useEffect(() => {
     handleLocationOptions();
   }, []); // Fetch locations on component mount
 
+  useEffect(() => {
+    handleProjectIDOptions();
+  }, []); // Fetch project IDs on component mount
+
+  useEffect(() => {
+    if (locationID !== "Location ID" && projectID !== "Project ID") {
+      handleUpdateTable();
+    }
+  }, [ location, projectID ])
+
   const handleLocationSelect = (selectedLocation) => {
     setLocation(selectedLocation);
+    setLocationID(locations[selectedLocation]);
   }
 
   const handleLocationOptions = () => {
@@ -27,60 +40,139 @@ export default function PeriodicUpdate() {
       }
     })
     .then((response) => {
-      const locationsData = response.data; // Get the JSON data
-      const longNames = Object.values(locationsData.LongName); // Extract the values associated with "LongName"
-      setLocations(longNames); // Set locations in state
+      console.log(response.data);
+      setLocations(response.data);
     })
     .catch((error) => {
       console.error('Error fetching locations:', error);
     });
   };
 
-  const handleDateSelect = (date) => {
-    console.log(date); // native Date object
+  const handleProjectIDSelect = (selectedProject) => {
+    setProjectID(selectedProject);
+  }
+
+  const handleProjectIDOptions = () => {
+    axios.get('/active/projects', {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then((response) => {
+      const projectData = response.data; // Get the JSON data
+      const projectIDs = Object.values(projectData.projectid);
+      setProjectIDs(projectIDs); // Set project ID's in state
+    })
+    .catch((error) => {
+      console.error("Error fetching project ID's:", error);
+    });
+  }
+
+  const handleUpdateTable = async () => {
+    try {
+      let config = {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      const response = await axios.post(
+        "/periodic_update",
+        { locationID, projectID },
+        config
+      );
+
+      if (response.status === 200) {
+        window.location.href="#"
+        console.log('Request sent for periodic update')
+      }
+
+      setData(response.data);
+
+      console.log(JSON.stringify(response));
+
+    } catch (error) {
+      if (!error?.response) {
+        setErrorMesssage('No Server Response')
+      } else if (error.response.status === 401) {
+        setErrorMesssage('Invalid Credentials')
+      } else {
+        setErrorMesssage('Login Failed')
+      }
+      console.log(errorMessage)
+    }
   }
 
   return (
     <div className="container" id="production-report-container">
-      <div className="dropdowns" id="dropdowns">
+      <div className="dropdowns" id="dropdowns" style={dropdownStyle}>
         <Dropdown>
           <Dropdown.Toggle variant="success" id="location-dropdown">
             {location}
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={() => handleLocationSelect("Location")}>All</Dropdown.Item>
-            {locations.map((loc, index) => (
+            {Object.keys(locations).map((loc, index) => (
               <Dropdown.Item key={index} onClick={() => handleLocationSelect(loc)}>
                 {loc}
               </Dropdown.Item>
             ))}
           </Dropdown.Menu>
         </Dropdown>
-        {/* Other dropdowns */}
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id="projectid-dropdown">
+            {projectID}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => handleProjectIDSelect("Project ID")}>All</Dropdown.Item>
+            {projectIDs.map((proj, index) => (
+              <Dropdown.Item key={index} onClick={() => handleProjectIDSelect(proj)}>
+                {proj}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
       <br/>
       <div>
-        <Button onClick={handleLocationOptions}>Test</Button>
+        {/*<Button onClick={handleLocationOptions}>Test</Button>*/}
       </div>
+      <d></d>
       <Table>
-        <thead>
+       <thead>
           <tr>
-            <th>COL 1</th>
-            <th>COL 2</th>
-            <th>COL 3</th>
+            <th>RecLoc</th>
+            <th>EID</th>
+            <th>MyName</th>
+            <th>Tenure</th>
+            <th>HRS</th>
+            <th>CMS</th>
+            <th>IntAL</th>
+            <th>CPH</th>
+            <th>MPH</th>
+            <th>PauseTime</th>
+            <th>ConnectTime</th>
+            <th>TotalDials</th>
+            <th>NAAM</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>dat 1</td>
-            <td>dat 2</td>
-            <td>dat 3</td>
-          </tr>
-          <tr>
-            <td>dat 4</td>
-            <td>dat 5</td>
-            <td>dat 6</td>
-          </tr>
+          {data.map((item, index) => (
+            <tr key={index}>
+              <td>{item.RecLoc}</td>
+              <td>{item.EID}</td>
+              <td>{item.MyName}</td>
+              <td>{item.Tenure}</td>
+              <td>{item.HRS}</td>
+              <td>{item.CMS}</td>
+              <td>{item.IntAL}</td>
+              <td>{item.CPH}</td>
+              <td>{item.MPH}</td>
+              <td>{item.PauseTime}</td>
+              <td>{item.ConnectTime}</td>
+              <td>{item.TotalDials}</td>
+              <td>{item.NAAM}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </div>
