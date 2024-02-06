@@ -27,7 +27,7 @@ class QueryBuilder:
             "LEFT JOIN (Select VoxcoID, AVG(duration/60) AS IntAvg FROM tblavgLengthShift " \
             f"{self._projectidclause2}" \
             "GROUP BY VoxcoID) AS tblAvgLength ON tblAvgLength.VoxcoID = tblCC3EmployeeList.VoxcoID " \
-            f"WHERE {self._projectidclause3} Code = 'TD'{self._location} " \
+            f"WHERE {self._projectidclause3} Code = 'TD'{self._locationClause} " \
             f"ORDER BY CMS DESC "
 
     '-----setters-----'
