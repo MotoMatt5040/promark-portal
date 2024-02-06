@@ -1,9 +1,9 @@
-from flask import Blueprint, request, jsonify, request, make_response
+import os
+
+from flask import Blueprint, request, make_response
+
 from server.defaults.core.dashboard.periodic_update.periodicUpdate import PeriodicUpdate
 from server.defaults.utils.database.datapuller import DataPuller
-from server.defaults.core.dashboard.defaultQueries import active_location_query
-import json
-import os
 
 allowed_domain = os.environ["testing"]
 
