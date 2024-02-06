@@ -3,9 +3,9 @@ from datetime import date, timedelta
 from server.defaults.core.auth.permissions import Permissions
 
 
-def active_project_query():
+def active_projectIDs_query():
     return \
-        f'SELECT DISTINCT projectid FROM tblProduction ' \
+        f'SELECT DISTINCT projectid FROM tblHourlyProduction ' \
         f"WHERE recdate >= '{date.today() - timedelta(hours=8)}'"
 
 
