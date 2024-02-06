@@ -1,7 +1,7 @@
 from server.defaults.utils.database.datapuller import DataPuller
 from .queryBuilder import QueryBuilder
 import pandas
-from ..defaultQueries import active_location_query, active_projectIDs_query, convert_location_name_to_id
+from ..defaultQueries import active_location_query, active_projectIDs_query
 
 
 class PeriodicUpdate(QueryBuilder):
