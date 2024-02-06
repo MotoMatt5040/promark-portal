@@ -136,7 +136,6 @@ export default function PeriodicUpdate() {
       <div>
         {/*<Button onClick={handleLocationOptions}>Test</Button>*/}
       </div>
-      <d></d>
       <Table>
        <thead>
           <tr>
