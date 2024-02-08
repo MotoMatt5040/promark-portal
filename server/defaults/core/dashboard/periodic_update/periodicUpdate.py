@@ -1,7 +1,9 @@
-from server.defaults.utils.database.datapuller import DataPuller
-from .queryBuilder import QueryBuilder
 import pandas
+
+from server.defaults.utils.database.datapuller import DataPuller  # need to remove "server" from import
+from .queryBuilder import QueryBuilder
 from ..defaultQueries import active_location_query, active_projectIDs_query
+from ..config import DATABASE
 
 
 class PeriodicUpdate(QueryBuilder):
@@ -10,7 +12,7 @@ class PeriodicUpdate(QueryBuilder):
     def __init__(self):
         super().__init__()
         self.dp = DataPuller()
-        self.dp.set_database('CaligulaD')
+        self.dp.set_database(DATABASE)
 
     def update(self) -> pandas.DataFrame:
         return self.dp.pull(self.periodic_update_query())
