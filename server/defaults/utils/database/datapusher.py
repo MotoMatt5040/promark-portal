@@ -88,7 +88,7 @@ class DataPusher:
     def connect(self):
         try:
             return self.engine.connect()
-        except Exception:
+        except Exception as err:
             print("No ODBC Driver detected. Please install Microsoft ODBC Driver 17 for SQL Server from "
                   "https://learn.microsoft.com/en-us/sql/connect/odbc/"
                   "download-odbc-driver-for-sql-server?view=sql-server-ver16#version-17")
@@ -96,4 +96,7 @@ class DataPusher:
                 "https://learn.microsoft.com/en-us/sql/connect/odbc/"
                 "download-odbc-driver-for-sql-server?view=sql-server-ver16#version-17")
             input("Press Enter to continue...")
+            print("*"*20)
+            error_log(err)
+            print("*" * 20)
         return "Connection Error"
