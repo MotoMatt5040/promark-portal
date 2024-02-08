@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from "../../api/axios";
 import Dropdown from "react-bootstrap/Dropdown";
 import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import Button from '@mui/material/Button';
 
 export default function PeriodicUpdate() {
   // const [show, setShow] = useState(false);
@@ -13,8 +16,8 @@ export default function PeriodicUpdate() {
   const [projectIDs, setProjectIDs] = useState([]);
   const [data, setData] = useState([]);
   const [errorMessage, setErrorMesssage] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [tableButton, setTableButton] = useState("<")
+  const [isOpen, setIsOpen] = useState(true);
+  const [tableButton, setTableButton] = useState(<VisibilityIcon/>)
 
   useEffect(() => {
     handleLocationOptions();
@@ -33,7 +36,7 @@ export default function PeriodicUpdate() {
 
   const toggle = () => {
     setIsOpen((isOpen) => !isOpen)
-    setTableButton(() => {if(!isOpen) return '>'; else return "<";})
+    setTableButton(() => {if(!isOpen) return <VisibilityIcon/>; else return <VisibilityOffIcon/>;})
   }
 
   const handleLocationSelect = (selectedLocation) => {
@@ -138,7 +141,8 @@ export default function PeriodicUpdate() {
       </div>
       <br/>
       <div style={{display: 'flex', width: "100%", justifyContent: 'right'}}>
-        <Button onClick={toggle}>{tableButton}</Button>
+        <Button onClick={toggle} >{tableButton}</Button>
+        {/*style={{backgroundColor: 'grey', border: 'darkgrey'}}*/}
       </div>
       {
         isOpen
