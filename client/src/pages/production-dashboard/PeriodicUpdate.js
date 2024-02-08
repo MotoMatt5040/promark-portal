@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from "../../api/axios";
-import Dropdown from "react-bootstrap/Dropdown";
 import Table from "react-bootstrap/Table";
 // import Button from "react-bootstrap/Button";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import Button from '@mui/material/Button';
+import ToggleButton from '@mui/material/ToggleButton';
+
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
 
 export default function PeriodicUpdate() {
   // const [show, setShow] = useState(false);
-  const [location, setLocation] = useState("Location");
+  const [location, setLocation] = useState("");
   const [locations, setLocations] = useState({});
   const [locationID, setLocationID] = useState('Location ID');
-  const [projectID, setProjectID] = useState("Project ID");
+  const [projectID, setProjectID] = useState("");
   const [projectIDs, setProjectIDs] = useState([]);
   const [data, setData] = useState([]);
   const [errorMessage, setErrorMesssage] = useState('');
   const [isOpen, setIsOpen] = useState(true);
   const [tableButton, setTableButton] = useState(<VisibilityIcon/>)
+  const [selected, setSelected] = React.useState(false);
 
   useEffect(() => {
     handleLocationOptions();
@@ -39,9 +45,9 @@ export default function PeriodicUpdate() {
     setTableButton(() => {if(!isOpen) return <VisibilityIcon/>; else return <VisibilityOffIcon/>;})
   }
 
-  const handleLocationSelect = (selectedLocation) => {
-    setLocation(selectedLocation);
-    setLocationID(locations[selectedLocation]);
+  const handleLocationSelect = (event: SelectChangeEvent) => {
+    setLocation(event.target.value);
+    setLocationID(locations[event.target.value]);
   }
 
   const handleLocationOptions = () => {
@@ -58,8 +64,8 @@ export default function PeriodicUpdate() {
     });
   };
 
-  const handleProjectIDSelect = (selectedProject) => {
-    setProjectID(selectedProject);
+  const handleProjectIDSelect = (event: SelectChangeEvent) => {
+    setProjectID(event.target.value);
   }
 
   const handleProjectIDOptions = () => {
@@ -116,33 +122,56 @@ export default function PeriodicUpdate() {
     <div className="container" id="production-report-container">
       <br/>
       <div className="dropdowns" id="dropdowns" style={dropdownStyle}>
-        <Dropdown>
-          <Dropdown.Toggle variant="success" id="location-dropdown">{location}</Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={() => handleLocationSelect("Location")}>All</Dropdown.Item>
-            {Object.keys(locations).map((loc, index) => (
-              <Dropdown.Item key={index} onClick={() => handleLocationSelect(loc)}>
-                {loc}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-        <Dropdown>
-          <Dropdown.Toggle variant="success" id="projectid-dropdown">{projectID}</Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={() => handleProjectIDSelect("Project ID")}>All</Dropdown.Item>
-            {projectIDs.map((proj, index) => (
-              <Dropdown.Item key={index} onClick={() => handleProjectIDSelect(proj)}>
-                {proj}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
+        <Box sx={{minWidth: 120}}>
+          <FormControl fullWidth>
+            <InputLabel id="location-label">Location</InputLabel>
+            <Select
+              labelId="location-label"
+              id="location"
+              value={location}
+              label="Location"
+              onChange={handleLocationSelect}
+            >
+              <MenuItem value={'All'} >All</MenuItem>
+                {Object.keys(locations).map((loc, index) => (
+                  <MenuItem key={index} value={loc}>
+                    {loc}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{minWidth: 120}}>
+          <FormControl fullWidth>
+            <InputLabel id="project-label">Project</InputLabel>
+            <Select
+              labelId="project-label"
+              id="project"
+              value={projectID}
+              label="Project"
+              onChange={handleProjectIDSelect}
+            >
+              <MenuItem value={'All'}>All</MenuItem>
+                {projectIDs.map((proj, index) => (
+                  <MenuItem key={index} value={proj}>
+                    {proj}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Box>
       </div>
       <br/>
       <div style={{display: 'flex', width: "100%", justifyContent: 'right'}}>
-        <Button onClick={toggle} >{tableButton}</Button>
+        {/*<Button onClick={toggle} >{tableButton}</Button>*/}
         {/*style={{backgroundColor: 'grey', border: 'darkgrey'}}*/}
+        <ToggleButton
+          value="check"
+          selected={selected}
+          onChange={() => {setSelected(!selected); toggle();}}
+        >
+          {tableButton}
+        </ToggleButton>
       </div>
       {
         isOpen
