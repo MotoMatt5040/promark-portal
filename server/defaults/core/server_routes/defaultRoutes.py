@@ -1,22 +1,17 @@
-import json
-import os
-import shutil
-
-from flask import Flask, request, jsonify, session, make_response, send_file
+from flask import Flask, request, jsonify, session, make_response
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 
 from .config import ApplicationConfig
-from ..auth.models import db, User
-from ..data_processing.reader import Reader
-from ..dashboard.periodic_update.periodicUpdate import PeriodicUpdate
+from .config import allowed_domain
+from .dataProcessingRoutes import data_processor
 from .periodicUpdateRoutes import periodic_update
-
-allowed_domain = os.environ["testing"]
+from ..auth.models import db, User
 
 app = Flask(__name__)
 app.register_blueprint(periodic_update)
+app.register_blueprint(data_processor)
 CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition"])
 app.config.from_object(ApplicationConfig)
 
@@ -24,76 +19,8 @@ bcrypt = Bcrypt(app)
 server_session = Session(app)
 db.init_app(app)
 
-reader = Reader()
-
-
-@app.route('/data_processing', methods=['POST', 'GET', 'OPTIONS'])
-# @cross_origin()
-def data_processing():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-
-    survey_id = request.json['surveyID']
-    project_id = request.json['projectID']
-
-    Reader.project_id = project_id
-    reader.setUrl(survey_id)
-
-    return ''
-
-
-@app.route('/data_processing/questions', methods=['POST', 'OPTIONS'])
-# @cross_origin(support_credentials=True)
-def data_processing_questions():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-    survey_id = request.json['surveyID']
-    project_id = request.json['projectID']
-
-    Reader.project_id = project_id
-    reader.setUrl(survey_id)
-    questions = reader.get_order()
-
-    return questions
-
-
-@app.route('/data_processing/questions/process_data', methods=['POST', 'OPTIONS'])
-# @cross_origin()
-def process_data():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-    # print(json.dumps(request.json, indent=4))
-    # print(json.dumps(request.json['selectedValues'], indent=4))
-    # for item in request.json:
-    #     print(item, request.json[item])
-    # print(request.json)
-    reader.set_data_layout(request.json)
-    reader.run()
-
-    shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
-
-    return "Zip created"
-
-
-@app.route("/data_processing/download", methods=["GET", 'OPTIONS'])
-# @cross_origin()
-def download():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-    sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
-    return sendfile
-
-
-@app.route('/', methods=['GET', 'OPTIONS'])
-# @cross_origin()
-def index():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-    return {"Working": "Code"}
-
 
 @app.route('/home', methods=['GET', 'POST', 'OPTIONS'])
-# @cross_origin()
 def home():
     """App home page"""
     if request.method == "OPTIONS":  # CORS preflight
@@ -123,7 +50,6 @@ def get_current_user():
 
 
 @app.route("/register", methods=["POST", 'OPTIONS'])
-# @cross_origin()
 def register():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
@@ -148,7 +74,6 @@ def register():
 
 
 @app.route('/login', methods=['POST', 'OPTIONS'])
-# @cross_origin()
 def login():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()

@@ -1,14 +1,11 @@
 import os
 
 import redis
-from dotenv import load_dotenv
 
-# from ...utils.database.database import Database
 
-load_dotenv()
+allowed_domain = os.environ['testing']
 
 #  initialize database access info to connect to database
-# dbai = Database()
 
 #  Build the connection string
 SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(

@@ -1,5 +1,10 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from defaults.core.server_routes import defaultRoutes
 from waitress import serve
+
 
 if __name__ == '__main__':
     print("http://localhost:5000/")
