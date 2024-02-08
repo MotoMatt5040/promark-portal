@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from "../../api/axios";
 import Dropdown from "react-bootstrap/Dropdown";
-import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
+import Button from "react-bootstrap/Button";
 
 export default function PeriodicUpdate() {
-  const [show, setShow] = useState(false);
+  // const [show, setShow] = useState(false);
   const [location, setLocation] = useState("Location");
   const [locations, setLocations] = useState({});
   const [locationID, setLocationID] = useState('Location ID');
@@ -13,6 +13,8 @@ export default function PeriodicUpdate() {
   const [projectIDs, setProjectIDs] = useState([]);
   const [data, setData] = useState([]);
   const [errorMessage, setErrorMesssage] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [tableButton, setTableButton] = useState("<")
 
   useEffect(() => {
     handleLocationOptions();
@@ -24,9 +26,15 @@ export default function PeriodicUpdate() {
 
   useEffect(() => {
     if (locationID !== "Location ID" && projectID !== "Project ID") {
-      handleUpdateTable();
+      handleUpdateTable().then(() => {console.log("Updated")})
+
     }
-  }, [ location, projectID ])
+  }, [ locationID, projectID ])
+
+  const toggle = () => {
+    setIsOpen((isOpen) => !isOpen)
+    setTableButton(() => {if(!isOpen) return '>'; else return "<";})
+  }
 
   const handleLocationSelect = (selectedLocation) => {
     setLocation(selectedLocation);
@@ -40,7 +48,6 @@ export default function PeriodicUpdate() {
       }
     })
     .then((response) => {
-      console.log(response.data);
       setLocations(response.data);
     })
     .catch((error) => {
@@ -88,7 +95,7 @@ export default function PeriodicUpdate() {
 
       setData(response.data);
 
-      console.log(JSON.stringify(response));
+      // console.log(JSON.stringify(response));
 
     } catch (error) {
       if (!error?.response) {
@@ -104,11 +111,10 @@ export default function PeriodicUpdate() {
 
   return (
     <div className="container" id="production-report-container">
+      <br/>
       <div className="dropdowns" id="dropdowns" style={dropdownStyle}>
         <Dropdown>
-          <Dropdown.Toggle variant="success" id="location-dropdown">
-            {location}
-          </Dropdown.Toggle>
+          <Dropdown.Toggle variant="success" id="location-dropdown">{location}</Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={() => handleLocationSelect("Location")}>All</Dropdown.Item>
             {Object.keys(locations).map((loc, index) => (
@@ -119,9 +125,7 @@ export default function PeriodicUpdate() {
           </Dropdown.Menu>
         </Dropdown>
         <Dropdown>
-          <Dropdown.Toggle variant="success" id="projectid-dropdown">
-            {projectID}
-          </Dropdown.Toggle>
+          <Dropdown.Toggle variant="success" id="projectid-dropdown">{projectID}</Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={() => handleProjectIDSelect("Project ID")}>All</Dropdown.Item>
             {projectIDs.map((proj, index) => (
@@ -133,59 +137,63 @@ export default function PeriodicUpdate() {
         </Dropdown>
       </div>
       <br/>
-      <div>
-        {/*<Button onClick={handleLocationOptions}>Test</Button>*/}
+      <div style={{display: 'flex', width: "100%", justifyContent: 'right'}}>
+        <Button onClick={toggle}>{tableButton}</Button>
       </div>
-      <Table>
-       <thead>
-          <tr>
-            <th>RecLoc</th>
-            <th>EID</th>
-            <th>MyName</th>
-            <th>Tenure</th>
-            <th>HRS</th>
-            <th>CMS</th>
-            <th>IntAL</th>
-            <th>CPH</th>
-            <th>MPH</th>
-            <th>PauseTime</th>
-            <th>ConnectTime</th>
-            <th>TotalDials</th>
-            <th>NAAM</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td>{item.RecLoc}</td>
-              <td>{item.EID}</td>
-              <td>{item.MyName}</td>
-              <td>{item.Tenure}</td>
-              <td>{item.HRS}</td>
-              <td>{item.CMS}</td>
-              <td>{item.IntAL}</td>
-              <td>{item.CPH}</td>
-              <td>{item.MPH}</td>
-              <td>{item.PauseTime}</td>
-              <td>{item.ConnectTime}</td>
-              <td>{item.TotalDials}</td>
-              <td>{item.NAAM}</td>
+      {
+        isOpen
+        &&
+        <Table>
+          <thead>
+            <tr>
+              <th>RecLoc</th>
+              <th>EID</th>
+              <th>MyName</th>
+              <th>Tenure</th>
+              <th>HRS</th>
+              <th>CMS</th>
+              <th>IntAL</th>
+              <th>CPH</th>
+              <th>MPH</th>
+              <th>PauseTime</th>
+              <th>ConnectTime</th>
+              <th>TotalDials</th>
+              <th>NAAM</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={index}>
+                <td>{item.RecLoc}</td>
+                <td>{item.EID}</td>
+                <td><a href="#">{item.MyName}</a></td>
+                <td>{item.Tenure}</td>
+                <td>{item.HRS}</td>
+                <td>{item.CMS}</td>
+                <td>{item.IntAL}</td>
+                <td>{item.CPH}</td>
+                <td>{item.MPH}</td>
+                <td>{item.PauseTime}</td>
+                <td>{item.ConnectTime}</td>
+                <td>{item.TotalDials}</td>
+                <td>{item.NAAM}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      }
     </div>
   )
 }
 
-const containerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'space-evenly',
-  alignContent: 'center',
-  width: '100%'
-}
+// const containerStyle = {
+//   display: 'flex',
+//   flexDirection: 'column',
+//   alignItems: 'center',
+//   justifyContent: 'space-evenly',
+//   alignContent: 'center',
+//   width: '100%'
+// }
 
 const dropdownStyle = {
   display: 'flex',
@@ -195,16 +203,16 @@ const dropdownStyle = {
   alignContent: 'center',
   width: '100%'
 }
-
-const dateButtonStyle = {
-  backgroundColor: 'green !important'
-}
-
-const dateCanvasStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-evenly',
-  alignContent: 'center',
-  width: '100%'
-}
+//
+// const dateButtonStyle = {
+//   backgroundColor: 'green !important'
+// }
+//
+// const dateCanvasStyle = {
+//   display: 'flex',
+//   flexDirection: 'row',
+//   alignItems: 'center',
+//   justifyContent: 'space-evenly',
+//   alignContent: 'center',
+//   width: '100%'
+// }
