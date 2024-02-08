@@ -1,9 +1,10 @@
 import React from 'react';
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
 import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Table from 'react-bootstrap/Table';
@@ -201,9 +202,9 @@ function DataProcessing() {
             <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
               <Button onClick={handleDownload}>Download</Button>
             </div>
-            <h4 style={{display: 'flex', alignContent: 'center', justifyContent: 'space-between'}}>
+            <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
               <label><b>Inline Total</b></label>
-              <input type="checkbox" name="total-style" id="total-style"/>
+              <Checkbox type="checkbox" name="total-style" id="total-style"/>
             </h4>
             <div style={checkboxContainerStyle}>
               <Table style={{width: "100%"}} striped>
