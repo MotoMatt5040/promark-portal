@@ -40,6 +40,7 @@ function App() {
         <Header title="React Navbar Component"/>
         <Routes>
           <Route index element={<Home/>}/>
+          <Route path="home" element={<Home/>}/>
           {/*<Route path="/home" element={<Home />} />*/}
           <Route path="data_processing" element={<DataProcessing />}/>
           <Route path="production_report" element={<ProductionReport />}/>
