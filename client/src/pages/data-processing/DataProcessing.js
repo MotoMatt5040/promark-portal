@@ -1,3 +1,4 @@
+import React from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { useState, useEffect } from "react";
@@ -61,9 +62,6 @@ function DataProcessing() {
       }
         // console.log(JSON.stringify(response));
       setQuestions(JSON.parse(JSON.stringify(response.data)));
-
-
-
     } catch (error) {
       if (!error?.response) {
         setErrorMesssage('No Server Response')
@@ -84,41 +82,6 @@ function DataProcessing() {
     }
     setValidated(true);
   };
-
-  // const handleRun = async (event) => {
-  //   event.preventDefault();
-  //   try {
-  //     let config = {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       }
-  //     }
-  //     console.log("data")
-  //     console.log(selectedValues);
-  //     const response = await axios.post(
-  //     DATA_PROCESSING_URL + PROCESS_DATA_URL,
-  //     {
-  //       selectedValues,
-  //       totalStyleChecked: document.getElementById("total-style").checked
-  //     },
-  //     config
-  //     );
-  //
-  //     if (response.status === 200) {
-  //       window.location.href="#"
-  //       console.log('Request sent for data processing')
-  //     }
-  //     // console.log(JSON.stringify(response));
-  //   } catch (error) {
-  //      if (!error?.response) {
-  //       setErrorMesssage('No Server Response')
-  //     } else if (error.response.status === 401) {
-  //       setErrorMesssage('Invalid Credentials')
-  //     } else {
-  //       setErrorMesssage('Request Failed')
-  //     }
-  //   }
-  // }
 
   const handleDownload = async (event) => {
     event.preventDefault();
@@ -175,12 +138,20 @@ function DataProcessing() {
       .catch(error => console.error(error))
   }
 
+  const chunkArray = (arr, size) => {
+    return arr.reduce((acc, _, i) => {
+      if (i % size === 0) {
+        acc.push(arr.slice(i, i + size));
+      }
+      return acc;
+    }, []);
+  };
+  const questionChunks = chunkArray(questions, 10);
+
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
-          {/*<div className='invis-form-spacer' style={invisFormSpacerStyle} />*/}
           <div className='dp-form' style={formDiv}>
-
             <Form
               noValidate
               validated={validated}
@@ -195,10 +166,9 @@ function DataProcessing() {
                     onChange={(e) => setSurveyID(e.target.value)}
                     placeholder="Survey ID"
                     required
+                    minLength="3"
                   />
-                  <Form.Text id="SurveyIDnote" muted>
-                    Step 3
-                  </Form.Text>
+                  <Form.Text id="SurveyIDnote" muted>Step 3</Form.Text>
                   <Form.Control.Feedback>Good!</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formGroupProjectId">
@@ -209,10 +179,9 @@ function DataProcessing() {
                     onChange={(e) => setProjectID(e.target.value)}
                     placeholder="Project Number"
                     required
+                    minLength="5"
                   />
-                  <Form.Text id="SurveyIDnote" muted>
-                    Promark Project Number
-                  </Form.Text>
+                  <Form.Text id="SurveyIDnote" muted>Promark Project Number</Form.Text>
                   <Form.Control.Feedback>Good!</Form.Control.Feedback>
                 </Form.Group>
               </div>
@@ -221,57 +190,56 @@ function DataProcessing() {
               </div>
             </Form>
           </div>
-          {/*<div style={downloadButtonDivStyle}>*/}
-          {/*  <Button onClick={handleDownload}>Download</Button>*/}
-          {/*</div>*/}
         </div>
-        <br/>
-        <Offcanvas show={show} onHide={handleClose}>
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Layout</Offcanvas.Title>
-            {/*<Button type="submit" onClick={handleRun}>Run</Button>*/}
-            <br/>
-            <label><b>Inline Total</b></label>
-            <input type="checkbox" name="total-style" id="total-style" />
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Table style={{width: "100%"}} striped>
-              <thead>
-                <tr>
-                  <th>QNAME</th>
-                  <th>Table</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(typeof questions === 'undefined') ? (
-                    <p>Loading...</p>
-                  ) : (
-                    questions.map((question ,i) => (
-                      <tr key={i}>
-                        <td>{question}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            type="checkbox"
-                            name={question}
-                            id={question}
-                            checked={selectedValues[question]}
-                            onChange={() => handleCheckboxChange(question)}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                )}
-              </tbody>
-            </Table>
-            <Button onClick={handleDownload}>Download</Button>
-          </Offcanvas.Body>
-        </Offcanvas>
-        <Instructions/>
+        <div style={widgetContainerStyle}>
+          <Instructions/>
+          {
+          show
+          &&
+          <div style={{margin: "1%"}}>
+            <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
+              <Button onClick={handleDownload}>Download</Button>
+            </div>
+            <h4 style={{display: 'flex', alignContent: 'center', justifyContent: 'space-between'}}>
+              <label><b>Inline Total</b></label>
+              <input type="checkbox" name="total-style" id="total-style"/>
+            </h4>
+            <div style={checkboxContainerStyle}>
+              <Table style={{width: "100%"}} striped>
+                <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0;'}}>
+                  <tr>
+                    <th>QNAME</th>
+                    <th>Table</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(typeof questions === 'undefined') ? (
+                      <p>Loading...</p>
+                    ) : (
+                      questions.map((question ,i) => (
+                        <tr key={i}>
+                          <td>{question}</td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              name={question}
+                              id={question}
+                              checked={selectedValues[question]}
+                              onChange={() => handleCheckboxChange(question)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                  )}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+          }
+        </div>
       </div>
     )
 }
-
 export default DataProcessing;
 
 const headerStyle = {
@@ -281,6 +249,11 @@ const headerStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   alignContent: 'center',
+}
+
+const widgetContainerStyle = {
+  display: 'flex',
+  flexDirection: 'row',
 }
 
 const invisFormSpacerStyle = {
@@ -338,4 +311,10 @@ const downloadButtonDivStyle = {
   alignContent: 'right',
   // paddingLeft: '30%'
   // width: "100%"
+}
+
+const checkboxContainerStyle = {
+  display: 'block',
+  height: '50vh',
+  overflowY: 'scroll'
 }
