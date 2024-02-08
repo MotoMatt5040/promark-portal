@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { useState, useEffect } from "react";
 import axios from "../../api/axios";
+import Checkbox from '@mui/material/Checkbox';
 
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Table from 'react-bootstrap/Table';
@@ -220,11 +221,12 @@ function DataProcessing() {
                         <tr key={i}>
                           <td>{question}</td>
                           <td>
-                            <input
+                            <Checkbox
                               type="checkbox"
                               name={question}
                               id={question}
-                              checked={selectedValues[question]}
+                              // checked={selectedValues[question]}
+                              defaultChecked
                               onChange={() => handleCheckboxChange(question)}
                             />
                           </td>
