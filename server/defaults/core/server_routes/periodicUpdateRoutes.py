@@ -1,12 +1,8 @@
-import os
-
 from flask import Blueprint, request, make_response
 
 from server.defaults.core.dashboard.periodic_update.periodicUpdate import PeriodicUpdate
 from server.defaults.utils.database.datapuller import DataPuller
-
-allowed_domain = os.environ["testing"]
-
+from .config import allowed_domain
 
 pu = PeriodicUpdate()
 periodic_update = Blueprint('periodic', __name__)
@@ -15,29 +11,25 @@ dp = DataPuller()
 
 @periodic_update.route('/periodic_update', methods=['POST', 'OPTIONS'])
 def updater():
-
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-
-    pu.projectid = request.json['projectID']
-    pu.location = request.json['locationID']
-
+    try:
+        pu.projectid = request.json['projectID']
+        pu.location = request.json['locationID']
+    except KeyError as err:
+        raise Exception(
+            "Key Error from request json (project or location id) in periodicUpdate.py -> updater() (/periodic_update)"
+        )
     response = pu.update().to_json(orient='records')
-
     return response
 
 
 @periodic_update.route('/active/locations', methods=['GET'])
 def active_locations():
     response = pu.active_locations()
-    # print(response)
-    # print(response.to_string())
     response.set_index('LongName', inplace=True)
     response = response.to_dict()['LocationID']
-    # print(json.dumps(response.to_dict()['LocationID'],indent=4))
-    # print(json.dumps(json.loads(response.to_json()), indent=4))
-    print(response)
-    return response#.to_dict('records')
+    return response
 
 
 @periodic_update.route('/active/projects', methods=['GET'])
