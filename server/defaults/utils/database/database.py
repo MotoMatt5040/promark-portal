@@ -1,29 +1,16 @@
 import os
-from configparser import ConfigParser
-from pathlib import Path
 
 
 class Database:
     '''Database Accessor'''
     # region constants for server info
-    config_object = ConfigParser()
-    config_path = Path(f"defaults/utils/config.ini")
-    config_object.read(config_path)
 
     CORESERVER = os.environ.get('coreserver')
     COREUSER = os.environ.get("coreuser")
     COREPASSWORD = os.environ.get("corepassword")
     DATABASE = os.environ.get("portal_database")
-    del config_object
 
     DRIVER = '{ODBC Driver 17 for SQL Server}'
-
-    # endregion constants for server info
-    # driver = 'ODBC17',
-    # servername = 'COREServer',
-    # database = 'FAJITA',
-    # userid = 'COREUser',
-    # password = 'COREPassword'
 
     def __init__(self):
         try:
