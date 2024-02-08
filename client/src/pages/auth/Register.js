@@ -2,6 +2,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import {useEffect, useRef, useState} from 'react';
 
+const EMAIL_REGEX = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
+const PASSWORD_REGEX = /(?=.{7,15}$)(?=\w{7,15})(?=.*[A-Z])(?=.*\d)/;
+const LOGIN_URL = '/login';
+
 function Register() {
 
   const [validated, setValidated] = useState(false);
@@ -24,9 +28,9 @@ function Register() {
   const [errorMessage, setErrorMesssage] = useState('');
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    emailRef.current.focus();
-  }, []);
+  // useEffect(() => {
+  //   emailRef.current.focus();
+  // }, []);
 
   useEffect(() => {
     const result = EMAIL_REGEX.test(email)
@@ -47,18 +51,6 @@ function Register() {
     useEffect(() => {
     setErrorMesssage('');
   }, [email, password, matchPassword]);
-
-
-
-
-
-
-
-
-
-
-
-
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
