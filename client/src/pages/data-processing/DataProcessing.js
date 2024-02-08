@@ -1,12 +1,12 @@
-import React from 'react';
-import Form from "react-bootstrap/Form";
 // import Button from "react-bootstrap/Button";
-import { useState, useEffect } from "react";
+import React, {useEffect, useState} from 'react';
+import Form from "react-bootstrap/Form";
 import axios from "../../api/axios";
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 
-import Offcanvas from 'react-bootstrap/Offcanvas';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 import Table from 'react-bootstrap/Table';
 import Instructions from "./Instructions";
 
@@ -16,14 +16,13 @@ const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
 function DataProcessing() {
 
-  const [validated, setValidated] = useState(false);
-  const [surveyID, setSurveyID] = useState(false);
-  const [projectID, setProjectID] = useState(false);
+  const [surveyID, setSurveyID] = useState();
+  const [isSurveyIDError, setSurveyIDError] = useState(false);
+  const [projectID, setProjectID] = useState();
+  const [isProjectIDError, setProjectIDError] = useState(false);
   const [errorMessage, setErrorMesssage] = useState('');
   const [questions, setQuestions] = useState([]);
-
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
 
   const [selectedValues, setSelectedValues] = useState({});
 
@@ -74,15 +73,6 @@ function DataProcessing() {
       }
     }
     setShow(true)
-  };
-
-  const handleValidation = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    setValidated(true);
   };
 
   const handleDownload = async (event) => {
@@ -140,15 +130,17 @@ function DataProcessing() {
       .catch(error => console.error(error))
   }
 
-  const chunkArray = (arr, size) => {
-    return arr.reduce((acc, _, i) => {
-      if (i % size === 0) {
-        acc.push(arr.slice(i, i + size));
-      }
-      return acc;
-    }, []);
+   const handleSurveyIDChange = (e) => {
+    const value = e.target.value;
+    setSurveyID(value);
+    setSurveyIDError(value.length < 3);
   };
-  const questionChunks = chunkArray(questions, 10);
+
+  const handleProjectIDChange = (e) => {
+    const value = e.target.value;
+    setProjectID(value);
+    setProjectIDError(value.length < 5);
+  };
 
     return (
       <div>
@@ -156,35 +148,48 @@ function DataProcessing() {
           <div className='dp-form' style={formDiv}>
             <Form
               noValidate
-              validated={validated}
-              onChange={handleValidation}
               style={formStyle}>
               <div style={formTextBox}>
                 <Form.Group className="mb-3" controlId="formGroupSruveryId">
-                  <Form.Label>Acuity Survey ID</Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Box
+                    component="form"
+                    sx={{
+                      '& > :not(style)': { m: 1, width: '25ch' },
+                    }}
+                    noValidate
                     autoComplete="off"
-                    onChange={(e) => setSurveyID(e.target.value)}
-                    placeholder="Survey ID"
-                    required
-                    minLength="3"
-                  />
-                  <Form.Text id="SurveyIDnote" muted>Step 3</Form.Text>
-                  <Form.Control.Feedback>Good!</Form.Control.Feedback>
+                  >
+                    <TextField
+                      error={isSurveyIDError}
+                      autoComplete="off"
+                      onChange={handleSurveyIDChange}
+                      value={surveyID}
+                      label="Acuity Survey ID"
+                      required
+                      variant="standard"
+                    />
+                  </Box>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formGroupProjectId">
-                  <Form.Label>PRC Project Number</Form.Label>
-                  <Form.Control
-                    type="text"
+
+                  <Box
+                    component="form"
+                    sx={{
+                      '& > :not(style)': { m: 1, width: '25ch' },
+                    }}
+                    noValidate
                     autoComplete="off"
-                    onChange={(e) => setProjectID(e.target.value)}
-                    placeholder="Project Number"
-                    required
-                    minLength="5"
-                  />
-                  <Form.Text id="SurveyIDnote" muted>Promark Project Number</Form.Text>
-                  <Form.Control.Feedback>Good!</Form.Control.Feedback>
+                  >
+                    <TextField
+                      error={isProjectIDError}
+                      autoComplete="off"
+                      onChange={handleProjectIDChange}
+                      value={projectID}
+                      label="PRC Project ID"
+                      required
+                      variant="standard"
+                    />
+                  </Box>
                 </Form.Group>
               </div>
               <div style={formButtons}>
@@ -226,7 +231,6 @@ function DataProcessing() {
                               type="checkbox"
                               name={question}
                               id={question}
-                              // checked={selectedValues[question]}
                               defaultChecked
                               onChange={() => handleCheckboxChange(question)}
                             />
