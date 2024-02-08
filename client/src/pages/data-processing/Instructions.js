@@ -1,8 +1,4 @@
 import Accordion from 'react-bootstrap/Accordion';
-import jt from './assets/j-t.png';
-import TableBody from './tableBody.js'
-import projTitle from "./assets/project-title-caseid.png"
-import Tooltip from "@mui/material/Tooltip";
 import React from 'react';
 import Step1 from "./instruction steps/Step1";
 import Step2 from "./instruction steps/Step2";
@@ -42,5 +38,5 @@ const accordionStyle = {
   display: 'flex',
   flexDirection: 'column',
   width: '49%',
-  marginLeft: "1%"
+  margin: "1%"
 }
