@@ -16,7 +16,7 @@ export default function PeriodicUpdate() {
   // const [show, setShow] = useState(false);
   const [location, setLocation] = useState("");
   const [locations, setLocations] = useState({});
-  const [locationID, setLocationID] = useState('Location ID');
+  const [locationID, setLocationID] = useState('');
   const [projectID, setProjectID] = useState("");
   const [projectIDs, setProjectIDs] = useState([]);
   const [data, setData] = useState([]);
@@ -46,8 +46,13 @@ export default function PeriodicUpdate() {
   }
 
   const handleLocationSelect = (event: SelectChangeEvent) => {
-    setLocation(event.target.value);
-    setLocationID(locations[event.target.value]);
+    if (event.target.value !== "All") {
+      setLocation(event.target.value);
+      setLocationID(locations[event.target.value]);
+      return
+    }
+    setLocation('All')
+    setLocationID('All')
   }
 
   const handleLocationOptions = () => {
@@ -86,6 +91,7 @@ export default function PeriodicUpdate() {
 
   const handleUpdateTable = async () => {
     try {
+      console.log("info => ", locationID, projectID)
       let config = {
           headers: {
             'Content-Type': 'application/json',
@@ -104,7 +110,7 @@ export default function PeriodicUpdate() {
 
       setData(response.data);
 
-      // console.log(JSON.stringify(response));
+      console.log(JSON.stringify(response));
 
     } catch (error) {
       if (!error?.response) {
