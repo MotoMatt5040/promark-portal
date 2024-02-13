@@ -29,7 +29,7 @@ def updater():
 
 @periodic_update.route('/project_summary', methods=['GET'])
 def project_summary():
-    response = pu.project_summary()
+    response = pu.project_summary().to_json()
     return response
 
 
