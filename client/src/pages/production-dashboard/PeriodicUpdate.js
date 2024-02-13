@@ -185,25 +185,27 @@ export default function PeriodicUpdate() {
         <Table>
           <thead>
             <tr>
-              <th>RecLoc</th>
+              {projectID === 'All' && <th>Project ID</th>}
+              {location === 'All' && <th>Location</th>}
               <th>EID</th>
-              <th>MyName</th>
+              <th>Name</th>
               <th>Tenure</th>
               <th>HRS</th>
               <th>CMS</th>
               <th>IntAL</th>
               <th>CPH</th>
               <th>MPH</th>
-              <th>PauseTime</th>
-              <th>ConnectTime</th>
-              <th>TotalDials</th>
+              <th>Pause Time</th>
+              <th>Connect Time</th>
+              <th>Total Dials</th>
               <th>NAAM</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, index) => (
               <tr key={index}>
-                <td>{item.RecLoc}</td>
+                {projectID === 'All' && <td>{item.projectid}</td>}
+                {location === 'All' && <td>{item.RecLoc}</td>}
                 <td>{item.EID}</td>
                 <td><a href="#">{item.MyName}</a></td>
                 <td>{item.Tenure}</td>
