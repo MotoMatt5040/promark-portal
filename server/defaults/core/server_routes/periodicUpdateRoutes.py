@@ -18,9 +18,18 @@ def updater():
         pu.location = request.json['locationID']
     except KeyError as err:
         raise Exception(
-            "Key Error from request json (project or location id) in periodicUpdate.py -> updater() (/periodic_update)"
+            f"""
+            Key Error from request json (project or location id) in periodicUpdate.py -> updater() (/periodic_update)
+            This error is typically caused by "All" being a selection and is currently being worked out.
+            """
         )
-    response = pu.update().to_json(orient='records')
+    response = pu.periodic_update().to_json(orient='records')
+    return response
+
+
+@periodic_update.route('/project_summary', methods=['GET'])
+def project_summary():
+    response = pu.project_summary()
     return response
 
 
