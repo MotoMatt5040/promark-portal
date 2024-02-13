@@ -136,6 +136,7 @@ function DataProcessing() {
     const value = e.target.value;
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
+    setShow(false)
     if (value.length > 2) {
       const response = axios.post(
         '/data_processing/survey_name',
