@@ -19,30 +19,34 @@ export default function PeriodicUpdate() {
   const [locationID, setLocationID] = useState('');
   const [projectID, setProjectID] = useState("");
   const [projectIDs, setProjectIDs] = useState([]);
-  const [data, setData] = useState([]);
+  const [periodicUpdateData, setPeriodicUpdateData] = useState([]);
+  const [productionSummaryData, setProductionSummaryData] = useState({});
   const [errorMessage, setErrorMesssage] = useState('');
-  const [isOpen, setIsOpen] = useState(true);
-  const [tableButton, setTableButton] = useState(<VisibilityIcon/>)
-  const [selected, setSelected] = React.useState(false);
+  const [periodicUpdateIsOpen, setPeriodicUpdateIsOpen] = useState(true);
+  const [productionSummaryIsOpen, setProductionSummaryIsOpen] = useState(true)
+  const [periodicUpdateTableButton, setPeriodicUpdateTableButton] = useState(<VisibilityIcon/>)
+  const [productionSummaryTableButton, setProductionSummaryTableButton] = useState(<VisibilityIcon/>)
+  const [periodicUpdateSelected, setPeriodicUpdateSelected] = React.useState(false);
+  const [productionSummarySelected, setProductionSummarySelected] = React.useState(false);
 
   useEffect(() => {
     handleLocationOptions();
+    handleProjectIDOptions();
+    handleProductionSummaryTableUpdate();
   }, []); // Fetch locations on component mount
 
   useEffect(() => {
-    handleProjectIDOptions();
-  }, []); // Fetch project IDs on component mount
-
-  useEffect(() => {
-    if (locationID !== "Location ID" && projectID !== "Project ID") {
-      handleUpdateTable().then(() => {console.log("Updated")})
-
-    }
+    handlePeriodicUpdateTable().then(() => {console.log("Updated")})
   }, [ locationID, projectID ])
 
-  const toggle = () => {
-    setIsOpen((isOpen) => !isOpen)
-    setTableButton(() => {if(!isOpen) return <VisibilityIcon/>; else return <VisibilityOffIcon/>;})
+  const togglePeriodicUpdate = () => {
+    setPeriodicUpdateIsOpen((periodicUpdateIsOpen) => !periodicUpdateIsOpen)
+    setPeriodicUpdateTableButton(() => {if(!periodicUpdateIsOpen) return <VisibilityIcon/>; else return <VisibilityOffIcon/>;})
+  }
+
+  const toggleProductionSummary = () => {
+    setProductionSummaryIsOpen((productionSummaryIsOpen) => !productionSummaryIsOpen)
+    setProductionSummaryTableButton(() => {if(!productionSummaryIsOpen) return <VisibilityIcon/>; else return <VisibilityOffIcon/>;})
   }
 
   const handleLocationSelect = (event: SelectChangeEvent) => {
@@ -89,7 +93,24 @@ export default function PeriodicUpdate() {
     });
   }
 
-  const handleUpdateTable = async () => {
+  const handleProductionSummaryTableUpdate = () => {
+    axios.get('/project_summary', {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then((response) => {
+      // const projectIDs = Object.values(projectData.projectid);
+      setProductionSummaryData(response.data);
+      // console.log(productionSummaryData);
+      // console.log(productionSummaryData)
+    })
+    .catch((error) => {
+      console.error("Error fetching project ID's:", error);
+    });
+  }
+
+  const handlePeriodicUpdateTable = async () => {
     try {
       console.log("info => ", locationID, projectID)
       let config = {
@@ -108,9 +129,9 @@ export default function PeriodicUpdate() {
         console.log('Request sent for periodic update')
       }
 
-      setData(response.data);
+      setPeriodicUpdateData(response.data);
 
-      console.log(JSON.stringify(response));
+      // console.log(JSON.stringify(response));
 
     } catch (error) {
       if (!error?.response) {
@@ -169,18 +190,63 @@ export default function PeriodicUpdate() {
       </div>
       <br/>
       <div style={{display: 'flex', width: "100%", justifyContent: 'right'}}>
+         <ToggleButton
+          value="check"
+          selected={productionSummarySelected}
+          onChange={() => {setProductionSummarySelected(!productionSummarySelected); toggleProductionSummary();}}
+        >
+          {productionSummaryTableButton}
+        </ToggleButton>
+      </div>
+      {
+        productionSummaryIsOpen
+        &&
+        Object.keys(productionSummaryData).length > 0 ? (
+          <Table>
+            <thead>
+              <tr>
+                <th>Project ID</th>
+                <th>Project Name</th>
+                <th>Center</th>
+                <th>CMS</th>
+                <th>HRS</th>
+                <th>CPH</th>
+                <th>MPH</th>
+                <th>AL</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(productionSummaryData.ProjectID).map((index) => (
+                <tr key={index}>
+                  <td>{productionSummaryData.ProjectID[index]}</td>
+                  <td>{productionSummaryData.ProjName[index]}</td>
+                  <td>{productionSummaryData.RecLoc[index]}</td>
+                  <td>{productionSummaryData.CMS[index]}</td>
+                  <td>{productionSummaryData.HRS[index]}</td>
+                  <td>{productionSummaryData.CPH[index]}</td>
+                  <td>{productionSummaryData.MPH[index]}</td>
+                  <td>{productionSummaryData.AL[index]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <p>Loading...</p>
+        )
+      }
+      <div style={{display: 'flex', width: "100%", justifyContent: 'right'}}>
         {/*<Button onClick={toggle} >{tableButton}</Button>*/}
         {/*style={{backgroundColor: 'grey', border: 'darkgrey'}}*/}
         <ToggleButton
           value="check"
-          selected={selected}
-          onChange={() => {setSelected(!selected); toggle();}}
+          selected={periodicUpdateSelected}
+          onChange={() => {setPeriodicUpdateSelected(!periodicUpdateSelected); togglePeriodicUpdate();}}
         >
-          {tableButton}
+          {periodicUpdateTableButton}
         </ToggleButton>
       </div>
       {
-        isOpen
+        periodicUpdateIsOpen
         &&
         <Table>
           <thead>
@@ -202,7 +268,7 @@ export default function PeriodicUpdate() {
             </tr>
           </thead>
           <tbody>
-            {data.map((item, index) => (
+            {periodicUpdateData.map((item, index) => (
               <tr key={index}>
                 {projectID === 'All' && <td>{item.projectid}</td>}
                 {location === 'All' && <td>{item.RecLoc}</td>}
