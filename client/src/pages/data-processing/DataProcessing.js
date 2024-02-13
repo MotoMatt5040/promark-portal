@@ -14,6 +14,8 @@ const DATA_PROCESSING_URL = '/data_processing';
 const QUESTIONS_URL = '/questions';
 const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
+
+
 function DataProcessing() {
 
   const [surveyID, setSurveyID] = useState();
@@ -23,7 +25,6 @@ function DataProcessing() {
   const [errorMessage, setErrorMesssage] = useState('');
   const [questions, setQuestions] = useState([]);
   const [show, setShow] = useState(false);
-
   const [selectedValues, setSelectedValues] = useState({});
 
   const handleCheckboxChange = (question) => {
