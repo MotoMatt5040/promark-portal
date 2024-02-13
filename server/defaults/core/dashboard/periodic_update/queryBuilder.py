@@ -25,7 +25,7 @@ class QueryBuilder:
             "INNER JOIN tblCC3EmployeeList ON tblIntCodes.VoxcoID = tblCC3EmployeeList.VoxcoID " \
             f"WHERE Code = '02' {self._projectidclause}GROUP BY EID) AS tblNAAM " \
             f"ON tblNAAM.EID = tblCC3Employeelist.EID " \
-            "LEFT JOIN (Select VoxcoID, AVG(duration/60) AS IntAvg FROM tblavgLengthShift " \
+            "LEFT JOIN (Select VoxcoID, ROUND(AVG(duration/60), 2) AS IntAvg FROM tblavgLengthShift " \
             f"{self._projectidclause2}" \
             "GROUP BY VoxcoID) AS tblAvgLength ON tblAvgLength.VoxcoID = tblCC3EmployeeList.VoxcoID " \
             f"WHERE {self._projectidclause3} Code = 'TD'{self._locationClause} " \
