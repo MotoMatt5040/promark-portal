@@ -20,7 +20,6 @@ function DataProcessing() {
 
   const [surveyID, setSurveyID] = useState();
   const [isSurveyIDError, setSurveyIDError] = useState(false);
-  const [projectID, setProjectID] = useState();
   const [isProjectIDError, setProjectIDError] = useState(false);
   const [errorMessage, setErrorMesssage] = useState('');
   const [questions, setQuestions] = useState([]);
@@ -55,7 +54,7 @@ function DataProcessing() {
         }
       const response = await axios.post(
         DATA_PROCESSING_URL + QUESTIONS_URL,
-        { surveyID, projectID },
+        { surveyID },
         config
       );
 
@@ -118,11 +117,12 @@ function DataProcessing() {
           }
     })
       .then((obj) => {
+        const survey_n = surveyName.substring(0, surveyName.indexOf(' '));
         console.log(obj.data)
         const url = URL.createObjectURL(obj.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = projectID + ' data.zip';
+        a.download = survey_n + '.zip';
         a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
@@ -157,12 +157,6 @@ function DataProcessing() {
     }
   };
 
-  const handleProjectIDChange = (e) => {
-    const value = e.target.value;
-    setProjectID(value);
-    setProjectIDError(value.length < 5);
-  };
-
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
@@ -187,27 +181,6 @@ function DataProcessing() {
                       onChange={handleSurveyIDChange}
                       value={surveyID}
                       label="Acuity Survey ID"
-                      required
-                      variant="standard"
-                    />
-                  </Box>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formGroupProjectId">
-
-                  <Box
-                    component="form"
-                    sx={{
-                      '& > :not(style)': { m: 1, width: '25ch' },
-                    }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <TextField
-                      error={isProjectIDError}
-                      autoComplete="off"
-                      onChange={handleProjectIDChange}
-                      value={projectID}
-                      label="PRC Project ID"
                       required
                       variant="standard"
                     />
