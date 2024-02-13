@@ -13,20 +13,23 @@ import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 
 export default function PeriodicUpdate() {
-  // const [show, setShow] = useState(false);
+  const [errorMessage, setErrorMesssage] = useState('');
+
   const [location, setLocation] = useState("");
   const [locations, setLocations] = useState({});
   const [locationID, setLocationID] = useState('');
+
   const [projectID, setProjectID] = useState("");
   const [projectIDs, setProjectIDs] = useState([]);
+
   const [periodicUpdateData, setPeriodicUpdateData] = useState([]);
-  const [productionSummaryData, setProductionSummaryData] = useState({});
-  const [errorMessage, setErrorMesssage] = useState('');
   const [periodicUpdateIsOpen, setPeriodicUpdateIsOpen] = useState(true);
-  const [productionSummaryIsOpen, setProductionSummaryIsOpen] = useState(true)
   const [periodicUpdateTableButton, setPeriodicUpdateTableButton] = useState(<VisibilityIcon/>)
-  const [productionSummaryTableButton, setProductionSummaryTableButton] = useState(<VisibilityIcon/>)
   const [periodicUpdateSelected, setPeriodicUpdateSelected] = React.useState(false);
+
+  const [productionSummaryData, setProductionSummaryData] = useState({});
+  const [productionSummaryIsOpen, setProductionSummaryIsOpen] = useState(true)
+  const [productionSummaryTableButton, setProductionSummaryTableButton] = useState(<VisibilityIcon/>)
   const [productionSummarySelected, setProductionSummarySelected] = React.useState(false);
 
   useEffect(() => {
