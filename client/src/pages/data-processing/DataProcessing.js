@@ -26,6 +26,7 @@ function DataProcessing() {
   const [questions, setQuestions] = useState([]);
   const [show, setShow] = useState(false);
   const [selectedValues, setSelectedValues] = useState({});
+  const [surveyName, setSurveyName] = useState('Please enter project info')
 
   const handleCheckboxChange = (question) => {
     setSelectedValues((prevValues) => ({
@@ -131,10 +132,29 @@ function DataProcessing() {
       .catch(error => console.error(error))
   }
 
-   const handleSurveyIDChange = (e) => {
+   const handleSurveyIDChange = async (e) => {
     const value = e.target.value;
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
+    if (value.length > 2) {
+      const response = axios.post(
+        '/data_processing/survey_name',
+        { surveyID: e.target.value },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+      })
+      .then((response) => {
+        setSurveyName(response.data)
+      })
+      .catch((error) => {
+        console.error("Error fetching survey name", error)
+        setSurveyName("Invalid Survey ID")
+      })
+
+      console.log(surveyName)
+    }
   };
 
   const handleProjectIDChange = (e) => {
@@ -146,6 +166,7 @@ function DataProcessing() {
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
+          <h4>{surveyName}</h4>
           <div className='dp-form' style={formDiv}>
             <Form
               noValidate
@@ -214,7 +235,7 @@ function DataProcessing() {
             </h4>
             <div style={checkboxContainerStyle}>
               <Table style={{width: "100%"}} striped>
-                <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0;'}}>
+                <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>
                   <tr>
                     <th>QNAME</th>
                     <th>Table</th>
@@ -253,7 +274,7 @@ export default DataProcessing;
 const headerStyle = {
   // border: '1px solid green',
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   alignContent: 'center',

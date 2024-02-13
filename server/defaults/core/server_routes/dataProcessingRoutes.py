@@ -30,11 +30,12 @@ def data_processing():
 def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    survey_id = request.json['surveyID']
-    project_id = request.json['projectID']
+    # survey_id = request.json['surveyID']
+    # project_id = request.json['projectID']
 
-    Reader.project_id = project_id
-    reader.setUrl(survey_id)
+    # Reader.project_id = project_id
+    # reader.setUrl(survey_id)
+    reader.request_data()
     questions = reader.get_order()
 
     return questions
@@ -44,11 +45,6 @@ def data_processing_questions():
 def process_data():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    # print(json.dumps(request.json, indent=4))
-    # print(json.dumps(request.json['selectedValues'], indent=4))
-    # for item in request.json:
-    #     print(item, request.json[item])
-    # print(request.json)
     reader.set_data_layout(request.json)
     reader.run()
 
@@ -63,6 +59,15 @@ def download():
         return _build_cors_preflight_response()
     sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
     return sendfile
+
+@data_processor.route("/data_processing/survey_name", methods=['POST', 'OPTIONS'])
+def survey_name():
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
+    survey_id = request.json['surveyID']
+    reader.setUrl(survey_id)
+
+    return reader.get_survey_name()
 
 
 @data_processor.route('/', methods=['GET', 'OPTIONS'])

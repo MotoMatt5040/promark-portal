@@ -32,8 +32,14 @@ class Reader:
 
     def setUrl(self, survey_id: str):
         self.api.set_sid(survey_id)
-        self.api.request_data()
+        # self.api.request_data()
         # self.run()
+
+    def request_data(self):
+        self.api.request_data()
+
+    def get_survey_name(self):
+        return self.api.get_survey_name()
 
     def get_questions(self):
         return self.api.question_names()

@@ -155,6 +155,12 @@ class AcuityData:
         self.__extraction_id = None
         self.__extraction_file_id = None
         self.sid = None
+        self.__access_token = os.environ['access_token']
+
+    def get_survey_name(self):
+        link = f"https://prcmmweb.promarkresearch.com/api/survey/{self.sid}"
+        survey_name = requests.get(link, headers={"Authorization": f"Client {self.__access_token}"}).json()['Name']
+        return survey_name
 
     def set_sid(self, sid):
         self.sid = sid
@@ -162,7 +168,7 @@ class AcuityData:
 
     def set_skips(self, skips):
         self.SKIP_TABLE = skips
-        print(self.SKIP_TABLE)
+        # print(self.SKIP_TABLE)
 
     def request_data(self):
         # print("\n")
