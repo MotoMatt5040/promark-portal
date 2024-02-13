@@ -25,6 +25,7 @@ class QueryBuilder:
             "INNER JOIN tblCC3EmployeeList ON tblIntCodes.VoxcoID = tblCC3EmployeeList.VoxcoID " \
             f"WHERE Code = '02' {self._projectidclause}GROUP BY EID) AS tblNAAM " \
             f"ON tblNAAM.EID = tblCC3Employeelist.EID " \
+            f"INNER JOIN tblLocation ON tblHourlyProductionDetail.recloc = tblLocation.LocationID " \
             "LEFT JOIN (Select VoxcoID, ROUND(AVG(duration/60), 2) AS IntAvg FROM tblavgLengthShift " \
             f"{self._projectidclause2}" \
             "GROUP BY VoxcoID) AS tblAvgLength ON tblAvgLength.VoxcoID = tblCC3EmployeeList.VoxcoID " \
@@ -41,7 +42,7 @@ class QueryBuilder:
     def location(self, location):
         self.resetLocation()
         if location == 'All':
-            self._locationAllClause = f"RecLoc, "
+            self._locationAllClause = f"LongName, "
             return
         self._location = location
         self._locationClause = f" AND tblHourlyProductionDetail.recLoc = '{location}'"

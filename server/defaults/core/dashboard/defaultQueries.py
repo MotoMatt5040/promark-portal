@@ -13,9 +13,10 @@ def active_location_query():
 
 def project_summary_query():
     return "Select DISTINCT tblHourlyProduction.ProjectID, tblBlueBookProjmaster.ProjName, " \
-           "tblHourlyProduction.RecLoc, tblHourlyProduction.AL, tblHourlyProduction.CMS, tblHourlyProduction.CPH, " \
+           "LongName, tblHourlyProduction.AL, tblHourlyProduction.CMS, tblHourlyProduction.CPH, " \
            "tblHourlyProduction.MPH, tblHourlyProduction.HRS From tblHourlyProduction " \
            "inner join tblBlueBookProjMaster ON tblHourlyPRoduction.ProjectID = tblBlueBookProjMaster.ProjectID " \
+           "INNER JOIN tblLocation ON tblHourlyProduction.RecLoc = tblLocation.LocationID " \
            "where recLoc <> '99' order by tblHourlyProduction.ProjectID"
 
 

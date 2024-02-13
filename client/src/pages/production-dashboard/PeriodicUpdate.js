@@ -220,7 +220,7 @@ export default function PeriodicUpdate() {
                 <tr key={index}>
                   <td>{productionSummaryData.ProjectID[index]}</td>
                   <td>{productionSummaryData.ProjName[index]}</td>
-                  <td>{productionSummaryData.RecLoc[index]}</td>
+                  <td>{productionSummaryData.LongName[index]}</td>
                   <td>{productionSummaryData.CMS[index]}</td>
                   <td>{productionSummaryData.HRS[index]}</td>
                   <td>{productionSummaryData.CPH[index]}</td>
@@ -271,7 +271,7 @@ export default function PeriodicUpdate() {
             {periodicUpdateData.map((item, index) => (
               <tr key={index}>
                 {projectID === 'All' && <td>{item.projectid}</td>}
-                {location === 'All' && <td>{item.RecLoc}</td>}
+                {location === 'All' && <td>{item.LongName}</td>}
                 <td>{item.EID}</td>
                 <td><a href="#">{item.MyName}</a></td>
                 <td>{item.Tenure}</td>
