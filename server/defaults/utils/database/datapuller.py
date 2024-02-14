@@ -1,14 +1,12 @@
+import traceback
+
 import pandas
 import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy import text
-from sqlalchemy.engine import URL
-import webbrowser
-import pyodbc
+
 from .database import Database
 from .sqldictionary import SQLDictionary
-import sys
-import traceback
+
 
 def error_log(err):
     print("\n\n\n")
