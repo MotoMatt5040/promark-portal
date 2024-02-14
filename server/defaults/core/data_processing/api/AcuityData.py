@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import requests
 from configparser import ConfigParser
+import os
 
 
 class AcuityData:
@@ -145,7 +146,10 @@ class AcuityData:
 
     @staticmethod
     def order():
-        return list(pd.read_csv("order.csv").columns[4:])
+        try:
+            return list(pd.read_csv("order.csv").columns[4:])
+        except:
+            return []
 
     def __init__(self):
         self.__variables = None
@@ -154,6 +158,12 @@ class AcuityData:
         self.__extraction_id = None
         self.__extraction_file_id = None
         self.sid = None
+        self.__access_token = os.environ['access_token']
+
+    def get_survey_name(self):
+        link = f"https://prcmmweb.promarkresearch.com/api/survey/{self.sid}"
+        survey_name = requests.get(link, headers={"Authorization": f"Client {self.__access_token}"}).json()['Name']
+        return survey_name
 
     def set_sid(self, sid):
         self.sid = sid
@@ -161,12 +171,16 @@ class AcuityData:
 
     def set_skips(self, skips):
         self.SKIP_TABLE = skips
-        print(self.SKIP_TABLE)
+        # print(self.SKIP_TABLE)
 
     def request_data(self):
         # print("\n")
         # print(os.getcwd())
+        if os.path.exists('order.csv'):
+            os.remove('order.csv')
+
         time.sleep(3)
+
 
         if platform == "linux" or platform == "linux2":
             __config_path = Path(r'./config.ini')
@@ -175,7 +189,8 @@ class AcuityData:
             __config_path = Path(r'defaults\core\data_processing\api\config.ini')
         __config_object = ConfigParser()
         __config_object.read(__config_path)
-        __access_token = __config_object['ACCESS TOKEN']['access token']
+        __access_token = os.environ['access_token']
+        # __access_token = __config_object['ACCESS TOKEN']['access token']
 
         __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{self.sid}?deployed=true"
         __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{self.sid}"
@@ -197,6 +212,9 @@ class AcuityData:
             if items["Name"] == "order":
                 self.__extraction_id = items["ExtractionId"]
 
+        if self.__extraction_id is None:
+            return 'order dne'
+
         __extraction_res_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/{self.__extraction_id}"
         __extraction_file_id_req = json.dumps(
             requests.get(__extraction_res_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
@@ -204,6 +222,8 @@ class AcuityData:
 
         __order_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/file" \
                       f"?extractionId={self.__extraction_id}&fileId={self.__extraction_file_id}"
+
+        self.__extraction_id = None
 
         __order_req = requests.get(__order_url, headers={"Authorization": f"Client {__access_token}"})
 

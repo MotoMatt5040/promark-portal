@@ -1,69 +1,76 @@
-import pandas as pd
-from sqlalchemy import create_engine
-from sqlalchemy import text
-import webbrowser
-import pyodbc
-from .database import Database
-from .sqldictionary import SQLDictionary
-import sys
 import traceback
 
+import pandas
+import pandas as pd
+from sqlalchemy import create_engine
+
+from .database import Database
+from .sqldictionary import SQLDictionary
+
+
+def error_log(err):
+    print("\n\n\n")
+    print("*" * 350)
+    print(err)
+    print("\n")
+    print("*" * 50)
+    print("\n")
+    print(traceback.format_exc())
+    # input("Press Enter to continue...")
+    print("*" * 150)
+    print("\n\n\n")
+
 class DataPuller:
-    '''Data Puller class'''
-    sqld = SQLDictionary()
 
-    #  initialize database access info to connect to database
-    dbai = Database()
+    def __init__(self):
+        '''Data Puller class'''
+        self.sqld = SQLDictionary()
 
-    #  Build the connection string
-    SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
-        dbai.get_driver(),
-        dbai.get_server(),
-        dbai.get_database(),
-        dbai.get_user_id(),
-        dbai.get_password()
-    )
-    del dbai
-    dbcon = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
-    engine = create_engine(dbcon)
-    del dbcon
+        #  initialize database access info to connect to database
+        self.dbai = Database()
 
-    def promark_phone_numbers(self):
-        """Used to pull Promark phone numbers"""
+        #  Build the connection string
+        self.SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
+            self.dbai.driver,
+            self.dbai.server,
+            self.dbai.database,
+            self.dbai.user_id,
+            self.dbai.password
+        )
+
+        self.dbcon = f'mssql+pyodbc:///?odbc_connect={self.SQL_CONNECTION}'
+        # connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": self.SQL_CONNECTION})
         try:
-            conn = self.connect()
-            df = pd.read_sql_query(text(self.sqld.promark_phone_numbers()), conn)
-            conn.close()
-            del conn
-            return df
+            # self.engine = create_engine(self.dbcon, pool_pre_ping=True)
+            self.engine = create_engine(self.dbcon)
         except Exception as err:
-            self.error_log(err)
-        return ['Error pulling promark phone numbers']
+            error_log(err)
 
-    def message_body(self, projectid: str):
-        """used to pull text message body"""
-        try:
-            conn = self.connect()
-            df = pd.read_sql_query(text(self.sqld.message_body(projectid)), conn)
-            conn.close()
-            del conn
-            return df
-        except Exception as err:
-            self.error_log(err)
-        return ['Error pulling message body']
+    def pull(self, qry: str) -> pandas.DataFrame:
+        conn = self.connect()
+        if not conn:
+            return pd.DataFrame([['connection failed']])
+        df = pd.read_sql_query(qry, conn)
+        conn.close()
+        del conn
+        return df
 
     def connect(self):
         try:
             return self.engine.connect()
-        except Exception:
-            print("No ODBC Driver detected. Please install Microsoft ODBC Driver 17 for SQL Server from "
-                  "https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16#version-17")
-            webbrowser.open(
-                "https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16#version-17")
-            input("Press Enter to continue...")
+        except Exception as err:
+            error_log(err)
         return "Connection Error"
 
-    def error_log(self, err):
-        print(err)
-        print(traceback.format_exc())
-        input("Press Enter to continue...")
+    def set_database(self, database):
+        self.dbai.database = database
+        SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
+            self.dbai.driver,
+            self.dbai.server,
+            self.dbai.database,
+            self.dbai.user_id,
+            self.dbai.password
+        )
+
+        dbcon = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
+        self.engine = create_engine(dbcon)

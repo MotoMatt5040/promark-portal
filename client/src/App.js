@@ -7,11 +7,13 @@ import {useEffect, useState} from 'react';
 import axios from './api/axios';
 import DataProcessing from "./pages/data-processing/DataProcessing";
 import ProductionReport from "./pages/production-dashboard/ProductionReport";
+import PeriodicUpdate from "./pages/production-dashboard/PeriodicUpdate";
+import Register from "./pages/auth/Register";
 
 function App() {
   // const [session , setSession] = useState();
   // const [user, setUser] = useState({id: '', email: ''});
-  //
+  // //
   // useEffect(() => {
   //   (async () => {
   //     try {
@@ -38,9 +40,12 @@ function App() {
         <Header title="React Navbar Component"/>
         <Routes>
           <Route index element={<Home/>}/>
+          <Route path="home" element={<Home/>}/>
           {/*<Route path="/home" element={<Home />} />*/}
           <Route path="data_processing" element={<DataProcessing />}/>
           <Route path="production_report" element={<ProductionReport />}/>
+          <Route path="periodic_update" element={<PeriodicUpdate />}/>
+          <Route path="register" element={<Register />}/>
         </Routes>
       </main>
     </BrowserRouter>

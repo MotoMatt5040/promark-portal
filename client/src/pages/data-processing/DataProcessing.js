@@ -1,9 +1,12 @@
+// import Button from "react-bootstrap/Button";
+import React, {useEffect, useState} from 'react';
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { useState, useEffect } from "react";
 import axios from "../../api/axios";
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
-import Offcanvas from 'react-bootstrap/Offcanvas';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 import Table from 'react-bootstrap/Table';
 import Instructions from "./Instructions";
 
@@ -11,18 +14,16 @@ const DATA_PROCESSING_URL = '/data_processing';
 const QUESTIONS_URL = '/questions';
 const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
+
+
 function DataProcessing() {
 
-  const [validated, setValidated] = useState(false);
-  const [surveyID, setSurveyID] = useState(false);
-  const [projectID, setProjectID] = useState(false);
-  const [errorMessage, setErrorMesssage] = useState('');
+  const [surveyID, setSurveyID] = useState();
+  const [isSurveyIDError, setSurveyIDError] = useState(false);
   const [questions, setQuestions] = useState([]);
-
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-
   const [selectedValues, setSelectedValues] = useState({});
+  const [surveyName, setSurveyName] = useState('Please enter project info')
 
   const handleCheckboxChange = (question) => {
     setSelectedValues((prevValues) => ({
@@ -51,7 +52,7 @@ function DataProcessing() {
         }
       const response = await axios.post(
         DATA_PROCESSING_URL + QUESTIONS_URL,
-        { surveyID, projectID },
+        { surveyID },
         config
       );
 
@@ -61,31 +62,19 @@ function DataProcessing() {
       }
         // console.log(JSON.stringify(response));
       setQuestions(JSON.parse(JSON.stringify(response.data)));
-
-
-
     } catch (error) {
       if (!error?.response) {
-        setErrorMesssage('No Server Response')
+        console.error('No Server Response')
       } else if (error.response.status === 401) {
-        setErrorMesssage('Invalid Credentials')
+        console.error('Invalid Credentials')
       } else {
-        setErrorMesssage('Login Failed')
+        console.error('Login Failed')
       }
     }
     setShow(true)
   };
 
-  const handleValidation = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    setValidated(true);
-  };
-
-  const handleRun = async (event) => {
+  const handleDownload = async (event) => {
     event.preventDefault();
     try {
       let config = {
@@ -111,16 +100,14 @@ function DataProcessing() {
       // console.log(JSON.stringify(response));
     } catch (error) {
        if (!error?.response) {
-        setErrorMesssage('No Server Response')
+        console.error('No Server Response')
       } else if (error.response.status === 401) {
-        setErrorMesssage('Invalid Credentials')
+        console.error('Invalid Credentials')
       } else {
-        setErrorMesssage('Request Failed')
+        console.error('Request Failed')
       }
     }
-  }
 
-  const handleDownload = async () => {
     axios.get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
       responseType: 'blob',
       headers: {
@@ -128,11 +115,12 @@ function DataProcessing() {
           }
     })
       .then((obj) => {
+        const survey_n = surveyName.substring(0, surveyName.indexOf(' '));
         console.log(obj.data)
         const url = URL.createObjectURL(obj.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'file.zip';
+        a.download = survey_n + '.zip';
         a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
@@ -142,45 +130,58 @@ function DataProcessing() {
       .catch(error => console.error(error))
   }
 
+   const handleSurveyIDChange = async (e) => {
+    const value = e.target.value;
+    setSurveyID(value);
+    setSurveyIDError(value.length < 3);
+    setShow(false)
+    if (value.length > 2) {
+      axios.post(
+        '/data_processing/survey_name',
+        { surveyID: e.target.value },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+      })
+      .then((response) => {
+        setSurveyName(response.data)
+      })
+      .catch((error) => {
+        console.error("Error fetching survey name", error)
+        setSurveyName("Invalid Survey ID")
+      })
+    }
+  };
+
     return (
       <div>
         <div className='p-4 text-center bg-light' style={headerStyle}>
-          {/*<div className='invis-form-spacer' style={invisFormSpacerStyle} />*/}
+          <h4>{surveyName}</h4>
           <div className='dp-form' style={formDiv}>
-
             <Form
               noValidate
-              validated={validated}
-              onChange={handleValidation}
               style={formStyle}>
               <div style={formTextBox}>
                 <Form.Group className="mb-3" controlId="formGroupSruveryId">
-                  <Form.Label>Acuity Survey ID</Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Box
+                    component="form"
+                    sx={{
+                      '& > :not(style)': { m: 1, width: '25ch' },
+                    }}
+                    noValidate
                     autoComplete="off"
-                    onChange={(e) => setSurveyID(e.target.value)}
-                    placeholder="Survey ID"
-                    required
-                  />
-                  <Form.Text id="SurveyIDnote" muted>
-                    Step 3
-                  </Form.Text>
-                  <Form.Control.Feedback>Good!</Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formGroupProjectId">
-                  <Form.Label>PRC Project Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    autoComplete="off"
-                    onChange={(e) => setProjectID(e.target.value)}
-                    placeholder="Project Number"
-                    required
-                  />
-                  <Form.Text id="SurveyIDnote" muted>
-                    Promark Project Number
-                  </Form.Text>
-                  <Form.Control.Feedback>Good!</Form.Control.Feedback>
+                  >
+                    <TextField
+                      error={isSurveyIDError}
+                      autoComplete="off"
+                      onChange={handleSurveyIDChange}
+                      value={surveyID}
+                      label="Acuity Survey ID"
+                      required
+                      variant="standard"
+                    />
+                  </Box>
                 </Form.Group>
               </div>
               <div style={formButtons}>
@@ -188,71 +189,70 @@ function DataProcessing() {
               </div>
             </Form>
           </div>
-          {/*<div style={downloadButtonDivStyle}>*/}
-          {/*  <Button onClick={handleDownload}>Download</Button>*/}
-          {/*</div>*/}
         </div>
-        <br/>
-        <Offcanvas show={show} onHide={handleClose}>
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Layout</Offcanvas.Title>
-            <Button type="submit" onClick={handleRun}>Run</Button>
-            <br/>
-            <label><b>Inline Total</b></label>
-            <input type="checkbox" name="total-style" id="total-style" />
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Table style={{width: "100%"}} striped>
-              <thead>
-                <tr>
-                  <th>QNAME</th>
-                  <th>Table</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(typeof questions === 'undefined') ? (
-                    <p>Loading...</p>
-                  ) : (
-                    questions.map((question ,i) => (
-                      <tr key={i}>
-                        <td>{question}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            type="checkbox"
-                            name={question}
-                            id={question}
-                            checked={selectedValues[question]}
-                            onChange={() => handleCheckboxChange(question)}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                )}
-              </tbody>
-            </Table>
-            <Button onClick={handleDownload}>Download</Button>
-          </Offcanvas.Body>
-        </Offcanvas>
-        <Instructions/>
+        <div style={widgetContainerStyle}>
+          <Instructions/>
+          {
+          show
+          &&
+          <div style={{margin: "1%"}}>
+            <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
+              <Button onClick={handleDownload}>Download</Button>
+            </div>
+            <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+              <label><b>Inline Total</b></label>
+              <Checkbox type="checkbox" name="total-style" id="total-style"/>
+            </h4>
+            <div style={checkboxContainerStyle}>
+              <Table style={{width: "100%"}} striped>
+                <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>
+                  <tr>
+                    <th>QNAME</th>
+                    <th>Table</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(typeof questions === 'undefined') ? (
+                      <p>Loading...</p>
+                    ) : (
+                      questions.map((question ,i) => (
+                        <tr key={i}>
+                          <td>{question}</td>
+                          <td>
+                            <Checkbox
+                              type="checkbox"
+                              name={question}
+                              id={question}
+                              defaultChecked
+                              onChange={() => handleCheckboxChange(question)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                  )}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+          }
+        </div>
       </div>
     )
 }
-
 export default DataProcessing;
 
 const headerStyle = {
   // border: '1px solid green',
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   alignContent: 'center',
 }
 
-const invisFormSpacerStyle = {
-  // border: '3px solid black',
+const widgetContainerStyle = {
   display: 'flex',
+  flexDirection: 'row',
 }
 
 const formDiv = {
@@ -296,13 +296,8 @@ const formButtons = {
   width: "30%"
 }
 
-const downloadButtonDivStyle = {
-  // border: '1px solid pink',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'right',
-  justifyContent: 'right',
-  alignContent: 'right',
-  // paddingLeft: '30%'
-  // width: "100%"
+const checkboxContainerStyle = {
+  display: 'block',
+  height: '50vh',
+  overflowY: 'scroll'
 }

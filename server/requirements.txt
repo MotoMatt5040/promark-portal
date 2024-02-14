@@ -13,3 +13,4 @@ Werkzeug~=2.3.7
 requests
 waitress
 openpyxl
+psycopg2

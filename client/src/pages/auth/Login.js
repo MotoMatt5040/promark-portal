@@ -102,38 +102,43 @@ function Login() {
           <p className={errorMessage ? "error message": "offscreen"} aria-live="assertive">{errorMessage}</p>
           <h1>Login</h1>
           <Form noValidate validated={validated} onChange={handleValidation} onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="formGroupEmail">
-            <Form.Label>Email address</Form.Label>
-            <Form.Control
-              type="email"
-              autoComplete="off"
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email"
-              required
-              autoFocus
-            />
-            <Form.Text id="uidnote" className={email && !validEmail ? "instructions": "offscreen"} muted>
-              Must not contain special characters or symbols.
-            </Form.Text>
-            <Form.Control.Feedback>Good!</Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formGroupPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              required
-              minLength="8"
-            />
-            <Form.Text id="pwdnote"  className={password && !validPassword ? "instructions": "offscreen"} muted>
-              Your password must be at least 8 characters long, contain letters and numbers,
-              and must not contain spaces, special characters(', ", &, |), or emoji.
-            </Form.Text>
-            <Form.Control.Feedback>Good!</Form.Control.Feedback>
-          </Form.Group>
-          <Button type="submit">Login</Button>
-        </Form>
+            <Form.Group className="mb-3" controlId="formGroupEmail">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type="email"
+                autoComplete="off"
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email"
+                required
+                autoFocus
+              />
+              <Form.Text id="uidnote" className={email && !validEmail ? "instructions": "offscreen"} muted>
+                Must not contain special characters or symbols.
+              </Form.Text>
+              <Form.Control.Feedback>Good!</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formGroupPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                minLength="8"
+              />
+              <Form.Text id="pwdnote"  className={password && !validPassword ? "instructions": "offscreen"} muted>
+                Your password must be at least 8 characters long, contain letters and numbers,
+                and must not contain spaces, special characters(', ", &, |), or emoji.
+              </Form.Text>
+              <Form.Control.Feedback>Good!</Form.Control.Feedback>
+            </Form.Group>
+            <div style={dropdownStyle}>
+              <Button type="submit">Login</Button>
+              <Button>Register</Button>
+            </div>
+
+          </Form>
+
         </div>
       </section> ) }
     </>
@@ -148,5 +153,14 @@ const stylesheet = {
   justifyContent: "center",
   alignContent: "center",
   height: "100vh",
-  idth: "100vw"
+  width: "100vw"
+}
+
+const dropdownStyle = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  alignContent: 'center',
+  width: '100%'
 }
