@@ -14,15 +14,6 @@ reader = Reader()
 
 @data_processor.route('/data_processing', methods=['POST', 'GET', 'OPTIONS'])
 def data_processing():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-
-    survey_id = request.json['surveyID']
-    project_id = request.json['projectID']
-
-    Reader.project_id = project_id
-    reader.setUrl(survey_id)
-
     return ''
 
 
@@ -30,11 +21,6 @@ def data_processing():
 def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    # survey_id = request.json['surveyID']
-    # project_id = request.json['projectID']
-
-    # Reader.project_id = project_id
-    # reader.setUrl(survey_id)
     reader.request_data()
     questions = reader.get_order()
 
@@ -50,7 +36,7 @@ def process_data():
 
     shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
 
-    return "Zip created"
+    return ''
 
 
 @data_processor.route("/data_processing/download", methods=["GET", 'OPTIONS'])
