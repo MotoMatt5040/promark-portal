@@ -23,7 +23,7 @@ export default function Step1() {
             &ensp;&emsp;&ensp;<b>Last Connection Date</b><br/>
             &ensp;&emsp;&ensp;<b>Start time of last connection</b><br/>
             &ensp;&emsp;&ensp;<b>Total Duration (sec.)</b><br/>
-            &ensp; Check the following: <i>Note: these are located at the bottom</i><br />
+            &ensp; Check <b>ONLY</b> the following: <i>Note: these are located at the bottom</i><br />
             &emsp; <b>Include header</b> <br />
             &emsp; <b>Strip HTML from labels</b> <br />
             &emsp; <b>Remove curly brackets and spaces of system variables</b><br/>
