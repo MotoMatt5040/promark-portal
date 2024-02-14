@@ -146,7 +146,10 @@ class AcuityData:
 
     @staticmethod
     def order():
-        return list(pd.read_csv("order.csv").columns[4:])
+        try:
+            return list(pd.read_csv("order.csv").columns[4:])
+        except:
+            return []
 
     def __init__(self):
         self.__variables = None
@@ -173,7 +176,11 @@ class AcuityData:
     def request_data(self):
         # print("\n")
         # print(os.getcwd())
+        if os.path.exists('order.csv'):
+            os.remove('order.csv')
+
         time.sleep(3)
+
 
         if platform == "linux" or platform == "linux2":
             __config_path = Path(r'./config.ini')
@@ -205,6 +212,9 @@ class AcuityData:
             if items["Name"] == "order":
                 self.__extraction_id = items["ExtractionId"]
 
+        if self.__extraction_id is None:
+            return 'order dne'
+
         __extraction_res_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/{self.__extraction_id}"
         __extraction_file_id_req = json.dumps(
             requests.get(__extraction_res_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
@@ -212,6 +222,8 @@ class AcuityData:
 
         __order_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/file" \
                       f"?extractionId={self.__extraction_id}&fileId={self.__extraction_file_id}"
+
+        self.__extraction_id = None
 
         __order_req = requests.get(__order_url, headers={"Authorization": f"Client {__access_token}"})
 
