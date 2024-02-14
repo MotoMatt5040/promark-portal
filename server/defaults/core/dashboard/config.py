@@ -1,3 +1,3 @@
 import os
 
-DATABASE = os.environ["caligula_test"]
+DATABASE = os.environ["caligula"]
