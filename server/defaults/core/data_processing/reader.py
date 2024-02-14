@@ -36,7 +36,11 @@ class Reader:
         # self.run()
 
     def request_data(self):
-        self.api.request_data()
+        match self.api.request_data():
+            case 'order dne':
+                return 'order.csv could not be found or does not exist'
+            case _:
+                return 1
 
     def get_survey_name(self):
         return self.api.get_survey_name()
