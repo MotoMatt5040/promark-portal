@@ -20,8 +20,6 @@ function DataProcessing() {
 
   const [surveyID, setSurveyID] = useState();
   const [isSurveyIDError, setSurveyIDError] = useState(false);
-  const [isProjectIDError, setProjectIDError] = useState(false);
-  const [errorMessage, setErrorMesssage] = useState('');
   const [questions, setQuestions] = useState([]);
   const [show, setShow] = useState(false);
   const [selectedValues, setSelectedValues] = useState({});
@@ -66,11 +64,11 @@ function DataProcessing() {
       setQuestions(JSON.parse(JSON.stringify(response.data)));
     } catch (error) {
       if (!error?.response) {
-        setErrorMesssage('No Server Response')
+        console.error('No Server Response')
       } else if (error.response.status === 401) {
-        setErrorMesssage('Invalid Credentials')
+        console.error('Invalid Credentials')
       } else {
-        setErrorMesssage('Login Failed')
+        console.error('Login Failed')
       }
     }
     setShow(true)
@@ -102,11 +100,11 @@ function DataProcessing() {
       // console.log(JSON.stringify(response));
     } catch (error) {
        if (!error?.response) {
-        setErrorMesssage('No Server Response')
+        console.error('No Server Response')
       } else if (error.response.status === 401) {
-        setErrorMesssage('Invalid Credentials')
+        console.error('Invalid Credentials')
       } else {
-        setErrorMesssage('Request Failed')
+        console.error('Request Failed')
       }
     }
 
@@ -138,7 +136,7 @@ function DataProcessing() {
     setSurveyIDError(value.length < 3);
     setShow(false)
     if (value.length > 2) {
-      const response = axios.post(
+      axios.post(
         '/data_processing/survey_name',
         { surveyID: e.target.value },
         {
@@ -153,8 +151,6 @@ function DataProcessing() {
         console.error("Error fetching survey name", error)
         setSurveyName("Invalid Survey ID")
       })
-
-      console.log(surveyName)
     }
   };
 
@@ -259,11 +255,6 @@ const widgetContainerStyle = {
   flexDirection: 'row',
 }
 
-const invisFormSpacerStyle = {
-  // border: '3px solid black',
-  display: 'flex',
-}
-
 const formDiv = {
   // border: '1px solid blue',
   display: 'flex',
@@ -303,17 +294,6 @@ const formButtons = {
   justifyContent: 'left',
   alignContent: 'center',
   width: "30%"
-}
-
-const downloadButtonDivStyle = {
-  // border: '1px solid pink',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'right',
-  justifyContent: 'right',
-  alignContent: 'right',
-  // paddingLeft: '30%'
-  // width: "100%"
 }
 
 const checkboxContainerStyle = {
