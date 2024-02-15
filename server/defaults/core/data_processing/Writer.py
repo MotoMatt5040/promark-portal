@@ -74,7 +74,7 @@ class Writer():
         if self._totals is None:
             return None
         keys = list(self._totals.keys())
-        if keys[0] == "REPUBLICAN" or keys[0] == "CONSERVATIVE":
+        if keys[0] == "REPUBLICAN":
             totals.append(f"R *D//S ({keys[0]} - {keys[2]}) ;NONE ;EX (R3-R5)\n")  # NEEDS TO BE keys[2] IN SOME CASES
         else:
             totals.append(f"R *D//S ({keys[0]} - {keys[1]}) ;NONE ;EX (R3-R4)\n")
