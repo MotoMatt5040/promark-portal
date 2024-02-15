@@ -1,7 +1,5 @@
 import io
-import json
 import os
-import time
 import zipfile
 
 import numpy as np
@@ -158,6 +156,26 @@ class AcuityData(AcuityAPI):
         self.__extraction_id = None
         self.__extraction_file_id = None
         self.sid = None
+        self.__xfile = [
+            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
+        ]
+        self.__builder = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
+        }
+        self.__layout = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            'Start': [1, 11, 19, 27],
+            'End': [10, 18, 26, 31],
+            'Width': [
+                len(self.__xfile[1][0]),
+                len(self.__xfile[1][1]),
+                len(self.__xfile[1][2]),
+                len(self.__xfile[1][3])],
+            'Description': ['', '', '', '']
+        }
 
     def get_survey_name(self):
         survey_name = requests.get(self.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
@@ -171,10 +189,8 @@ class AcuityData(AcuityAPI):
         self.SKIP_TABLE = skips
 
     def request_data(self):
-        start=time.perf_counter()
         if os.path.exists('order.csv'):
             os.remove('order.csv')
-
 
         self.__extraction_task = requests.get(self.extraction_task_url, headers={"Authorization": f"Client {self._access_token}"}).json()
 
@@ -195,7 +211,6 @@ class AcuityData(AcuityAPI):
             z = zipfile.ZipFile(io.BytesIO(order_req.content))
             z.extract("order.csv")
             z.close()
-        print(time.perf_counter()-start)
 
     def question_names(self):
         self.__variables = requests.get(
@@ -356,12 +371,8 @@ class AcuityData(AcuityAPI):
             if __key not in data:
                 del __data[__key]
 
-        for __qname in __data:
-            maxchoice = __data[__qname]['maxchoice']
-            codewidth = __data[__qname]['codewidth']
         order = self.order()
         self.xfile_layout(__data, order)
-        layout = pd.read_excel('EXTRACTION/DATABASE/layout.xlsx')
         for __qname in order:
             maxchoice = __data[__qname]['maxchoice']
             codewidth = __data[__qname]['codewidth']
@@ -412,74 +423,47 @@ class AcuityData(AcuityAPI):
 
     def xfile_layout(self, data, order):
         __data = data
-        __xfile = [
-            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
-        ]
-        __builder = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
-        }
-        __layout = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            'Start': [1, 11, 19, 27],
-            'End': [10, 18, 26, 31],
-            'Width': [
-                len(__xfile[1][0]),
-                len(__xfile[1][1]),
-                len(__xfile[1][2]),
-                len(__xfile[1][3])],
-            'Description': ['', '', '', '']
-        }
-
         __table = 1
         __column = 32
         __codes = ""
         for __qname in order:
-            __maxchoice = __data[__qname]['maxchoice']
-            __codewidth = __data[__qname]['codewidth']
+            maxchoice = __data[__qname]['maxchoice']
+            codewidth = __data[__qname]['codewidth']
             tableNumber = True
 
             if __qname in self.SKIP_TABLE:
-                __builder['Table'].append(np.nan)
+                self.__builder['Table'].append(np.nan)
             else:
-                __builder['Table'].append(__table)
-            __builder['Field'].append(__qname)
+                self.__builder['Table'].append(__table)
+            self.__builder['Field'].append(__qname)
 
-            for i in range(__maxchoice):
-                if __maxchoice > 1:
+            for i in range(maxchoice):
+                if maxchoice > 1:
                     __name = f"{__qname}_M{i + 1}"
                 else:
                     __name = __qname
-                __xfile[0].append(__name)
+                self.__xfile[0].append(__name)
 
-                x = ''
-                for j in range(__codewidth):
-                    x += 'x'
-                __xfile[1].append(x)
+                self.__xfile[1].append('x' * codewidth)
 
                 if __qname in self.SKIP_TABLE or not tableNumber:
-                    __layout['Table'].append(np.nan)
+                    self.__layout['Table'].append(np.nan)
                 else:
-                    __layout['Table'].append(__table)
+                    self.__layout['Table'].append(__table)
                     __table += 1
-                __layout['Field'].append(__name)
-                __layout['Start'].append(__column)
-                __layout['End'].append(__column + __codewidth - 1)
-                __layout['Width'].append(__codewidth)
-                __layout['Description'].append('')
+                self.__layout['Field'].append(__name)
+                self.__layout['Start'].append(__column)
+                self.__layout['End'].append(__column + codewidth - 1)
+                self.__layout['Width'].append(codewidth)
+                self.__layout['Description'].append('')
 
                 tableNumber = False
                 __column += __data[__qname]['codewidth']
 
-        xfile = pd.DataFrame(__xfile, columns=__xfile[0]).drop(0)
-        layout = pd.DataFrame(__layout)
-        builder = pd.DataFrame(__builder)
+        xfile = pd.DataFrame(self.__xfile, columns=self.__xfile[0]).drop(0)
+        layout = pd.DataFrame(self.__layout)
+        builder = pd.DataFrame(self.__builder)
 
         xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
-
-        # print(layout.to_string())
-
