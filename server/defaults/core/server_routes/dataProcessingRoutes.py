@@ -17,7 +17,7 @@ def data_processing():
     return ''
 
 
-@data_processor.route('/data_processing/questions', methods=['POST', 'OPTIONS'])
+@data_processor.route('/data_processing/checkboxes', methods=['POST', 'OPTIONS'])
 def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()

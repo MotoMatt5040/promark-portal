@@ -1,29 +1,12 @@
-import pandas as pd
 import traceback
+
+import pandas as pd
 
 from .Writer import Writer
 from .api import AcuityData
 
 
 class Reader:
-    '''
-      Selector
-      Things needed in each function
-      layout
-          frame sizing (dynamic) or perhaps just an input for id#
-          ----------------------------------------------------------------
-          | project id# []                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          |                                                              |
-          ----------------------------------------------------------------
-      '''
     project_id = None
 
     def __init__(self):
@@ -32,8 +15,6 @@ class Reader:
 
     def setUrl(self, survey_id: str):
         self.api.set_sid(survey_id)
-        # self.api.request_data()
-        # self.run()
 
     def request_data(self):
         match self.api.request_data():
@@ -61,8 +42,6 @@ class Reader:
 
     def run(self):
         data = self.api.data()
-        # order = pd.read_csv("order.csv").columns[6:]
-        # self.api.xfile_layout(data, order)
 
         """
         LAYOUT OF CURRENT dictionaries
@@ -131,19 +110,14 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
 
         """
 
-        print("----------------------------------------------------------------")
-        # print(json.dumps(data, indent=4))
         writer = Writer()
         writer.set_style(self.style)
         tnum = 1
         builder = pd.read_excel('builder.xlsx')
-        # layout = pd.read_excel('DATABASE/layout.xlsx')
         order = builder.dropna()
         with open(rf'EXTRACTION/UNCLE/tables.txt', 'w') as f:
             for qname in order['Field']:
-                # print(qname)
                 try:
-                    # print()
                     writer.set_code_width(data[qname]['codewidth'])
                     writer.set_tnum(
                         builder['Table'].where(builder['Field'] == qname)
@@ -165,12 +139,10 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                     writer.set_choice_labels(list(data[qname]['choices'].values()))
                     f.write(writer.create_table())
                     tnum += 1
-                    print(qname, writer.get_start_column())
                 except Exception as err:
                     print(traceback.format_exc())
                     if qname == "QIDEOLOGY":
                         try:
-
                             f.write(
                                 "*\n"
                                 f"TABLE {writer.get_tnum()}\n"
@@ -201,7 +173,3 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                                 "R BASE==TOTAL SAMPLE             ;ALL     ;HP NOVP\n"
                             )
                     print("Main loop:", writer.get_qname(), err)
-
-
-# if __name__ == "__main__":
-#     r = Reader()

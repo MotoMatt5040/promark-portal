@@ -1,18 +1,15 @@
 import io
-import json
-import time
+import os
 import zipfile
-from pathlib import Path
-from sys import platform
 
 import numpy as np
 import pandas as pd
 import requests
-from configparser import ConfigParser
-import os
+
+from .AcuityAPI import AcuityAPI
 
 
-class AcuityData:
+class AcuityData(AcuityAPI):
     __TOTALS = {
         "STRONG REPUBLICAN": {"REPUBLICAN": [1, 2], "INDEPENDENT": [3, 5], "DEMOCRAT": [6, 7]},
         "NOT SO STRONG REPUBLICAN": {"REPUBLICAN": [1, 2], "INDEPENDENT": [3, 5], "DEMOCRAT": [6, 7]},
@@ -152,17 +149,36 @@ class AcuityData:
             return []
 
     def __init__(self):
+        super().__init__()
         self.__variables = None
         self.__questions = None
         self.__extraction_task = None
         self.__extraction_id = None
         self.__extraction_file_id = None
         self.sid = None
-        self.__access_token = os.environ['access_token']
+        self.__xfile = [
+            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
+        ]
+        self.__builder = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
+        }
+        self.__layout = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            'Start': [1, 11, 19, 27],
+            'End': [10, 18, 26, 31],
+            'Width': [
+                len(self.__xfile[1][0]),
+                len(self.__xfile[1][1]),
+                len(self.__xfile[1][2]),
+                len(self.__xfile[1][3])],
+            'Description': ['', '', '', '']
+        }
 
     def get_survey_name(self):
-        link = f"https://prcmmweb.promarkresearch.com/api/survey/{self.sid}"
-        survey_name = requests.get(link, headers={"Authorization": f"Client {self.__access_token}"}).json()['Name']
+        survey_name = requests.get(self.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
         return survey_name
 
     def set_sid(self, sid):
@@ -171,97 +187,37 @@ class AcuityData:
 
     def set_skips(self, skips):
         self.SKIP_TABLE = skips
-        # print(self.SKIP_TABLE)
 
     def request_data(self):
-        # print("\n")
-        # print(os.getcwd())
         if os.path.exists('order.csv'):
             os.remove('order.csv')
 
-        time.sleep(3)
-
-
-        if platform == "linux" or platform == "linux2":
-            __config_path = Path(r'./config.ini')
-        else:
-
-            __config_path = Path(r'defaults\core\data_processing\api\config.ini')
-        __config_object = ConfigParser()
-        __config_object.read(__config_path)
-        __access_token = os.environ['access_token']
-        # __access_token = __config_object['ACCESS TOKEN']['access token']
-
-        __questions_url = f"https://prcmmweb.promarkresearch.com/api/survey/export/json/{self.sid}?deployed=true"
-        __variables_url = f"https://prcmmweb.promarkresearch.com/api/survey/variables/{self.sid}"
-        __extraction_task_url = f"https://prcmmweb.promarkresearch.com/api/results/extract?surveyId={self.sid}"
-
-        __variables_req = json.dumps(
-            requests.get(__variables_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
-        __questions_req = json.dumps(
-            requests.get(__questions_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
-        __extraction_req = json.dumps(
-            requests.get(__extraction_task_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
-
-        self.__variables = json.loads(__variables_req)
-        self.__questions = json.loads(__questions_req)
-        self.__extraction_task = json.loads(__extraction_req)
+        self.__extraction_task = requests.get(self.extraction_task_url, headers={"Authorization": f"Client {self._access_token}"}).json()
 
         for items in self.__extraction_task['Extractions']:
-            # print(json.dumps(items, indent=4))
             if items["Name"] == "order":
-                self.__extraction_id = items["ExtractionId"]
+                self.extraction_id = items["ExtractionId"]
 
-        if self.__extraction_id is None:
+        if self.extraction_id is None:
             return 'order dne'
 
-        __extraction_res_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/{self.__extraction_id}"
-        __extraction_file_id_req = json.dumps(
-            requests.get(__extraction_res_url, headers={"Authorization": f"Client {__access_token}"}).json(), indent=4)
-        self.__extraction_file_id = json.loads(__extraction_file_id_req)["FileId"]
+        extraction_file_id_req = requests.get(self.extraction_res_url, headers={"Authorization": f"Client {self._access_token}"}).json()
 
-        __order_url = f"https://prcmmweb.promarkresearch.com/api/results/extract/file" \
-                      f"?extractionId={self.__extraction_id}&fileId={self.__extraction_file_id}"
+        self.order_url = extraction_file_id_req["FileId"]
+        self.extraction_id = None
 
-        self.__extraction_id = None
-
-        __order_req = requests.get(__order_url, headers={"Authorization": f"Client {__access_token}"})
-
-        if __order_req.ok:
-            z = zipfile.ZipFile(io.BytesIO(__order_req.content))
+        order_req = requests.get(self.order_url, headers={"Authorization": f"Client {self._access_token}"})
+        if order_req.ok:
+            z = zipfile.ZipFile(io.BytesIO(order_req.content))
             z.extract("order.csv")
             z.close()
 
-        # stuff = __order_req.content.decode("ISO-8859-16")
-        # print(stuff)
-
-        # decoded = __order_req.content.decode("Windows-1252")
-        # cr = csv.reader(decoded.splitlines())
-        #
-        # my_data = list(cr)
-        # for row in my_data:
-        #     print(row)
-
-        # print("first task")
-        # print(json.dumps(self.__extraction_id, indent=4))
-        # print("second task")
-        # print(json.dumps(self.__extraction_task, indent=4))
-        # print("third task")
-        # print(json.dumps(self.__extraction_file_id, indent=4))
-
-        # print(json.dumps(self.__variables, indent=4))
-        # print('\n\n\n')
-        # print('control f')
-        # print(json.dumps(self.__questions, indent=4))
-        self.question_names()
-
     def question_names(self):
+        self.__variables = requests.get(
+            self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
         __name = []
         for item in self.__variables:
             __name.append(item["Name"])
-        #     print(item["Name"])
-        #
-        # print(__name)
         return __name
 
     def blocks(self):
@@ -271,6 +227,9 @@ class AcuityData:
         return __blocks
 
     def data(self):
+        self.question_names()
+        self.__questions = requests.get(
+            self.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
         __data = {}
         for __block in self.blocks():
             __name = __block['Name']
@@ -412,15 +371,9 @@ class AcuityData:
             if __key not in data:
                 del __data[__key]
 
-        for __qname in __data:
-            # print(__qname, __column)
-            maxchoice = __data[__qname]['maxchoice']
-            codewidth = __data[__qname]['codewidth']
         order = self.order()
         self.xfile_layout(__data, order)
-        layout = pd.read_excel('EXTRACTION/DATABASE/layout.xlsx')
         for __qname in order:
-            # print(__qname, __column)
             maxchoice = __data[__qname]['maxchoice']
             codewidth = __data[__qname]['codewidth']
             __data[__qname]['startcolumn'] = __column
@@ -459,11 +412,6 @@ class AcuityData:
                                 sixth = __column + codewidth * maxchoice - 1
                                 column_code = f";R({__column}:{second}/{third}:{fourth}...{fifth}:{sixth},{__label})"
                 __data[__qname]['rows'].append(f"{__data[__qname]['choices'][__label]} {column_code}")
-            # TODO Add NO ANSWER row
-            # if maxchoice < 2:
-            #     match codewidth:
-            #         case 1:
-            #             __data[__qname]['rows'].append(f"{__column}N{column_code}")
             __column += codewidth * maxchoice
 
             for __label in __data[__qname]['choices']:
@@ -475,82 +423,47 @@ class AcuityData:
 
     def xfile_layout(self, data, order):
         __data = data
-        __xfile = [
-            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
-        ]
-        __builder = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
-        }
-        __layout = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            'Start': [1, 11, 19, 27],
-            'End': [10, 18, 26, 31],
-            'Width': [
-                len(__xfile[1][0]),
-                len(__xfile[1][1]),
-                len(__xfile[1][2]),
-                len(__xfile[1][3])],
-            'Description': ['', '', '', '']
-        }
-
         __table = 1
         __column = 32
         __codes = ""
-        # print(json.dumps(__data, indent=4))
         for __qname in order:
-            # if __qname != 'ACTAG':
-            __maxchoice = __data[__qname]['maxchoice']
-            __codewidth = __data[__qname]['codewidth']
-            # else:
-            #     __maxchoice = 1
-            #     __codewidth = 4
+            maxchoice = __data[__qname]['maxchoice']
+            codewidth = __data[__qname]['codewidth']
             tableNumber = True
 
             if __qname in self.SKIP_TABLE:
-                __builder['Table'].append(np.nan)
+                self.__builder['Table'].append(np.nan)
             else:
-                __builder['Table'].append(__table)
-            __builder['Field'].append(__qname)
+                self.__builder['Table'].append(__table)
+            self.__builder['Field'].append(__qname)
 
-            for i in range(__maxchoice):
-                if __maxchoice > 1:
+            for i in range(maxchoice):
+                if maxchoice > 1:
                     __name = f"{__qname}_M{i + 1}"
                 else:
                     __name = __qname
-                __xfile[0].append(__name)
+                self.__xfile[0].append(__name)
 
-                x = ''
-                for j in range(__codewidth):
-                    x += 'x'
-                __xfile[1].append(x)
+                self.__xfile[1].append('x' * codewidth)
 
                 if __qname in self.SKIP_TABLE or not tableNumber:
-                    __layout['Table'].append(np.nan)
+                    self.__layout['Table'].append(np.nan)
                 else:
-                    __layout['Table'].append(__table)
+                    self.__layout['Table'].append(__table)
                     __table += 1
-                __layout['Field'].append(__name)
-                __layout['Start'].append(__column)
-                __layout['End'].append(__column + __codewidth - 1)
-                __layout['Width'].append(__codewidth)
-                __layout['Description'].append('')
+                self.__layout['Field'].append(__name)
+                self.__layout['Start'].append(__column)
+                self.__layout['End'].append(__column + codewidth - 1)
+                self.__layout['Width'].append(codewidth)
+                self.__layout['Description'].append('')
 
                 tableNumber = False
-                # if __qname != 'ACTAG':
                 __column += __data[__qname]['codewidth']
-                # else:
-                #     __column += 4
 
-        xfile = pd.DataFrame(__xfile, columns=__xfile[0]).drop(0)
-        layout = pd.DataFrame(__layout)
-        builder = pd.DataFrame(__builder)
+        xfile = pd.DataFrame(self.__xfile, columns=self.__xfile[0]).drop(0)
+        layout = pd.DataFrame(self.__layout)
+        builder = pd.DataFrame(self.__builder)
 
         xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
-
-        # print(layout.to_string())
-

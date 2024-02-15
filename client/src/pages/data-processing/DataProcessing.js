@@ -11,7 +11,6 @@ import Table from 'react-bootstrap/Table';
 import Instructions from "./Instructions";
 
 const DATA_PROCESSING_URL = '/data_processing';
-const QUESTIONS_URL = '/questions';
 const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
 
@@ -51,7 +50,7 @@ function DataProcessing() {
           }
         }
       const response = await axios.post(
-        DATA_PROCESSING_URL + QUESTIONS_URL,
+        DATA_PROCESSING_URL + "/checkboxes",
         { surveyID },
         config
       );
