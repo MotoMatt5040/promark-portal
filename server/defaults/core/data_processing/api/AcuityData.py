@@ -156,26 +156,6 @@ class AcuityData(AcuityAPI):
         self.__extraction_id = None
         self.__extraction_file_id = None
         self.sid = None
-        self.__xfile = [
-            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
-        ]
-        self.__builder = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
-        }
-        self.__layout = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            'Start': [1, 11, 19, 27],
-            'End': [10, 18, 26, 31],
-            'Width': [
-                len(self.__xfile[1][0]),
-                len(self.__xfile[1][1]),
-                len(self.__xfile[1][2]),
-                len(self.__xfile[1][3])],
-            'Description': ['', '', '', '']
-        }
 
     def get_survey_name(self):
         survey_name = requests.get(self.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
@@ -206,6 +186,7 @@ class AcuityData(AcuityAPI):
         self.order_url = extraction_file_id_req["FileId"]
         self.extraction_id = None
 
+        # this returns a .zip file
         order_req = requests.get(self.order_url, headers={"Authorization": f"Client {self._access_token}"})
         if order_req.ok:
             z = zipfile.ZipFile(io.BytesIO(order_req.content))
@@ -216,7 +197,10 @@ class AcuityData(AcuityAPI):
         self.__variables = requests.get(
             self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
         __name = []
+        skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
         for item in self.__variables:
+            if item['Name'] in skips or "FIL1" in item["Name"] or "FIL2" in item["Name"]:
+                continue
             __name.append(item["Name"])
         return __name
 
@@ -422,6 +406,26 @@ class AcuityData(AcuityAPI):
         return __data
 
     def xfile_layout(self, data, order):
+        self.__xfile = [
+            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
+        ]
+        self.__builder = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
+        }
+        self.__layout = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            'Start': [1, 11, 19, 27],
+            'End': [10, 18, 26, 31],
+            'Width': [
+                len(self.__xfile[1][0]),
+                len(self.__xfile[1][1]),
+                len(self.__xfile[1][2]),
+                len(self.__xfile[1][3])],
+            'Description': ['', '', '', '']
+        }
         __data = data
         __table = 1
         __column = 32
