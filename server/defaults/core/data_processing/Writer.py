@@ -3,57 +3,57 @@ from typing import Union
 class Writer():
 
     def __init__(self):
-        self._tnum = None
-        self._qname = None
-        self._title_text = None
-        self._qtext = None
-        self._rank = None
-        self._qual = None
-        self._base = None
-        self._totals = None
-        self._code_width = None
-        self._start_column = None
-        self._end_column = None
+        self.tnum = None
+        self.qname = None
+        self.title_text = None
+        self.qtext = None
+        self.rank = None
+        self.qual = None
+        self.base = None
+        self.totals = None
+        self.code_width = None
+        self.start_column = None
+        self.end_column = None
         self._column_text = None
-        self._choice_codes = None
-        self._max_choice = None
-        self._choice_labels = None
-        self._rows = None
-        self._style = None
+        self.choice_codes = None
+        self.max_choice = None
+        self.choice_labels = None
+        self.rows = None
+        self.style = None
 
-    def tnum(self):
-        return f"TABLE {self._tnum}\n"
+    def table_number(self):
+        return f"TABLE {self.tnum}\n"
 
-    def qname(self):
+    def question_name(self):
         return f"T {self._qname}:\n"
 
-    def title_text(self):
+    def write_title_text(self):
         title_text = self._title_text
         return f"T {title_text}\n"
 
-    def qtext(self):
+    def question_text(self):
         qtext = self._qtext
 
         if self._title_text is not None:
-            return f"{self.title_text()}" \
+            return f"{self.write_title_text()}" \
                    f"T /\n" \
                    f"T {qtext}\n"
         return f"T {qtext}\n" \
                f"T \n" \
                f"T /\n"
 
-    def rank(self):
+    def write_rank(self):
         if self._rank:
             return "O RANK\n"
         return ""
 
-    def qual(self):
+    def write_qual(self):
         if self._qual is not None:
             return f"Q {self._qual}\n"
         else:
             return ""
 
-    def base(self):
+    def write_base(self):
         if self._base is None:
             return "R BASE==TOTAL SAMPLE ;ALL ;HP NOVP\n"
         else:
@@ -61,10 +61,10 @@ class Writer():
 
     def row_style(self):
         if self._totals is None:
-            return self.rows()
+            return self.write_rows()
         if not self._style:
             return (
-                f"{self.rows()}"
+                f"{self.write_rows()}"
             )
         else:
             return self.rows_inline()
@@ -141,7 +141,7 @@ class Writer():
 
     def rows_inline(self):
         if self._qname == 'QPARTYID':
-            return self.rows()
+            return self.write_rows()
         totals = self.total_rows()
         rows = self.rows_list()
         final_rows = rows[4:]
@@ -156,7 +156,7 @@ class Writer():
             + ''.join(final_rows)  # rows after total included rows, non-indented
         )
 
-    def rows(self):
+    def write_rows(self):
         rows = ""
         if self._totals is not None:
             for row in self.total_rows():
@@ -169,124 +169,153 @@ class Writer():
 
     def create_table(self) -> str:
         table = f"*\n" \
-                f"{self.tnum()}" \
-                f"{self.qname()}" \
-                f"{self.qtext()}" \
-                f"{self.rank()}{self.qual()}{self.base()}" \
+                f"{self.table_number()}" \
+                f"{self.question_name()}" \
+                f"{self.question_text()}" \
+                f"{self.write_rank()}{self.write_qual()}{self.write_base()}" \
                 f"{self.row_style()}"
         return table
 
     """-----------------------------------------------Create--------------------------------------------------"""
 
-    def set_tnum(self, tnum: int):
-        self._tnum = tnum
-
-    def set_qname(self, qname: str):
-        self._qname = qname
-
-    def set_title_text(self, title_text: str):
-        if title_text != "":
-            self._title_text = title_text
-        else:
-            self._title_text = None
-
-    def set_qtext(self, qtext: str):
-        self._qtext = qtext
-
-    def set_rank(self, rank: bool):
-        self._rank = rank
-
-    def set_qual(self, qual):
-        self._qual = qual
-
-    def set_base(self, base: str):
-        self._base = base
-
-    def set_totals(self, totals: dict[str: list[int]]):
-        self._totals = totals
-
-    def set_code_width(self, code_width: int):
-        self._code_width = code_width
-
-    def set_start_column(self, start_column):
-        self._start_column = start_column
-
-    def set_end_column(self, end_column):
-        self._end_column = end_column
-
-    def set_column_text(self):
+    def column_text(self):
         if self._code_width > 1:
             self._column_text = f"R({self._start_column}:{self._end_column},"
         else:
             self._column_text = f"{self._start_column}"
 
-    def set_choice_codes(self, choice_codes: Union[int, list[int]]):
+    @property
+    def tnum(self) -> int:
+        return self._tnum
+
+    @property
+    def qname(self) -> str:
+        return self._qname
+
+    @property
+    def title_text(self) -> str:
+        return self._title_text
+
+    @property
+    def qtext(self) -> str:
+        return self._qtext
+
+    @property
+    def rank(self) -> bool:
+        return self._rank
+
+    @property
+    def qual(self) -> str:
+        return self._qual
+
+    @property
+    def base(self) -> str:
+        return self._base
+
+    @property
+    def code_width(self) -> int:
+        return self._code_width
+
+    @property
+    def start_column(self) -> int:
+        return self._start_column
+
+    @property
+    def end_column(self) -> int:
+        return self._end_column
+
+    @property
+    def choice_codes(self) -> list[int]:
+        return self._choice_codes
+
+    @property
+    def choice_labels(self) -> list[str]:
+        return self._choice_labels
+
+    @property
+    def max_choice(self) -> int:
+        return self._max_choice
+
+    @property
+    def rows(self) -> list[str]:
+        return self._rows
+
+    @property
+    def totals(self) -> list[str]:
+        return self._totals.keys()
+
+    @property
+    def style(self) -> bool:
+        return self._style
+
+    """--------------------------------------------------SET--------------------------------------------------"""
+
+    @tnum.setter
+    def tnum(self, tnum: int):
+        self._tnum = tnum
+
+    @qname.setter
+    def qname(self, qname: str):
+        self._qname = qname
+
+    @title_text.setter
+    def title_text(self, title_text: str):
+        if title_text != "":
+            self._title_text = title_text
+        else:
+            self._title_text = None
+
+    @qtext.setter
+    def qtext(self, qtext: str):
+        self._qtext = qtext
+
+    @rank.setter
+    def rank(self, rank: bool):
+        self._rank = rank
+
+    @qual.setter
+    def qual(self, qual):
+        self._qual = qual
+
+    @base.setter
+    def base(self, base: str):
+        self._base = base
+
+    @totals.setter
+    def totals(self, totals: dict[str: list[int]]):
+        self._totals = totals
+
+    @code_width.setter
+    def code_width(self, code_width: int):
+        self._code_width = code_width
+
+    @start_column.setter
+    def start_column(self, start_column):
+        self._start_column = start_column
+
+    @end_column.setter
+    def end_column(self, end_column):
+        self._end_column = end_column
+
+    @choice_codes.setter
+    def choice_codes(self, choice_codes: Union[int, list[int]]):
         if type(choice_codes) == int:
             self._choice_codes = [choice_codes]
         else:
             self._choice_codes = choice_codes
 
-    def set_max_choice(self, max_choice: int):
+    @max_choice.setter
+    def max_choice(self, max_choice: int):
         self._max_choice = max_choice
 
-    def set_choice_labels(self, choice_labels: list[str]):
+    @choice_labels.setter
+    def choice_labels(self, choice_labels: list[str]):
         self._choice_labels = choice_labels
 
-    def set_rows(self, rows: list[str]):
+    @rows.setter
+    def rows(self, rows: list[str]):
         self._rows = rows
 
-    def set_style(self, style: bool):
+    @style.setter
+    def style(self, style: bool):
         self._style = style
-
-    """--------------------------------------------------GET--------------------------------------------------"""
-
-    def get_tnum(self) -> int:
-        return self._tnum
-
-    def get_qname(self) -> str:
-        return self._qname
-
-    def get_title_text(self) -> str:
-        return self._title_text
-
-    def get_qtext(self) -> str:
-        return self._qtext
-
-    def get_rank(self) -> bool:
-        return self._rank
-
-    def get_qual(self) -> str:
-        return self._qual
-
-    def get_base(self) -> str:
-        return self._base
-
-    def get_code_width(self) -> int:
-        return self._code_width
-
-    def get_start_column(self) -> int:
-        return self._start_column
-
-    def get_end_column(self) -> int:
-        return self._end_column
-
-    def get_column_text(self) -> str:
-        return self._column_text
-
-    def get_choice_codes(self) -> list[int]:
-        return self._choice_codes
-
-    def get_choice_labels(self) -> list[str]:
-        return self._choice_labels
-
-    def get_max_choice(self) -> int:
-        return self._max_choice
-
-    def get_rows(self) -> list[str]:
-        return self._rows
-
-    def get_totals(self) -> list[str]:
-        return self._totals.keys()
-
-    def get_styles(self) -> bool:
-        return self._style
