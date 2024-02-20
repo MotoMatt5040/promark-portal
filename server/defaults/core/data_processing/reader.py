@@ -111,32 +111,32 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
         """
 
         writer = Writer()
-        writer.set_style(self.style)
+        writer.style = self.style
         tnum = 1
         builder = pd.read_excel('builder.xlsx')
         order = builder.dropna()
         with open(rf'EXTRACTION/UNCLE/tables.txt', 'w') as f:
             for qname in order['Field']:
                 try:
-                    writer.set_code_width(data[qname]['codewidth'])
-                    writer.set_tnum(
-                        builder['Table'].where(builder['Field'] == qname)
-                        .dropna().reset_index(drop=True).astype(int)[0]
-                    )
-                    writer.set_qname(qname)
-                    writer.set_title_text(data[qname]['text'])
-                    writer.set_qtext(data[qname]['question'])
-                    writer.set_qual(data[qname]['qual']['logic'])
-                    writer.set_rank(data[qname]['rank'])
-                    writer.set_base(data[qname]['qual']['label'])
-                    writer.set_totals(data[qname]['totals'])
-                    writer.set_rows(data[qname]['rows'])
-                    writer.set_max_choice(data[qname]['maxchoice'])
-                    writer.set_start_column(data[qname]['startcolumn'])
-                    writer.set_end_column(data[qname]['endcolumn'])
-                    writer.set_column_text()
-                    writer.set_choice_codes(list(data[qname]['choices'].keys()))
-                    writer.set_choice_labels(list(data[qname]['choices'].values()))
+                    writer.code_width =data[qname]['codewidth']
+                    writer.tnum = \
+                        builder['Table'].where(builder['Field'] == qname
+                                               ).dropna().reset_index(drop=True).astype(int)[0]
+
+                    writer.qname = qname
+                    writer.title_text = data[qname]['text']
+                    writer.qtext = data[qname]['question']
+                    writer.qual = data[qname]['qual']['logic']
+                    writer.rank = data[qname]['rank']
+                    writer.base = data[qname]['qual']['label']
+                    writer.totals = data[qname]['totals']
+                    writer.rows = data[qname]['rows']
+                    writer.max_choice = data[qname]['maxchoice']
+                    writer.start_column = data[qname]['startcolumn']
+                    writer.end_column = data[qname]['endcolumn']
+                    writer.column_text()
+                    writer.choice_codes = list(data[qname]['choices'].keys())
+                    writer.choice_labels = list(data[qname]['choices'].values())
                     f.write(writer.create_table())
                     tnum += 1
                 except Exception as err:
@@ -145,31 +145,31 @@ R NO ANSWER                      ;112N1:6 ;NOR SZR
                         try:
                             f.write(
                                 "*\n"
-                                f"TABLE {writer.get_tnum()}\n"
+                                f"TABLE {writer.tnum}\n"
                                 "T QIDEOLOGY:\n"
-                                f"T {writer.get_qtext()}\n"
+                                f"T {writer.qtext}\n"
                                 "T\n"
                                 "T /\n"
                                 "R BASE==TOTAL SAMPLE             ;ALL     ;HP NOVP\n"
-                                f"R *D//S ({writer.get_totals()[0]} - {writer.get_totals()[1]}) ;NONE    ;EX (R3-R4)\n"
-                                f"R &UT- TOTAL {writer.get_totals()[0]}        ;{writer.get_start_column()}-1:2\n"
-                                f"R &UT- TOTAL {writer.get_totals()[1]}            ;{writer.get_start_column()}-4:5\n"
-                                f"R &AI2 STRONGLY {writer.get_totals()[0]}     ;{writer.get_start_column()}-1\n"
-                                f"R &AI2 SOMEWHAT {writer.get_totals()[0]}     ;{writer.get_start_column()}-2\n"
-                                f"R MODERATE                       ;{writer.get_start_column()}-3\n"
-                                f"R &AI2 SOMEWHAT {writer.get_totals()[1]}          ;{writer.get_start_column()}-4\n"
-                                f"R &AI2 STRONGLY {writer.get_totals()[1]}          ;{writer.get_start_column()}-5\n"
-                                f"R UNSURE // REFUSED              ;{writer.get_start_column()}-6\n"
-                                f"R NO ANSWER                      ;{writer.get_start_column()}N1:6 ;NOR SZR\n"
+                                f"R *D//S ({writer.totals[0]} - {writer.totals[1]}) ;NONE    ;EX (R3-R4)\n"
+                                f"R &UT- TOTAL {writer.totals[0]}        ;{writer.start_column}-1:2\n"
+                                f"R &UT- TOTAL {writer.totals[1]}            ;{writer.start_column}-4:5\n"
+                                f"R &AI2 STRONGLY {writer.totals[0]}     ;{writer.start_column}-1\n"
+                                f"R &AI2 SOMEWHAT {writer.totals[0]}     ;{writer.start_column}-2\n"
+                                f"R MODERATE                       ;{writer.start_column}-3\n"
+                                f"R &AI2 SOMEWHAT {writer.totals[1]}          ;{writer.start_column}-4\n"
+                                f"R &AI2 STRONGLY {writer.totals[1]}          ;{writer.start_column}-5\n"
+                                f"R UNSURE // REFUSED              ;{writer.start_column}-6\n"
+                                f"R NO ANSWER                      ;{writer.start_column}N1:6 ;NOR SZR\n"
                             )
                         except Exception:
                             f.write(
                                 "*\n"
-                                f"TABLE {writer.get_tnum()}\n"
+                                f"TABLE {writer.tnum}\n"
                                 "T QIDEOLOGY:\n"
-                                f"T {writer.get_qtext()}\n"
+                                f"T {writer.qtext}\n"
                                 "T\n"
                                 "T /\n"
                                 "R BASE==TOTAL SAMPLE             ;ALL     ;HP NOVP\n"
                             )
-                    print("Main loop:", writer.get_qname(), err)
+                    print("Main loop:", writer.qname, err)
