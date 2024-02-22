@@ -33,7 +33,6 @@ class Reader:
         return self.api.question_names()
 
     def get_order(self):
-        self.api.quotas()
         return self.api.order()
 
     def set_data_layout(self, data):
