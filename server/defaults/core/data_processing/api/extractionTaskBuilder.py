@@ -1,13 +1,10 @@
-import io
-import json
 import os
 
-import numpy as np
-import pandas as pd
 import requests
 
-class ExtractionBuilder():
-    def dat(self, prc_number, survey_id, variables: []):
+
+class ExtractionTaskBuilder:
+    def dat_file(self, prc_number, survey_id, variables: []):
         dat = {
             "Name": f"{prc_number}dat",
             "SurveyId": survey_id,
@@ -74,12 +71,14 @@ class ExtractionBuilder():
             "Filter": {
                 "Id": 0,
                 "DispositionResults": [
-                  "Completed"
+                    "Completed"
                 ],
                 "EmailStatus": "All",
                 "SMSStatus": "All",
                 "LastActivity": {
-                  "UseCurrentDate": True
+                    "UseCurrentDate": True
+                    # "Begin": "2024-02-15T22:04:12.267Z",
+                    # "End": "2024-02-15T22:04:12.267Z"
                 },
                 "Languages": [
                   "string"
@@ -120,5 +119,3 @@ class ExtractionBuilder():
           data=order
         )
         print(info)
-
-
