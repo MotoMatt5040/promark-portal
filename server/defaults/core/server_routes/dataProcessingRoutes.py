@@ -21,9 +21,9 @@ def data_processing():
 def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    questions = reader.get_order()
-    reader.get_questions()
 
+    reader.request_data()
+    questions = reader.get_order()
     return questions
 
 
@@ -31,7 +31,6 @@ def data_processing_questions():
 def process_data():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    reader.request_data()
     reader.set_data_layout(request.json)
     reader.run()
 
