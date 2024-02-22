@@ -19,6 +19,7 @@ const Header = (props) => {
               <NavDropdown.Item href="/interviewer_breakdown">Interviewer Breakdown</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link href="data_processing">Data Processing</Nav.Link>
+            <Nav.Link href="global_quotas">Global Quota Module</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
