@@ -13,6 +13,9 @@ class Reader:
         self.style = None
         self.api = AcuityData.AcuityData()
 
+    # def extract(self):
+    #     self.api.build_extraction_task(prc_id=prc_id)
+
     def setUrl(self, survey_id: str):
         self.api.set_sid(survey_id)
 
@@ -30,6 +33,7 @@ class Reader:
         return self.api.question_names()
 
     def get_order(self):
+        self.api.quotas()
         return self.api.order()
 
     def set_data_layout(self, data):
@@ -41,7 +45,9 @@ class Reader:
         self.style = data['totalStyleChecked']
 
     def run(self):
+
         data = self.api.data()
+        self.api.build_extraction_task('TESTING') 
 
         """
         LAYOUT OF CURRENT dictionaries
