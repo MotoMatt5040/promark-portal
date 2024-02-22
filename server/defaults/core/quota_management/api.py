@@ -9,48 +9,48 @@ class API:
         self._web_sid = None
         self._landline_sid = None
         self._cell_sid = None
-        self._web_url = None
-        self._landline_url = None
-        self._cell_url = None
+        self._web_quotas_url = None
+        self._landline_quotas_url = None
+        self._cell_quotas_url = None
 
     @property
     def web_sid(self):
         return self._web_sid
 
     @property
-    def web_url(self):
-        return self._web_url
+    def web_quotas_url(self):
+        return self._web_quotas_url
 
     @web_sid.setter
     def web_sid(self, sid):
         self._web_sid = sid
-        self._web_url = f"{os.environ['web_quotas_url']}{sid}"
+        self._web_quotas_url = f"{os.environ['web_quotas_url']}{sid}"
 
     @property
     def landline_sid(self):
         return self._landline_sid
 
     @property
-    def landline_url(self):
-        return self._landline_url
+    def landline_quotas_url(self):
+        return self._landline_quotas_url
 
     @landline_sid.setter
     def landline_sid(self, sid):
         self._landline_sid = sid
-        self._landline_url = f"{os.environ['voxco_quotas_url']}{sid}/stratas?status=All"
+        self._landline_quotas_url = f"{os.environ['voxco_quotas_url']}{sid}/stratas?status=All"
 
     @property
     def cell_sid(self):
         return self._cell_sid
 
     @property
-    def cell_url(self):
-        return self._cell_url
+    def cell_quotas_url(self):
+        return self._cell_quotas_url
 
     @cell_sid.setter
     def cell_sid(self, sid):
         self._cell_sid = sid
-        self._cell_url = f"{os.environ['voxco_quotas_url']}{sid}/stratas?status=All"
+        self._cell_quotas_url = f"{os.environ['voxco_quotas_url']}{sid}/stratas?status=All"
 
     @property
     def voxco_access_token(self):

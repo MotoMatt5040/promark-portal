@@ -34,17 +34,17 @@ class DataManagement(API):
         match self.source:
             case "web":
                 return requests.get(
-                    self.web_url,
+                    self.web_quotas_url,
                     headers={"Authorization": f"Client {os.environ['access_token']}"}
                 ).json()
             case "landline":
                 return requests.get(
-                    self.landline_url,
+                    self.landline_quotas_url,
                     headers={"Authorization": f"Client {self.voxco_access_token}"}
                 ).json()
             case "cell":
                 return requests.get(
-                    self.cell_url,
+                    self.cell_quotas_url,
                     headers={"Authorization": f"Client {self.voxco_access_token}"}
                 ).json()
             case _:
