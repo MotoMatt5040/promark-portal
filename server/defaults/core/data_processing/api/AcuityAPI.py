@@ -32,7 +32,7 @@ class AcuityAPI():
         self._questions_url = f"{os.environ['questions_url']}{sid}"
         self._variables_url = f"{os.environ['variables_url']}{sid}"
         self._extraction_task_url = f"{os.environ['extraction_task_url']}{sid}"
-        self._survey_url = f"{os.environ['survey_url']}{sid}"
+        self._survey_url = f"{os.environ['web_survey_url']}{sid}"
 
     @property
     def questions_url(self):

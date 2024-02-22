@@ -198,7 +198,6 @@ class AcuityData(AcuityAPI):
     def question_names(self):
         self.__variables = requests.get(
             self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
-        print(json.dumps(self.__variables, indent=4))
         __name = []
         skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
         for item in self.__variables:
