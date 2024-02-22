@@ -70,4 +70,3 @@ class AcuityAPI():
     @order_url.setter
     def order_url(self, order_id):
         self._order_url = f"{os.environ['order_url']}?extractionId={self._extraction_id}&fileId={order_id}"
-

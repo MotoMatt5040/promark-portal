@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import zipfile
 
@@ -188,6 +189,7 @@ class AcuityData(AcuityAPI):
 
         # this returns a .zip file
         order_req = requests.get(self.order_url, headers={"Authorization": f"Client {self._access_token}"})
+
         if order_req.ok:
             z = zipfile.ZipFile(io.BytesIO(order_req.content))
             z.extract("order.csv")
@@ -196,6 +198,7 @@ class AcuityData(AcuityAPI):
     def question_names(self):
         self.__variables = requests.get(
             self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
+        print(json.dumps(self.__variables, indent=4))
         __name = []
         skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
         for item in self.__variables:
@@ -355,9 +358,9 @@ class AcuityData(AcuityAPI):
             if __key not in data:
                 del __data[__key]
 
-        order = self.order()
-        self.xfile_layout(__data, order)
-        for __qname in order:
+        self._order = self.order()
+        self.xfile_layout(__data, self._order)
+        for __qname in self._order:
             maxchoice = __data[__qname]['maxchoice']
             codewidth = __data[__qname]['codewidth']
             __data[__qname]['startcolumn'] = __column
@@ -471,3 +474,53 @@ class AcuityData(AcuityAPI):
         xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
+
+    def build_extraction_task(self, prc_id, t=True):
+        if t:
+            return
+        dest = f"{prc_id}dat-testing"
+        v = ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)', ]
+        for item in self._order:
+            v.append(item)
+        dat = {
+            "Name": dest,
+            "SurveyId": self.sid,
+            "Language": "en",
+            "Description": "Used to extract data for UNCLE",
+            "DestinationFileName": dest,
+            "ExtractFormat": "CSV",
+            "Filter": {
+                "DispositionResults": [
+                    "Completed"
+                ]
+            },
+            "IncludeOpenEnds": False,  # Stating False is redundant in all cases below this line
+            "IncludeConnectionHistory": False,
+            "IncludeLabels": False,
+            "StripHtmlFromLabels": True,
+            "FieldDelimiter": "Comma",
+            "Encoding": "Windows1252",
+            "EncloseValuesInDoubleQuotes": False,
+            "IncludeHeader": True,
+            "UseChoiceLabels": False,
+            "MergeOpenEnds": False,
+            "DichotomizedMultiple": False,
+            "DichotomizedEmptyWhenNoAnswer": False,
+            "UseNegativeIntegersForEmptyAnswers": False,
+            "DapresyDataFormat": False,
+            "LoopsInQuestionnaireOrder": False,
+            "RemoveBracesOfSystemVariables": True,
+            "Variables": v
+        }
+        info = requests.post(
+            f"{os.environ['extraction_url']}",
+            headers={
+                "Authorization": f"Client {self.access_token}"
+            },
+            data=dat
+        )
+        print(self._order)
+        # print(self._order)
+        print(json.dumps(dat, indent=4))
+        print(info)
+
