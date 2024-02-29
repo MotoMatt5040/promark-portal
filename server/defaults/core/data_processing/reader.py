@@ -46,7 +46,7 @@ class Reader:
     def run(self):
 
         data = self.api.data()
-        self.api.build_extraction_task('TESTING') 
+        self.api.build_extraction_task()
 
         """
         LAYOUT OF CURRENT dictionaries
