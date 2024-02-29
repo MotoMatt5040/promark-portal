@@ -23,8 +23,8 @@ function Home() {
             <h2>Promark Portal</h2>
             <p>
               Currently available features:<br/>
-              &emsp;Dashboard<br/>
-              &emsp;Data Processing
+              &emsp;<a href='/periodic_update'>Periodic Update</a><br/>
+              &emsp;<a href='/data_processing'>Data Processing</a>
             </p>
             {/*<button className="btn btn-outline-secondary" type="button">Example button</button>*/}
           </div>
