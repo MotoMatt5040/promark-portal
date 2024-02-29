@@ -1,3 +1,4 @@
+import json
 import shutil
 
 from flask import Blueprint, request, make_response, send_file
@@ -19,6 +20,7 @@ def survey_quotas():
     sid = request.json['surveyID']
 
     dm.source = source
+
     match source:
         case 'web':
             dm.web_sid = sid
@@ -26,20 +28,25 @@ def survey_quotas():
             dm.landline_sid = sid
         case 'cell':
             dm.cell_sid = sid
+            dm.merge_data()
         case _:
-            return ''
+            return {}
 
-    dm.set_data()
+    data = dm.clean_names()
+
+    return data.to_json()
 
 
 @quotas.route('/quotas/survey_name', methods=['POST', 'OPTIONS'])
 def survey_name():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
+
     source = request.json['source']
     sid = request.json['surveyID']
 
     dm.source = source
+
     match source:
         case 'web':
             dm.web_sid = sid
@@ -49,8 +56,8 @@ def survey_name():
             dm.cell_sid = sid
         case _:
             return ''
-
-    dm.set_data()
+    name = dm.survey_name()
+    return name
 
 
 def _build_cors_preflight_response():
