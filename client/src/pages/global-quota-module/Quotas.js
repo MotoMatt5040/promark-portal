@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState } from 'react';
 import Form from "react-bootstrap/Form";
 import axios from "../../api/axios";
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import Table from 'react-bootstrap/Table';
+// import Table from 'react-bootstrap/Table';
+import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 
 function Quotas() {
 
@@ -12,54 +13,51 @@ function Quotas() {
   const [landlineSurveyID, setLandlineSurveyID] = useState();
   const [cellSurveyID, setCellSurveyID] = useState();
 
-
-  const [webSurveyName, setWebSurveyName] = useState('Please enter web project info')
-  const [landlineSurveyName, setLandlineSurveyName] = useState('Please enter landline project info')
-  const [cellSurveyName, setCellSurveyName] = useState('Please enter cell project info')
+  const [webSurveyName, setWebSurveyName] = useState('Web Survey ID')
+  const [landlineSurveyName, setLandlineSurveyName] = useState('Landline Survey ID')
+  const [cellSurveyName, setCellSurveyName] = useState('Cell Survey ID')
 
   const [isWebSurveyIDError, setWebSurveyIDError] = useState(false);
   const [isLandlineSurveyIDError, setLandlineSurveyIDError] = useState(false);
   const [isCellSurveyIDError, setCellSurveyIDError] = useState(false);
 
+  const [webData, setWebData] = useState({});
+  const [landlineData, setLandlineData] = useState({});
+  const [cellData, setCellData] = useState({});
+
   useEffect(() => {
 
   }, []);
 
-  const handleRun = async (event) => {
-    event.preventDefault();
-    // axios.get("/quotas/data", {
-    //   responseType: 'blob',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   }
-    // })
-    //   .then((obj) => {
-    //     const survey_n = webSurveyName.substring(0, webSurveyName.indexOf(' '));
-    //     console.log(obj.data)
-    //     const url = URL.createObjectURL(obj.data);
-    //     const a = document.createElement('a');
-    //     a.href = url;
-    //     a.download = survey_n + '.zip';
-    //     a.style.display = 'none';
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     a.remove();
-    //     URL.revokeObjectURL(url);
-    //   })
-    //     .catch(error => console.error(error))
+  const handleRun = async () => {
+    // console.log(webData, landlineData, cellData);
+    setWebData({});
+    setLandlineData({});
+    setCellData({});
+    if(!isWebSurveyIDError) {
+      await getSurveyQuotas('web', webSurveyID);
+    }
+    if(!isLandlineSurveyIDError) {
+      await getSurveyQuotas('landline', landlineSurveyID);
+    }
+    if(!isCellSurveyIDError) {
+      await getSurveyQuotas('cell', cellSurveyID);
+    }
+    // console.log(webData, landlineData, cellData);
   };
 
-  const handleSurveyIDChange = async (e) => {
+  const checkData = () => {
+    console.log(webData, landlineData, cellData);
+  }
 
+  const handleSurveyIDChange = (e) => {
     const value = e.target.value;
     const source_id = e.target.id;
-
 
     switch (source_id) {
       case "web":
         setWebSurveyID(value);
         setWebSurveyIDError(value.length < 3);
-        console.log('web')
         if(value.length > 2) {
           getSurveyName(source_id, value);
         }
@@ -67,7 +65,6 @@ function Quotas() {
       case "landline":
         setLandlineSurveyID(value);
         setLandlineSurveyIDError(value.length < 5);
-        console.log('ll')
         if(value.length > 4) {
           getSurveyName(source_id, value);
         }
@@ -75,18 +72,16 @@ function Quotas() {
       case "cell":
         setCellSurveyID(value);
         setCellSurveyIDError(value.length < 5);
-        console.log('cell')
         if(value.length > 4) {
           getSurveyName(source_id, value);
         }
         break;
       default:
-        console.log("Invalid id")
         break;
     }
   }
 
-  const getSurveyName = (source, surveyID) => {
+  const getSurveyName = async (source, surveyID) => {
     axios.post(
       '/quotas/survey_name',
       { source, surveyID },
@@ -96,18 +91,79 @@ function Quotas() {
         }
     })
       .then((response) => {
-        return response.data;
+        switch (source) {
+          case 'web':
+            setWebSurveyName(response.data);
+            break;
+          case 'landline':
+            setLandlineSurveyName(response.data);
+            break;
+          case 'cell':
+            setCellSurveyName(response.data);
+            break;
+          default:
+            return '';
+        }
       })
       .catch((error) => {
         console.error("Error fetching survey name", error)
-        setWebSurveyName("Invalid Survey ID")
+        switch (source) {
+          case 'web':
+            setWebSurveyName("Invalid Web Survey ID");
+            setWebSurveyIDError(true)
+            break;
+          case 'landline':
+            setLandlineSurveyName("Invalid Landline Survey ID");
+            setLandlineSurveyIDError(true)
+            break;
+          case 'cell':
+            setCellSurveyName("Invalid Cell Survey ID");
+            setCellSurveyIDError(true)
+            break;
+          default:
+            return '';
+        }
+      })
+  }
+
+  const getSurveyQuotas = async (source, surveyID) => {
+    await axios.post(
+      '/quotas/survey_quotas',
+      { source, surveyID },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+    })
+      .then((response) => {
+        switch (source) {
+          case 'web':
+            setWebData({});
+            setWebData(response.data);
+            break;
+          case 'landline':
+            setLandlineData({});
+            setLandlineData(response.data);
+            break;
+          case 'cell':
+            setCellData({});
+            setCellData(response.data);
+            break;
+          default:
+            return '';
+        }
+
+
+
+      })
+      .catch((error) => {
+        console.error("Error fetching survey quotas", error)
       })
   }
 
   return (
     <div>
       <div className='p-4 text-center bg-light' style={headerStyle}>
-        <h4>{webSurveyName}</h4>
         <div className='dp-form' style={formDiv}>
           <div
             style={formStyle}>
@@ -127,7 +183,7 @@ function Quotas() {
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
                     value={webSurveyID}
-                    label="Acuity Survey ID"
+                    label={webSurveyName}
                     required
                     variant="standard"
                   />
@@ -149,7 +205,7 @@ function Quotas() {
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
                     value={landlineSurveyID}
-                    label="Voxco Landline Survey ID"
+                    label={landlineSurveyName}
                     required
                     variant="standard"
                   />
@@ -171,7 +227,7 @@ function Quotas() {
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
                     value={cellSurveyID}
-                    label="Voxco Cell Survey ID"
+                    label={cellSurveyName}
                     required
                     variant="standard"
                   />
@@ -180,7 +236,36 @@ function Quotas() {
             </div>
           </div>
         </div>
+        <Button onClick={handleRun}>Run</Button>
+        <Button onClick={checkData}>Check Data</Button>
       </div>
+      {/*{typeof webData !== {}*/}
+      {Object.keys(webData).length > 0 && (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>StratumId</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Criterion</TableCell>
+              <TableCell>Objective</TableCell>
+              <TableCell>Frequency</TableCell>
+              <TableCell>To Do</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Object.keys(webData.StratumId).map((key, index) => (
+              <TableRow key={index}>
+                <TableCell>{webData.StratumId[index]}</TableCell>
+                <TableCell>{webData.Status[index]}</TableCell>
+                <TableCell>{webData.Criterion[index]}</TableCell>
+                <TableCell>{webData.Objective[index]}</TableCell>
+                <TableCell>{webData.Frequency[index]}</TableCell>
+                <TableCell>{webData['To Do'][index]}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   )
 }
@@ -224,14 +309,4 @@ const formTextBox = {
   alignContent: 'center',
   flexGrow: '1',
   width: '70%'
-}
-
-const formButtons = {
-  // border: '1px solid pink',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'left',
-  alignContent: 'center',
-  width: "30%"
 }
