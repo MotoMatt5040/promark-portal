@@ -151,15 +151,19 @@ class AcuityData(AcuityAPI):
 
     def __init__(self):
         super().__init__()
-        self.__variables = None
-        self.__questions = None
-        self.__extraction_task = None
-        self.__extraction_id = None
-        self.__extraction_file_id = None
+        self._variables = None
+        self._questions = None
+        self._extraction_task = None
+        self._order_extraction_id = None
+        self._dat_extraction_id = None
+        self._prc_id = None
+        self._dat_extraction_id = None
         self.sid = None
+        self._dat_id = None
 
     def get_survey_name(self):
         survey_name = requests.get(self.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
+        self._prc_id = survey_name[:survey_name.find(' ')]
         return survey_name
 
     def set_sid(self, sid):
@@ -169,23 +173,17 @@ class AcuityData(AcuityAPI):
     def set_skips(self, skips):
         self.SKIP_TABLE = skips
 
-    def request_data(self):
+    def order_data(self):
         if os.path.exists('order.csv'):
             os.remove('order.csv')
 
-        self.__extraction_task = requests.get(self.extraction_task_url, headers={"Authorization": f"Client {self._access_token}"}).json()
+        if self.order_extraction_id is None:
+            return False
 
-        for items in self.__extraction_task['Extractions']:
-            if items["Name"] == "order":
-                self.extraction_id = items["ExtractionId"]
+        order_extraction_file_id_req = requests.get(self.order_extraction_res_url, headers={"Authorization": f"Client {self._access_token}"}).json()
 
-        if self.extraction_id is None:
-            return 'order dne'
-
-        extraction_file_id_req = requests.get(self.extraction_res_url, headers={"Authorization": f"Client {self._access_token}"}).json()
-
-        self.order_url = extraction_file_id_req["FileId"]
-        self.extraction_id = None
+        self.order_url = order_extraction_file_id_req["FileId"]
+        self._order_extraction_id = None
 
         # this returns a .zip file
         order_req = requests.get(self.order_url, headers={"Authorization": f"Client {self._access_token}"})
@@ -195,12 +193,29 @@ class AcuityData(AcuityAPI):
             z.extract("order.csv")
             z.close()
 
+    def request_data(self):
+
+        self._dat_id = f"{self._prc_id}dat"
+        self._extraction_task = requests.get(self.extraction_task_url,
+                                             headers={"Authorization": f"Client {self._access_token}"}).json()
+        for items in self._extraction_task['Extractions']:
+            match items["Name"].lower():
+                case "order":
+                    self.order_extraction_id = items["ExtractionId"]
+                case 'testdat':
+                    self.dat_extraction_id = items["ExtractionId"]
+                    requests.delete(self.dat_extraction_res_url,
+                                    headers={"Authorization": f"Client {self._access_token}"})
+                case _:
+                    continue
+        self.order_data()
+
     def question_names(self):
-        self.__variables = requests.get(
+        self._variables = requests.get(
             self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
         __name = []
         skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
-        for item in self.__variables:
+        for item in self._variables:
             if item['Name'] in skips or "FIL1" in item["Name"] or "FIL2" in item["Name"]:
                 continue
             __name.append(item["Name"])
@@ -208,13 +223,13 @@ class AcuityData(AcuityAPI):
 
     def blocks(self):
         __blocks = []
-        for __item in self.__variables:
+        for __item in self._variables:
             __blocks.append(__item)
         return __blocks
 
     def data(self):
         self.question_names()
-        self.__questions = requests.get(
+        self._questions = requests.get(
             self.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
         __data = {}
         for __block in self.blocks():
@@ -334,7 +349,7 @@ class AcuityData(AcuityAPI):
     def fills_skips(self):
         __fills = {}
         __skip = {}
-        for __block in self.__questions['blocks']:
+        for __block in self._questions['blocks']:
             for __item in __block['questions']:
                 try:
                     __item['name'] = __item['name'].replace("II", "")
@@ -474,14 +489,18 @@ class AcuityData(AcuityAPI):
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
 
-    def build_extraction_task(self, prc_id, t=True):
-        if t:
-            return
-        dest = f"{prc_id}dat-testing"
+    def build_extraction_task(self):
+
+        header = {
+
+            "Authorization": f"Client {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        dest = f"{self._prc_id}dat"
         v = ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)', ]
         for item in self._order:
             v.append(item)
-        dat = {
+        dat = json.dumps({
             "Name": dest,
             "SurveyId": self.sid,
             "Language": "en",
@@ -510,16 +529,12 @@ class AcuityData(AcuityAPI):
             "LoopsInQuestionnaireOrder": False,
             "RemoveBracesOfSystemVariables": True,
             "Variables": v
-        }
-        info = requests.post(
+        })
+        requests.post(
             f"{os.environ['extraction_url']}",
-            headers={
-                "Authorization": f"Client {self.access_token}"
-            },
+            headers=header,
             data=dat
         )
-        print(self._order)
-        # print(self._order)
-        print(json.dumps(dat, indent=4))
-        print(info)
+
+        "419 76552 76627"
 
