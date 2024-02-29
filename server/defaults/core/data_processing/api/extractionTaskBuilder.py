@@ -58,7 +58,6 @@ class ExtractionTaskBuilder:
                 "Authorization": os.environ['access_token']},
             data=dat
         )
-        print(info)
 
     def test(self):
         order = {
