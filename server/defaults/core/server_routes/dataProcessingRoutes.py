@@ -46,6 +46,7 @@ def download():
     sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
     return sendfile
 
+
 @data_processor.route("/data_processing/survey_name", methods=['POST', 'OPTIONS'])
 def survey_name():
     if request.method == "OPTIONS":  # CORS preflight
