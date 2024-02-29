@@ -12,6 +12,9 @@ class API:
         self._web_quotas_url = None
         self._landline_quotas_url = None
         self._cell_quotas_url = None
+        self._web_survey_url = None
+        self._landline_survey_url = None
+        self._cell_survey_url = None
 
     @property
     def web_sid(self):
@@ -25,6 +28,7 @@ class API:
     def web_sid(self, sid):
         self._web_sid = sid
         self._web_quotas_url = f"{os.environ['web_quotas_url']}{sid}"
+        self._web_survey_url = f"{os.environ['web_survey_url']}{sid}"
 
     @property
     def landline_sid(self):
@@ -37,7 +41,8 @@ class API:
     @landline_sid.setter
     def landline_sid(self, sid):
         self._landline_sid = sid
-        self._landline_quotas_url = f"{os.environ['voxco_quotas_url']}{sid}/stratas?status=All"
+        self._landline_quotas_url = f"{os.environ['voxco_survey_url']}{sid}/stratas?status=All"
+        self._landline_survey_url = f"{os.environ['voxco_survey_url']}{sid}"
 
     @property
     def cell_sid(self):
@@ -50,8 +55,21 @@ class API:
     @cell_sid.setter
     def cell_sid(self, sid):
         self._cell_sid = sid
-        self._cell_quotas_url = f"{os.environ['voxco_quotas_url']}{sid}/stratas?status=All"
+        self._cell_quotas_url = f"{os.environ['voxco_survey_url']}{sid}/stratas?status=All"
+        self._cell_survey_url = f"{os.environ['voxco_survey_url']}{sid}"
 
     @property
     def voxco_access_token(self):
         return requests.get(os.environ['voxco_access_token_url']).json()['Token']
+
+    @property
+    def web_survey_url(self):
+        return self._web_survey_url
+
+    @property
+    def landline_survey_url(self):
+        return self._landline_survey_url
+
+    @property
+    def cell_survey_url(self):
+        return self._cell_survey_url
