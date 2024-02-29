@@ -16,7 +16,6 @@ class DataManagement(API):
 
     def set_data(self):
         df = pd.DataFrame(self.create_layout())
-        print(self.source, '\n', df.to_string())
         match self.source:
             case "web":
                 self._web_data = df
@@ -28,14 +27,15 @@ class DataManagement(API):
                 self._web_data = pd.DataFrame()
                 self._landline_data = pd.DataFrame()
                 self._cell_data = pd.DataFrame()
+        df.to_csv(f"{self.source}.csv", encoding='utf-8', index=False)
+        return df
 
     def get_data(self):
-
         match self.source:
             case "web":
                 return requests.get(
                     self.web_quotas_url,
-                    headers={"Authorization": f"Client {os.environ['access_token']}"}
+                    headers={"Authorization": f"Client {self._acuity_access_token}"}
                 ).json()
             case "landline":
                 return requests.get(
@@ -82,6 +82,32 @@ class DataManagement(API):
             case _:
                 return output
         return output
+
+    def survey_name(self):
+        match self.source:
+            case 'web':
+                return requests.get(self.web_survey_url, headers={"Authorization": f"Client {self._acuity_access_token}"}).json()['Name']
+            case 'landline':
+                r = requests.get(self.landline_survey_url, headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
+                return f"{r['Name']} {r['Description']}"
+            case 'cell':
+                r = requests.get(self.cell_survey_url, headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
+                return f"{r['Name']} {r['Description']}"
+            case _:
+                return
+
+    def clean_names(self):
+        df = self.set_data()
+        # df['Criterion'] = df['Criterion'].str.split(' ').str[0].tolist()
+        return df
+
+    def merge_data(self):
+        df1 = self._web_data
+        df2 = self._landline_data
+        df3 = self._cell_data
+        d = df2.merge(df1[['Criterion']])
+
+
 
     @property
     def source(self):
