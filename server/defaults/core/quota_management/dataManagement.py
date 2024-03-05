@@ -119,7 +119,6 @@ class DataManagement(API):
         d.drop(['Objective_x', 'Objective_y', 'To Do_x', 'To Do_y'], axis=1, inplace=True)
 
         d2 = pd.merge(d, df3, on="Criterion")
-
         d2['Objective'] = d2['Objective_x'] + d2['Objective_y']
         d2['Frequency'] = d2['Frequency_x'] + d2['Frequency_y']
         d2['To Do'] = d2["To Do_x"] + d2['To Do_y']
@@ -133,11 +132,10 @@ class DataManagement(API):
         #     "StratumId": "Cell StratumId",
         #     "Status": "Cell Status"
         # }, inplace=True)
+
         d2.rename(columns={
             'Frequency_y': 'Cell Frequency'
         }, inplace=True)
-
-        print(d2.to_string())
 
         df = d2[[
             # 'Web StratumId',
