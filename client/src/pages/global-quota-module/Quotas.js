@@ -253,13 +253,13 @@ function Quotas() {
       {/*{typeof webData !== {}*/}
       <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
         {Object.keys(data).length > 0 && (
-          <Table style={{width: "50%", border: '1px solid'}} striped>
+          <Table style={{width: "50%", border: '1px solid black'}} striped>
             <thead>
               <tr>
-                <th scope="col" colSpan="4" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Global</th>
-                <th scope="col" colSpan="3" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Web</th>
-                <th scope="col" colSpan="3" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Landline</th>
-                <th scope="col" colSpan="3" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Cell</th>
+                <th scope="col" colSpan="4" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>
+                <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>
+                <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Landline</th>
+                <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Cell</th>
               </tr>
 
               <tr>
@@ -269,19 +269,19 @@ function Quotas() {
                 {/*<TableCell>LL Status</TableCell>*/}
                 {/*<TableCell>Cell StratumId</TableCell>*/}
                 {/*<TableCell>Cell Status</TableCell>*/}
-                <th style={{border: '1px solid'}}>Criterion</th>
-                <th style={{border: '1px solid'}}>Objective</th>
-                <th style={{border: '1px solid'}}>Freq</th>
-                <th style={{border: '1px solid'}}>To Do</th>
-                <th style={{border: '1px solid'}}>Obj</th>
-                <th style={{border: '1px solid'}}>Freq</th>
-                <th style={{border: '1px solid'}}>%</th>
-                <th style={{border: '1px solid'}}>Obj</th>
-                <th style={{border: '1px solid'}}>Freq</th>
-                <th style={{border: '1px solid'}}>%</th>
-                <th style={{border: '1px solid'}}>Obj</th>
-                <th style={{border: '1px solid'}}>Freq</th>
-                <th style={{border: '1px solid'}}>%</th>
+                <th style={{border: '1px solid black'}}>Criterion</th>
+                <th style={{border: '1px solid black'}}>Objective</th>
+                <th style={{border: '1px solid black'}}>Freq</th>
+                <th style={{border: '1px solid black'}}>To Do</th>
+                <th style={{border: '1px solid black'}}>Obj</th>
+                <th style={{border: '1px solid black'}}>Freq</th>
+                <th style={{border: '1px solid black'}}>% Global</th>
+                <th style={{border: '1px solid black'}}>Obj</th>
+                <th style={{border: '1px solid black'}}>Freq</th>
+                <th style={{border: '1px solid black'}}>% Global</th>
+                <th style={{border: '1px solid black'}}>Obj</th>
+                <th style={{border: '1px solid black'}}>Freq</th>
+                <th style={{border: '1px solid black'}}>% Global</th>
               </tr>
             </thead>
             <tbody>
@@ -293,43 +293,76 @@ function Quotas() {
                   {/*<td>{data["LL Status"][index]}</td>*/}
                   {/*<td>{data["Cell StratumId"][index]}</td>*/}
                   {/*<td>{data["Cell Status"][index]}</td>*/}
-                  <td style={{borderLeft: "1px solid"}}>{data.Criterion[index]}</td>
+                  <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
                   <td>{data.Obj[index]}</td>
                   <td>{data.Freq[index]}</td>
-                  <td style={{borderRight: "1px solid"}}>{data['To Do'][index]}</td>
+                  <td style={{borderRight: "1px solid black"}}>{data['To Do'][index]}</td>
 
-                  <td style={{backgroundColor: (data['Web Status'][index] === "Open") ? "lightgreen" : "crimson"}}>{data['W Obj'][index]}</td>
+                  <td style={{
+                    backgroundColor: (data['Web Status'][index] === "Open") ? "darkgreen" : "crimson",
+                    color: "white"
+                  }}
+                  >
+                    {data['W Obj'][index]}
+                  </td>
                   <td
                   style={{
+                    color:
+                      (-1 <= data["W Freq"][index] - data["W Obj"][index] && 1 >= data["W Freq"][index] - data["W Obj"][index]) ? "" :
+                        (-10 <= data["W Freq"][index] - data["W Obj"][index] && 10 >= data["W Freq"][index] - data["W Obj"][index]) ? "darkorange" :
+                          "crimson",
                     backgroundColor:
-                      (-1 < data["W Freq"][index] - data["W Obj"][index] && 1 > data["W Freq"][index] - data["W Obj"][index]) ? "lightgreen" :
-                        (-10 < data["W Freq"][index] - data["W Obj"][index] && 10 > data["W Freq"][index] - data["W Obj"][index]) ? "orange" : "crimson"
+                      (-1 > data["W Freq"][index] - data["W Obj"][index]) ? "" :
+                        (-1 <= data["W Freq"][index] - data["W Obj"][index] && 1 >= data["W Freq"][index] - data["W Obj"][index]) ? "lightgreen" :
+                          (10 >= data["W Freq"][index] - data["W Obj"][index] && 2 <= data["W Freq"][index] - data["W Obj"][index]) ? "lightyellow" :
+                            "lightpink"
                   }}>
                     {data['W Freq'][index]}
                   </td>
-                  <td style={{borderRight: "1px solid"}}>{data['W%'][index]}</td>
+                  <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}</td>
 
-                  <td style={{backgroundColor: (data['LL Status'][index] === "Open") ? "lightgreen" : "crimson"}}>{data['L Obj'][index]}</td>
+                  <td style={{
+                    backgroundColor: (data['LL Status'][index] === "Open") ? "darkgreen" : "crimson",
+                    color: "white"
+                  }}
+                  >
+                    {data['L Obj'][index]}
+                  </td>
                   <td
                   style={{
+                    color:
+                      (-1 <= data["L Freq"][index] - data["L Obj"][index] && 1 >= data["L Freq"][index] - data["L Obj"][index]) ? "" :
+                        (-10 <= data["L Freq"][index] - data["L Obj"][index] && 10 >= data["L Freq"][index] - data["L Obj"][index]) ? "darkorange" : "crimson",
                     backgroundColor:
-                      (-1 < data["L Freq"][index] - data["L Obj"][index] && 1 > data["L Freq"][index] - data["L Obj"][index]) ? "lightgreen" :
-                        (-10 < data["L Freq"][index] - data["L Obj"][index] && 10 > data["L Freq"][index] - data["L Obj"][index]) ? "orange" : "crimson"
+                      (-1 > data["L Freq"][index] - data["L Obj"][index]) ? "" :
+                        (-1 <= data["L Freq"][index] - data["L Obj"][index] && 1 >= data["L Freq"][index] - data["L Obj"][index]) ? "lightgreen" :
+                          (10 >= data["L Freq"][index] - data["L Obj"][index] && 2 <= data["L Freq"][index] - data["L Obj"][index]) ? "lightyellow" : "lightpink"
                   }}>
                     {data['L Freq'][index]}
                   </td>
-                  <td style={{borderRight: "1px solid"}}>{data['L%'][index]}</td>
+                  <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}</td>
 
-                  <td style={{backgroundColor: (data['Cell Status'][index] === "Open") ? "lightgreen" : "crimson"}}>{data['C Obj'][index]}</td>
+                  <td
+                    style={{
+                      backgroundColor: (data['Cell Status'][index] === "Open") ? "darkgreen" : "crimson",
+                      color: 'white'
+                  }}
+                  >
+                    {data['C Obj'][index]}
+                  </td>
                   <td
                   style={{
+                    color:
+                      (-1 <= data["C Freq"][index] - data["C Obj"][index] && 1 >= data["C Freq"][index] - data["C Obj"][index]) ? "" :
+                        (-10 <= data["C Freq"][index] - data["C Obj"][index] && 10 >= data["C Freq"][index] - data["C Obj"][index]) ? "darkorange" : "crimson",
                     backgroundColor:
-                      (-1 < data["C Freq"][index] - data["C Obj"][index] && 1 > data["C Freq"][index] - data["C Obj"][index]) ? "lightgreen" :
-                        (-10 < data["C Freq"][index] - data["C Obj"][index] && 10 > data["C Freq"][index] - data["C Obj"][index]) ? "orange" : "crimson"
+                      (-1 > data["C Freq"][index] - data["C Obj"][index]) ? "" :
+                        (-1 <= data["C Freq"][index] - data["C Obj"][index] && 1 >= data["C Freq"][index] - data["C Obj"][index]) ? "lightgreen" :
+                          (10 >= data["C Freq"][index] - data["C Obj"][index] && 2 <= data["C Freq"][index] - data["C Obj"][index]) ? "lightyellow" : "lightpink"
                   }}>
                     {data['C Freq'][index]}
                   </td>
-                  <td style={{borderRight: "1px solid"}}>{data['C%'][index]}</td>
+                  <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}</td>
                 </tr>
               ))}
             </tbody>
@@ -343,7 +376,7 @@ function Quotas() {
 export default Quotas;
 
 const headerStyle = {
-  // border: '1px solid green',
+  // border: '1px solid black green',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -352,7 +385,7 @@ const headerStyle = {
 }
 
 const formDiv = {
-  // border: '1px solid blue',
+  // border: '1px solid black blue',
   display: 'flex',
   flexDirection: 'row',
   width: "40%",
@@ -362,7 +395,7 @@ const formDiv = {
 }
 
 const formStyle = {
-  // border: '1px solid red',
+  // border: '1px solid black red',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
@@ -372,7 +405,7 @@ const formStyle = {
 }
 
 const formTextBox = {
-  // border: '1px solid green',
+  // border: '1px solid black green',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-evenly',
