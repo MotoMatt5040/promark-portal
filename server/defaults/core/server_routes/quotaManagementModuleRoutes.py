@@ -28,13 +28,23 @@ def survey_quotas():
             dm.landline_sid = sid
         case 'cell':
             dm.cell_sid = sid
-            dm.merge_data()
         case _:
             return {}
 
     data = dm.clean_names()
 
     return data.to_json()
+
+
+@quotas.route('/quotas/check', methods=['GET'])
+def check():
+    dm.merge_data()
+    return ''
+
+
+@quotas.route('/quotas/merge', methods=['GET'])
+def merge():
+    return dm.merge_data().to_json()
 
 
 @quotas.route('/quotas/survey_name', methods=['POST', 'OPTIONS'])
