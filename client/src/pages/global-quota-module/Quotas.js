@@ -255,31 +255,37 @@ function Quotas() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Web StratumId</TableCell>
-              <TableCell>Web Status</TableCell>
-              <TableCell>LL StratumId</TableCell>
-              <TableCell>LL Status</TableCell>
-              <TableCell>Cell StratumId</TableCell>
-              <TableCell>Cell Status</TableCell>
+              {/*<TableCell>Web StratumId</TableCell>*/}
+              {/*<TableCell>Web Status</TableCell>*/}
+              {/*<TableCell>LL StratumId</TableCell>*/}
+              {/*<TableCell>LL Status</TableCell>*/}
+              {/*<TableCell>Cell StratumId</TableCell>*/}
+              {/*<TableCell>Cell Status</TableCell>*/}
               <TableCell>Criterion</TableCell>
               <TableCell>Objective</TableCell>
               <TableCell>Frequency</TableCell>
               <TableCell>To Do</TableCell>
+              <TableCell>Web Frequency</TableCell>
+              <TableCell>LL Frequency</TableCell>
+              <TableCell>Cell Frequency</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.keys(data["Web StratumId"]).map((key, index) => (
+            {Object.keys(data.Criterion).map((key, index) => (
               <TableRow key={index}>
-                <TableCell>{data["Web StratumId"][index]}</TableCell>
-                <TableCell>{data["Web Status"][index]}</TableCell>
-                <TableCell>{data["LL StratumId"][index]}</TableCell>
-                <TableCell>{data["LL Status"][index]}</TableCell>
-                <TableCell>{data["Cell StratumId"][index]}</TableCell>
-                <TableCell>{data["Cell Status"][index]}</TableCell>
+                {/*<TableCell>{data["Web StratumId"][index]}</TableCell>*/}
+                {/*<TableCell>{data["Web Status"][index]}</TableCell>*/}
+                {/*<TableCell>{data["LL StratumId"][index]}</TableCell>*/}
+                {/*<TableCell>{data["LL Status"][index]}</TableCell>*/}
+                {/*<TableCell>{data["Cell StratumId"][index]}</TableCell>*/}
+                {/*<TableCell>{data["Cell Status"][index]}</TableCell>*/}
                 <TableCell>{data.Criterion[index]}</TableCell>
                 <TableCell>{data.Objective[index]}</TableCell>
                 <TableCell>{data.Frequency[index]}</TableCell>
                 <TableCell>{data['To Do'][index]}</TableCell>
+                <TableCell>{data['Web Frequency'][index]}</TableCell>
+                <TableCell>{data['LL Frequency'][index]}</TableCell>
+                <TableCell>{data['Cell Frequency'][index]}</TableCell>
               </TableRow>
             ))}
           </TableBody>

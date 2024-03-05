@@ -1,4 +1,6 @@
 import os
+import time
+
 from .api import API
 import pandas as pd
 import numpy as np
@@ -110,35 +112,47 @@ class DataManagement(API):
         d['Objective'] = d['Objective_x'] + d['Objective_y']
         d['Frequency'] = d['Frequency_x'] + d['Frequency_y']
         d['To Do'] = d["To Do_x"] + d['To Do_y']
-        d.drop(['Objective_x', 'Objective_y', 'Frequency_x', 'Frequency_y', 'To Do_x', 'To Do_y'], axis=1, inplace=True)
+        d.rename(columns={
+            'Frequency_x': 'Web Frequency',
+            'Frequency_y': 'LL Frequency',
+        }, inplace=True)
+        d.drop(['Objective_x', 'Objective_y', 'To Do_x', 'To Do_y'], axis=1, inplace=True)
 
         d2 = pd.merge(d, df3, on="Criterion")
+
         d2['Objective'] = d2['Objective_x'] + d2['Objective_y']
         d2['Frequency'] = d2['Frequency_x'] + d2['Frequency_y']
         d2['To Do'] = d2["To Do_x"] + d2['To Do_y']
-        d2.drop(['Objective_x', 'Objective_y', 'Frequency_x', 'Frequency_y', 'To Do_x', 'To Do_y'], axis=1, inplace=True)
+        d2.drop(['StratumId_x', 'Status_x', 'StratumId_y', 'Status_y', 'StratumId', 'Status', 'Frequency_x', 'Objective_x', 'Objective_y','To Do_x', 'To Do_y'], axis=1, inplace=True)
 
+        # d2.rename(columns={
+        #     "StratumId_x": "Web StratumId",
+        #     "Status_x": "Web Status",
+        #     "StratumId_y": "LL StratumId",
+        #     "Status_y": "LL Status",
+        #     "StratumId": "Cell StratumId",
+        #     "Status": "Cell Status"
+        # }, inplace=True)
         d2.rename(columns={
-            "StratumId_x": "Web StratumId",
-            "Status_x": "Web Status",
-            "StratumId_y": "LL StratumId",
-            "Status_y": "LL Status",
-            "StratumId": "Cell StratumId",
-            "Status": "Cell Status"
+            'Frequency_y': 'Cell Frequency'
         }, inplace=True)
 
+        print(d2.to_string())
 
         df = d2[[
-            'Web StratumId',
-            'Web Status',
-            'LL StratumId',
-            'LL Status',
-            'Cell StratumId',
-            'Cell Status',
+            # 'Web StratumId',
+            # 'Web Status',
+            # 'LL StratumId',
+            # 'LL Status',
+            # 'Cell StratumId',
+            # 'Cell Status',
             'Criterion',
             'Objective',
             'Frequency',
-            'To Do'
+            'To Do',
+            'Web Frequency',
+            'LL Frequency',
+            'Cell Frequency'
         ]]
 
         return df
