@@ -4,8 +4,8 @@ import axios from "../../api/axios";
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-// import Table from 'react-bootstrap/Table';
-import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import Table from 'react-bootstrap/Table';
+// import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 
 function Quotas() {
 
@@ -251,46 +251,92 @@ function Quotas() {
         <Button onClick={checkData}>Check Data</Button>
       </div>
       {/*{typeof webData !== {}*/}
-      {Object.keys(data).length > 0 && (
-        <Table>
-          <TableHead>
-            <TableRow>
-              {/*<TableCell>Web StratumId</TableCell>*/}
-              {/*<TableCell>Web Status</TableCell>*/}
-              {/*<TableCell>LL StratumId</TableCell>*/}
-              {/*<TableCell>LL Status</TableCell>*/}
-              {/*<TableCell>Cell StratumId</TableCell>*/}
-              {/*<TableCell>Cell Status</TableCell>*/}
-              <TableCell>Criterion</TableCell>
-              <TableCell>Objective</TableCell>
-              <TableCell>Frequency</TableCell>
-              <TableCell>To Do</TableCell>
-              <TableCell>Web Frequency</TableCell>
-              <TableCell>LL Frequency</TableCell>
-              <TableCell>Cell Frequency</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Object.keys(data.Criterion).map((key, index) => (
-              <TableRow key={index}>
-                {/*<TableCell>{data["Web StratumId"][index]}</TableCell>*/}
-                {/*<TableCell>{data["Web Status"][index]}</TableCell>*/}
-                {/*<TableCell>{data["LL StratumId"][index]}</TableCell>*/}
-                {/*<TableCell>{data["LL Status"][index]}</TableCell>*/}
-                {/*<TableCell>{data["Cell StratumId"][index]}</TableCell>*/}
-                {/*<TableCell>{data["Cell Status"][index]}</TableCell>*/}
-                <TableCell>{data.Criterion[index]}</TableCell>
-                <TableCell>{data.Objective[index]}</TableCell>
-                <TableCell>{data.Frequency[index]}</TableCell>
-                <TableCell>{data['To Do'][index]}</TableCell>
-                <TableCell>{data['Web Frequency'][index]}</TableCell>
-                <TableCell>{data['LL Frequency'][index]}</TableCell>
-                <TableCell>{data['Cell Frequency'][index]}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+      <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
+        {Object.keys(data).length > 0 && (
+          <Table style={{width: "50%", border: '1px solid'}} striped>
+            <thead>
+              <tr>
+                <th scope="col" colSpan="4" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Global</th>
+                <th scope="col" colSpan="3" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Web</th>
+                <th scope="col" colSpan="3" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Landline</th>
+                <th scope="col" colSpan="3" style={{border: '1px solid', background: "lightgrey", textAlign: "center"}}>Cell</th>
+              </tr>
+
+              <tr>
+                {/*<TableCell>Web StratumId</TableCell>*/}
+                {/*<TableCell>Web Status</TableCell>*/}
+                {/*<TableCell>LL StratumId</TableCell>*/}
+                {/*<TableCell>LL Status</TableCell>*/}
+                {/*<TableCell>Cell StratumId</TableCell>*/}
+                {/*<TableCell>Cell Status</TableCell>*/}
+                <th style={{border: '1px solid'}}>Criterion</th>
+                <th style={{border: '1px solid'}}>Objective</th>
+                <th style={{border: '1px solid'}}>Freq</th>
+                <th style={{border: '1px solid'}}>To Do</th>
+                <th style={{border: '1px solid'}}>Obj</th>
+                <th style={{border: '1px solid'}}>Freq</th>
+                <th style={{border: '1px solid'}}>%</th>
+                <th style={{border: '1px solid'}}>Obj</th>
+                <th style={{border: '1px solid'}}>Freq</th>
+                <th style={{border: '1px solid'}}>%</th>
+                <th style={{border: '1px solid'}}>Obj</th>
+                <th style={{border: '1px solid'}}>Freq</th>
+                <th style={{border: '1px solid'}}>%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(data.Criterion).map((key, index) => (
+                <tr key={index}>
+                  {/*<td>{data["Web StratumId"][index]}</td>*/}
+                  {/*<td>{data["Web Status"][index]}</td>*/}
+                  {/*<td>{data["LL StratumId"][index]}</td>*/}
+                  {/*<td>{data["LL Status"][index]}</td>*/}
+                  {/*<td>{data["Cell StratumId"][index]}</td>*/}
+                  {/*<td>{data["Cell Status"][index]}</td>*/}
+                  <td style={{borderLeft: "1px solid"}}>{data.Criterion[index]}</td>
+                  <td>{data.Obj[index]}</td>
+                  <td>{data.Freq[index]}</td>
+                  <td style={{borderRight: "1px solid"}}>{data['To Do'][index]}</td>
+
+                  <td style={{backgroundColor: (data['Web Status'][index] === "Open") ? "lightgreen" : "crimson"}}>{data['W Obj'][index]}</td>
+                  <td
+                  style={{
+                    backgroundColor:
+                      (-1 < data["W Freq"][index] - data["W Obj"][index] && 1 > data["W Freq"][index] - data["W Obj"][index]) ? "lightgreen" :
+                        (-10 < data["W Freq"][index] - data["W Obj"][index] && 10 > data["W Freq"][index] - data["W Obj"][index]) ? "orange" : "crimson"
+                  }}>
+                    {data['W Freq'][index]}
+                  </td>
+                  <td style={{borderRight: "1px solid"}}>{data['W%'][index]}</td>
+
+                  <td style={{backgroundColor: (data['LL Status'][index] === "Open") ? "lightgreen" : "crimson"}}>{data['L Obj'][index]}</td>
+                  <td
+                  style={{
+                    backgroundColor:
+                      (-1 < data["L Freq"][index] - data["L Obj"][index] && 1 > data["L Freq"][index] - data["L Obj"][index]) ? "lightgreen" :
+                        (-10 < data["L Freq"][index] - data["L Obj"][index] && 10 > data["L Freq"][index] - data["L Obj"][index]) ? "orange" : "crimson"
+                  }}>
+                    {data['L Freq'][index]}
+                  </td>
+                  <td style={{borderRight: "1px solid"}}>{data['L%'][index]}</td>
+
+                  <td style={{backgroundColor: (data['Cell Status'][index] === "Open") ? "lightgreen" : "crimson"}}>{data['C Obj'][index]}</td>
+                  <td
+                  style={{
+                    backgroundColor:
+                      (-1 < data["C Freq"][index] - data["C Obj"][index] && 1 > data["C Freq"][index] - data["C Obj"][index]) ? "lightgreen" :
+                        (-10 < data["C Freq"][index] - data["C Obj"][index] && 10 > data["C Freq"][index] - data["C Obj"][index]) ? "orange" : "crimson"
+                  }}>
+                    {data['C Freq'][index]}
+                  </td>
+                  <td style={{borderRight: "1px solid"}}>{data['C%'][index]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
+      </div>
+
     </div>
   )
 }

@@ -108,21 +108,25 @@ class DataManagement(API):
         df2 = self._landline_data
         df3 = self._cell_data
 
+        print(df1.to_string())
+
         d = pd.merge(df1, df2, on=["Criterion"])
         d['Objective'] = d['Objective_x'] + d['Objective_y']
         d['Frequency'] = d['Frequency_x'] + d['Frequency_y']
         d['To Do'] = d["To Do_x"] + d['To Do_y']
         d.rename(columns={
-            'Frequency_x': 'Web Frequency',
-            'Frequency_y': 'LL Frequency',
+            'Frequency_x': 'W Freq',
+            'Frequency_y': 'L Freq',
+            'Objective_x': 'W Obj',
+            'Objective_y': 'L Obj'
         }, inplace=True)
-        d.drop(['Objective_x', 'Objective_y', 'To Do_x', 'To Do_y'], axis=1, inplace=True)
+        d.drop(['To Do_x', 'To Do_y'], axis=1, inplace=True)
 
         d2 = pd.merge(d, df3, on="Criterion")
         d2['Objective'] = d2['Objective_x'] + d2['Objective_y']
         d2['Frequency'] = d2['Frequency_x'] + d2['Frequency_y']
         d2['To Do'] = d2["To Do_x"] + d2['To Do_y']
-        d2.drop(['StratumId_x', 'Status_x', 'StratumId_y', 'Status_y', 'StratumId', 'Status', 'Frequency_x', 'Objective_x', 'Objective_y','To Do_x', 'To Do_y'], axis=1, inplace=True)
+        d2.drop(['StratumId_x', 'StratumId_y', 'StratumId', 'Frequency_x', 'Objective_x','To Do_x', 'To Do_y'], axis=1, inplace=True)
 
         # d2.rename(columns={
         #     "StratumId_x": "Web StratumId",
@@ -134,24 +138,44 @@ class DataManagement(API):
         # }, inplace=True)
 
         d2.rename(columns={
-            'Frequency_y': 'Cell Frequency'
+            'Frequency_y': 'C Freq',
+            'Frequency': 'Freq',
+            'Objective_y': 'C Obj',
+            'Objective': 'Obj',
+            "Status": "Cell Status",
+            "Status_y": "LL Status",
+            "Status_x": "Web Status"
         }, inplace=True)
+
+        d2['W%'] = np.round(d2['W Freq'] * 100 / d2['Freq'], 2)
+        d2['L%'] = np.round(d2['L Freq'] * 100 / d2['Freq'], 2)
+        d2['C%'] = np.round(d2['C Freq'] * 100 / d2['Freq'], 2)
+        # print(d2.to_string())
 
         df = d2[[
             # 'Web StratumId',
-            # 'Web Status',
+            'Web Status',
             # 'LL StratumId',
-            # 'LL Status',
+            'LL Status',
             # 'Cell StratumId',
-            # 'Cell Status',
+            'Cell Status',
             'Criterion',
-            'Objective',
-            'Frequency',
+            'Obj',
+            'Freq',
             'To Do',
-            'Web Frequency',
-            'LL Frequency',
-            'Cell Frequency'
+            'W Obj',
+            'W Freq',
+            'W%',
+            'L Obj',
+            'L Freq',
+            'L%',
+            'C Obj',
+            'C Freq',
+            'C%'
         ]]
+
+
+        # print(df.to_string())
 
         return df
 
