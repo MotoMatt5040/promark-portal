@@ -29,7 +29,7 @@ function Home() {
               <br/>
               &emsp;<a href='/data_processing'>Data Processing</a><br/>
               &emsp;&emsp;<b>New Features:</b><br/>
-              &emsp;&emsp;&emsp;UNCLE data extraction task is now auto created when 'Download' button is pressed. The 'Checkboxes' butten deletes the extraction task.<br/>
+              &emsp;&emsp;&emsp;UNCLE data extraction task is now auto created when 'Download' button is pressed. The 'Checkboxes' button deletes the extraction task.<br/>
               <br/>
               &emsp;<a href='/global_quotas'>Global Quota Module</a><br/>
               &emsp;&emsp;<b>New Features:</b><br/>
