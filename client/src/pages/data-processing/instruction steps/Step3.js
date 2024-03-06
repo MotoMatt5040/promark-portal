@@ -6,7 +6,7 @@ import React from "react";
 export default function Step3() {
   return (
     <Accordion.Item eventKey="2">
-      <Accordion.Header>Step 3:  Enter Survey ID and Project Number</Accordion.Header>
+      <Accordion.Header>Step 3:  Enter Survey ID</Accordion.Header>
       <Accordion.Body>
         <p>
           Finding Survey ID: <i>Note: This can only be done while in the Surveys section.</i><br />

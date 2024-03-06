@@ -7,6 +7,7 @@ export default function Step5() {
       <Accordion.Header>Step 5: Click Download</Accordion.Header>
       <Accordion.Body>
         <p>
+          <i>Note: This will automatically create an UNCLE extraction task based off of your <b>order</b> extraction task</i><br/>
           Download the zip file and copy the files into the following directories: <br/>
           &ensp;<b>[DATABASE]</b><br/>
           &emsp;<b>layout.csv</b><br/>
