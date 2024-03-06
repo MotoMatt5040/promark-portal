@@ -216,7 +216,7 @@ function DataProcessing() {
                     ) : (
                       questions.map((question ,i) => (
                         <tr key={i}>
-                          <td>{question}</td>
+                          <td style={{verticalAlign: 'middle'}}>{question}</td>
                           <td>
                             <Checkbox
                               type="checkbox"

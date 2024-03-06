@@ -11,8 +11,7 @@ class QueryBuilder:
         self._projectIDAllClause = ''
 
     def periodic_update_query(self) -> str:
-        print(self._projectIDAllClause, ": ALL CLAUSE")
-        return \
+        return  \
             f"SELECT {self._projectIDAllClause}{self._locationAllClause}tblCC3EMployeeList.EID, LastName + ', ' + FirstName AS MyName, " \
             f"Tenure, HRS, CMS, IntAVG AS IntAL, CPH, " \
             "MPH, PauseTime, ConnectTime, CodeQty AS TotalDials, NAAM " \

@@ -21,9 +21,9 @@ def data_processing():
 def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
+
     reader.request_data()
     questions = reader.get_order()
-
     return questions
 
 
@@ -45,6 +45,7 @@ def download():
         return _build_cors_preflight_response()
     sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
     return sendfile
+
 
 @data_processor.route("/data_processing/survey_name", methods=['POST', 'OPTIONS'])
 def survey_name():

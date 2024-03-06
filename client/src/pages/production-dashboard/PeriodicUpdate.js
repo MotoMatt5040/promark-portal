@@ -233,9 +233,9 @@ export default function PeriodicUpdate() {
               ))}
             </tbody>
           </Table>
-        ) : (
+        ) : productionSummaryIsOpen ? (
           <p>Loading...</p>
-        )
+        ) : null
       }
       <div style={{display: 'flex', width: "100%", justifyContent: 'right'}}>
         {/*<Button onClick={toggle} >{tableButton}</Button>*/}

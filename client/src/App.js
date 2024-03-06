@@ -9,6 +9,7 @@ import DataProcessing from "./pages/data-processing/DataProcessing";
 import ProductionReport from "./pages/production-dashboard/ProductionReport";
 import PeriodicUpdate from "./pages/production-dashboard/PeriodicUpdate";
 import Register from "./pages/auth/Register";
+import Quotas from "./pages/global-quota-module/Quotas"
 
 function App() {
   // const [session , setSession] = useState();
@@ -42,9 +43,10 @@ function App() {
           <Route index element={<Home/>}/>
           <Route path="home" element={<Home/>}/>
           {/*<Route path="/home" element={<Home />} />*/}
-          <Route path="data_processing" element={<DataProcessing />}/>
-          <Route path="production_report" element={<ProductionReport />}/>
-          <Route path="periodic_update" element={<PeriodicUpdate />}/>
+          <Route path="data_processing" element={<DataProcessing />} />
+          <Route path="production_report" element={<ProductionReport />} />
+          <Route path="periodic_update" element={<PeriodicUpdate />} />
+          <Route path="global_quotas" element={<Quotas />} />
           <Route path="register" element={<Register />}/>
         </Routes>
       </main>

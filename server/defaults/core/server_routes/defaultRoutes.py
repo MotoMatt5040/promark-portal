@@ -7,11 +7,13 @@ from .config import ApplicationConfig
 from .config import allowed_domain
 from .dataProcessingRoutes import data_processor
 from .periodicUpdateRoutes import periodic_update
+from .quotaManagementModuleRoutes import quotas
 from ..auth.models import db, User
 
 app = Flask(__name__)
 app.register_blueprint(periodic_update)
 app.register_blueprint(data_processor)
+app.register_blueprint(quotas)
 CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition"])
 app.config.from_object(ApplicationConfig)
 

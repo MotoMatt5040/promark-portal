@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import zipfile
 
@@ -150,35 +151,19 @@ class AcuityData(AcuityAPI):
 
     def __init__(self):
         super().__init__()
-        self.__variables = None
-        self.__questions = None
-        self.__extraction_task = None
-        self.__extraction_id = None
-        self.__extraction_file_id = None
+        self._variables = None
+        self._questions = None
+        self._extraction_task = None
+        self._order_extraction_id = None
+        self._dat_extraction_id = None
+        self._prc_id = None
+        self._dat_extraction_id = None
         self.sid = None
-        self.__xfile = [
-            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
-        ]
-        self.__builder = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
-        }
-        self.__layout = {
-            'Table': [np.nan, np.nan, np.nan, np.nan],
-            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
-            'Start': [1, 11, 19, 27],
-            'End': [10, 18, 26, 31],
-            'Width': [
-                len(self.__xfile[1][0]),
-                len(self.__xfile[1][1]),
-                len(self.__xfile[1][2]),
-                len(self.__xfile[1][3])],
-            'Description': ['', '', '', '']
-        }
+        self._dat_id = None
 
     def get_survey_name(self):
         survey_name = requests.get(self.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
+        self._prc_id = survey_name[:survey_name.find(' ')]
         return survey_name
 
     def set_sid(self, sid):
@@ -188,47 +173,63 @@ class AcuityData(AcuityAPI):
     def set_skips(self, skips):
         self.SKIP_TABLE = skips
 
-    def request_data(self):
+    def order_data(self):
         if os.path.exists('order.csv'):
             os.remove('order.csv')
 
-        self.__extraction_task = requests.get(self.extraction_task_url, headers={"Authorization": f"Client {self._access_token}"}).json()
+        if self.order_extraction_id is None:
+            return False
 
-        for items in self.__extraction_task['Extractions']:
-            if items["Name"] == "order":
-                self.extraction_id = items["ExtractionId"]
+        order_extraction_file_id_req = requests.get(self.order_extraction_res_url, headers={"Authorization": f"Client {self._access_token}"}).json()
 
-        if self.extraction_id is None:
-            return 'order dne'
+        self.order_url = order_extraction_file_id_req["FileId"]
+        self._order_extraction_id = None
 
-        extraction_file_id_req = requests.get(self.extraction_res_url, headers={"Authorization": f"Client {self._access_token}"}).json()
-
-        self.order_url = extraction_file_id_req["FileId"]
-        self.extraction_id = None
-
+        # this returns a .zip file
         order_req = requests.get(self.order_url, headers={"Authorization": f"Client {self._access_token}"})
+
         if order_req.ok:
             z = zipfile.ZipFile(io.BytesIO(order_req.content))
             z.extract("order.csv")
             z.close()
 
+    def request_data(self):
+
+        self._dat_id = f"{self._prc_id}dat"
+        self._extraction_task = requests.get(self.extraction_task_url,
+                                             headers={"Authorization": f"Client {self._access_token}"}).json()
+        for items in self._extraction_task['Extractions']:
+            match items["Name"].lower():
+                case "order":
+                    self.order_extraction_id = items["ExtractionId"]
+                case 'testdat':
+                    self.dat_extraction_id = items["ExtractionId"]
+                    requests.delete(self.dat_extraction_res_url,
+                                    headers={"Authorization": f"Client {self._access_token}"})
+                case _:
+                    continue
+        self.order_data()
+
     def question_names(self):
-        self.__variables = requests.get(
+        self._variables = requests.get(
             self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
         __name = []
-        for item in self.__variables:
+        skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
+        for item in self._variables:
+            if item['Name'] in skips or "FIL1" in item["Name"] or "FIL2" in item["Name"]:
+                continue
             __name.append(item["Name"])
         return __name
 
     def blocks(self):
         __blocks = []
-        for __item in self.__variables:
+        for __item in self._variables:
             __blocks.append(__item)
         return __blocks
 
     def data(self):
         self.question_names()
-        self.__questions = requests.get(
+        self._questions = requests.get(
             self.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
         __data = {}
         for __block in self.blocks():
@@ -348,7 +349,7 @@ class AcuityData(AcuityAPI):
     def fills_skips(self):
         __fills = {}
         __skip = {}
-        for __block in self.__questions['blocks']:
+        for __block in self._questions['blocks']:
             for __item in __block['questions']:
                 try:
                     __item['name'] = __item['name'].replace("II", "")
@@ -371,9 +372,9 @@ class AcuityData(AcuityAPI):
             if __key not in data:
                 del __data[__key]
 
-        order = self.order()
-        self.xfile_layout(__data, order)
-        for __qname in order:
+        self._order = self.order()
+        self.xfile_layout(__data, self._order)
+        for __qname in self._order:
             maxchoice = __data[__qname]['maxchoice']
             codewidth = __data[__qname]['codewidth']
             __data[__qname]['startcolumn'] = __column
@@ -422,6 +423,26 @@ class AcuityData(AcuityAPI):
         return __data
 
     def xfile_layout(self, data, order):
+        self.__xfile = [
+            ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            ['xxxxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', 'xxxxx']
+        ]
+        self.__builder = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)']
+        }
+        self.__layout = {
+            'Table': [np.nan, np.nan, np.nan, np.nan],
+            'Field': ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)'],
+            'Start': [1, 11, 19, 27],
+            'End': [10, 18, 26, 31],
+            'Width': [
+                len(self.__xfile[1][0]),
+                len(self.__xfile[1][1]),
+                len(self.__xfile[1][2]),
+                len(self.__xfile[1][3])],
+            'Description': ['', '', '', '']
+        }
         __data = data
         __table = 1
         __column = 32
@@ -467,3 +488,53 @@ class AcuityData(AcuityAPI):
         xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
         layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
         builder.to_excel('builder.xlsx', index=False)
+
+    def build_extraction_task(self):
+
+        header = {
+
+            "Authorization": f"Client {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        dest = f"{self._prc_id}dat"
+        v = ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)', ]
+        for item in self._order:
+            v.append(item)
+        dat = json.dumps({
+            "Name": dest,
+            "SurveyId": self.sid,
+            "Language": "en",
+            "Description": "Used to extract data for UNCLE",
+            "DestinationFileName": dest,
+            "ExtractFormat": "CSV",
+            "Filter": {
+                "DispositionResults": [
+                    "Completed"
+                ]
+            },
+            "IncludeOpenEnds": False,  # Stating False is redundant in all cases below this line
+            "IncludeConnectionHistory": False,
+            "IncludeLabels": False,
+            "StripHtmlFromLabels": True,
+            "FieldDelimiter": "Comma",
+            "Encoding": "Windows1252",
+            "EncloseValuesInDoubleQuotes": False,
+            "IncludeHeader": True,
+            "UseChoiceLabels": False,
+            "MergeOpenEnds": False,
+            "DichotomizedMultiple": False,
+            "DichotomizedEmptyWhenNoAnswer": False,
+            "UseNegativeIntegersForEmptyAnswers": False,
+            "DapresyDataFormat": False,
+            "LoopsInQuestionnaireOrder": False,
+            "RemoveBracesOfSystemVariables": True,
+            "Variables": v
+        })
+        requests.post(
+            f"{os.environ['extraction_url']}",
+            headers=header,
+            data=dat
+        )
+
+        "419 76552 76627"
+
