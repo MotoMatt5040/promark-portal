@@ -108,7 +108,7 @@ class DataManagement(API):
         df2 = self._landline_data
         df3 = self._cell_data
 
-        print(df1.to_string())
+        # print(df1.to_string())
 
         d = pd.merge(df1, df2, on=["Criterion"])
         d['Objective'] = d['Objective_x'] + d['Objective_y']

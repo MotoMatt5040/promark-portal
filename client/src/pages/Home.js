@@ -34,6 +34,7 @@ function Home() {
               &emsp;<a href='/global_quotas'>Global Quota Module</a><br/>
               &emsp;&emsp;<b>New Features:</b><br/>
               &emsp;&emsp;&emsp;Input survey ID fields to output a table with merged quota data.<br/>
+              &emsp;&emsp;&emsp;Stylized data table for quick viewing and data highlights<br/>
             </p>
             {/*<button className="btn btn-outline-secondary" type="button">Example button</button>*/}
           </div>
