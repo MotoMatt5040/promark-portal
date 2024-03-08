@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session, make_response
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
+from flask_login import LoginManager, current_user
 
 from .config import ApplicationConfig
 from .config import allowed_domain
@@ -11,7 +12,9 @@ from .quotaManagementModuleRoutes import quotas
 from ..auth.models import db, User
 
 app = Flask(__name__)
-app.register_blueprint(periodic_update)
+login_manager = LoginManager()
+login_manager.init_app(app)
+app.register_blueprint(periodic_update)  # This is used to allow the routes to be in other files
 app.register_blueprint(data_processor)
 app.register_blueprint(quotas)
 CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition"])
@@ -20,6 +23,11 @@ app.config.from_object(ApplicationConfig)
 bcrypt = Bcrypt(app)
 server_session = Session(app)
 db.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 @app.route('/home', methods=['GET', 'POST', 'OPTIONS'])
@@ -81,6 +89,8 @@ def login():
         return _build_cors_preflight_response()
     # response = make_response()
     # response.set_cookie("session", )
+    # form = LoginForm()
+    # if form.validate_on_submit
 
     email = request.json['email']
     password = request.json['password']
