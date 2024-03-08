@@ -31,8 +31,6 @@ class QueryBuilder:
             f"WHERE {self._projectidclause3} Code = 'TD'{self._locationClause} " \
             f"ORDER BY CMS DESC "
 
-    '-----setters-----'
-
     @property
     def location(self):
         return self._location
