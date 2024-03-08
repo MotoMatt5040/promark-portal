@@ -22,6 +22,8 @@ def survey_quotas():
     dm.source = source
 
     match source:
+        case 'com':
+            dm.com_sid = sid
         case 'web':
             dm.web_sid = sid
         case 'landline':
@@ -31,7 +33,7 @@ def survey_quotas():
         case _:
             return {}
 
-    data = dm.clean_names()
+    data = dm.set_data()
 
     return data.to_json()
 
@@ -58,6 +60,8 @@ def survey_name():
     dm.source = source
 
     match source:
+        case 'com':
+            dm.com_sid = sid
         case 'web':
             dm.web_sid = sid
         case 'landline':
