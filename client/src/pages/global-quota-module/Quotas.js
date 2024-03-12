@@ -333,12 +333,6 @@ function Quotas() {
             <tbody>
               {Object.keys(data.Criterion).map((key, index) => (
                 <tr key={index}>
-                  {/*<td>{data["Web StratumId"][index]}</td>*/}
-                  {/*<td>{data["Web Status"][index]}</td>*/}
-                  {/*<td>{data["LL StratumId"][index]}</td>*/}
-                  {/*<td>{data["LL Status"][index]}</td>*/}
-                  {/*<td>{data["Cell StratumId"][index]}</td>*/}
-                  {/*<td>{data["Cell Status"][index]}</td>*/}
                   <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
                   <td>{data['COM Objective'][index]}</td>
                   <td>{data['COM Frequency'][index]}</td>
