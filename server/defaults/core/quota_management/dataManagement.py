@@ -169,117 +169,22 @@ class DataManagement(API):
         df_web = self._web_data
         df_ll = self._landline_data
         df_cell = self._cell_data
-        # df = df_com
-
-        # for item in df_com['Criterion']:
-        #     print(item)
-        # df['web test'] = df_web['Web Frequency'].where(df['Criterion'] == df_web['Criterion'])
-        # print(df.to_string())
-
         res = pd.merge(df_com, df_web, how='left', on='Criterion')
-        # print(res.to_string())
-
-
         df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
-        # df_com_web['Frequency'] = df_com_web['Frequency_y']
-        # df_com_web['To Do'] = df_com_web['To Do_y']
-        # df_com_web.rename(columns={
-        #     'StratumId_x': 'COM StratumID',
-        #     'Status_x': 'COM Status',
-        #     'Frequency_x': 'Freq',
-        #     'Objective_x': 'Obj',
-        #     'To Do_x': 'COM To Do',
-        #
-        #     'StratumId_y': 'Web StratumID',
-        #     'Status_y': 'Web Status',
-        #     'Frequency_y': 'W Freq',
-        #     'Objective_y': 'W Obj',
-        #     'To Do_y': 'Web To Do'
-        # }, inplace=True)
-        # df_com_web.drop(['Frequency_x', 'To Do_x', 'To Do_y'], axis=1, inplace=True)
-
-        # print(df_comweb.to_string())
 
         df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
 
-        # print(df_cw_ll.to_string())
-
-        # df_cw_ll['Frequency'] = df_cw_ll['Frequency_x'] + df_cw_ll['Frequency_y']
-        # df_cw_ll['To Do'] = df_cw_ll["To Do_x"] + df_cw_ll['To Do_y']
-        # df_cw_ll.rename(columns={
-        #     'Frequency_x': 'W Freq',
-        #     'Frequency_y': 'L Freq',
-        #     'Objective': 'L Obj',
-        #     'Objective_y': 'L Obj'
-        # }, inplace=True)
-        # df_cw_ll.drop(['To Do_x', 'To Do_y'], axis=1, inplace=True)
-
-        # print(df_cwll.to_string())
-
         df_cwlc = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
-        # print(df_cwlc.to_string())
-        # d2['Objective'] = d2['Objective_x'] + d2['Objective_y']
-        # d2['Frequency'] = d2['Frequency_x'] + d2['Frequency_y']
-        # d2['To Do'] = d2["To Do_x"] + d2['To Do_y']
-        # d2.drop(['StratumId_x', 'StratumId_y', 'StratumId', 'Frequency_x', 'Objective_x','To Do_x', 'To Do_y'], axis=1, inplace=True)
-        #
-        # # d2.rename(columns={
-        # #     "StratumId_x": "Web StratumId",
-        # #     "Status_x": "Web Status",
-        # #     "StratumId_y": "LL StratumId",
-        # #     "Status_y": "LL Status",
-        # #     "StratumId": "Cell StratumId",
-        # #     "Status": "Cell Status"
-        # # }, inplace=True)
-        #
-        # d2.rename(columns={
-        #     'Frequency_y': 'C Freq',
-        #     'Frequency': 'Freq',
-        #     'Objective_y': 'C Obj',
-        #     'Objective': 'Obj',
-        #     "Status": "Cell Status",
-        #     "Status_y": "LL Status",
-        #     "Status_x": "Web Status"
-        # }, inplace=True)
-        #
-        # d2['W%'] = np.round(d2['W Freq'] * 100 / d2['Freq'], 2)
-        # d2['L%'] = np.round(d2['L Freq'] * 100 / d2['Freq'], 2)
-        # d2['C%'] = np.round(d2['C Freq'] * 100 / d2['Freq'], 2)
-        # # print(d2.to_string())
-        #
-        # df = d2[[
-        #     # 'Web StratumId',
-        #     'Web Status',
-        #     # 'LL StratumId',
-        #     'LL Status',
-        #     # 'Cell StratumId',
-        #     'Cell Status',
-        #     'Criterion',
-        #     'Obj',
-        #     'Freq',
-        #     'To Do',
-        #     'W Obj',
-        #     'W Freq',
-        #     'W%',
-        #     'L Obj',
-        #     'L Freq',
-        #     'L%',
-        #     'C Obj',
-        #     'C Freq',
-        #     'C%'
-        # ]]
 
-        # print(df.to_string())
 
         df_cwlc['W%'] = np.round(df_cwlc['Web Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
         df_cwlc['L%'] = np.round(df_cwlc['LL Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
         df_cwlc['C%'] = np.round(df_cwlc['Cell Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
-        # for column in df_cwlc.columns:
-        #     print(column)
+
 
         self.reset()
 
-        return df
+        return df_cwlc
 
     @property
     def source(self):
