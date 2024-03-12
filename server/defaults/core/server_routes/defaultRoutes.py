@@ -104,10 +104,6 @@ def login():
 
     session["user_id"] = user.id
 
-    print('\n')
-    print(session)
-    print('\n')
-
 
     return jsonify({
         "id": user.id,
