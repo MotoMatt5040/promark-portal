@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import {Link, NavLink} from "react-router-dom";
+
 const Header = (props) => {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
@@ -20,6 +20,12 @@ const Header = (props) => {
             </NavDropdown>
             <Nav.Link href="data_processing">Data Processing</Nav.Link>
             <Nav.Link href="global_quotas">Global Quota Module</Nav.Link>
+            <NavDropdown title="Profile" id="profile">
+              <NavDropdown.Item href="settings">Settings</NavDropdown.Item>
+              <NavDropdown.Item href="https://www.promarkresearch.com/privacy-policy/">Privacy Policy</NavDropdown.Item>
+              <div style={{borderBottom: "1px solid lightgrey", margin: "5px"}}></div>
+              <NavDropdown.Item href="logout">Logout</NavDropdown.Item>
+            </NavDropdown>
           </Nav>
         </Navbar.Collapse>
       </Container>
