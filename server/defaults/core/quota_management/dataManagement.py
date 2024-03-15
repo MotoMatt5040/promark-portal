@@ -169,18 +169,14 @@ class DataManagement(API):
         df_web = self._web_data
         df_ll = self._landline_data
         df_cell = self._cell_data
-        res = pd.merge(df_com, df_web, how='left', on='Criterion')
+
         df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
-
         df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
-
         df_cwlc = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
-
 
         df_cwlc['W%'] = np.round(df_cwlc['Web Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
         df_cwlc['L%'] = np.round(df_cwlc['LL Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
         df_cwlc['C%'] = np.round(df_cwlc['Cell Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
-
 
         self.reset()
 
