@@ -10,44 +10,53 @@ import ProductionReport from "./pages/production-dashboard/ProductionReport";
 import PeriodicUpdate from "./pages/production-dashboard/PeriodicUpdate";
 import Register from "./pages/auth/Register";
 import Quotas from "./pages/global-quota-module/Quotas"
+import Logout from "./pages/auth/Logout";
+import Profile from "./pages/profile/Profile";
+import Settings from "./pages/profile/Settings";
 
 function App() {
-  // const [session , setSession] = useState();
-  // const [user, setUser] = useState({id: '', email: ''});
-  // //
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const response = await axios.get("/@me");
-  //       setUser(response.data);
-  //       console.log(response.data, response.data.id)
-  //       setSession((response.data.id))
-  //       console.log('user authorized')
-  //     } catch (error) {
-  //       console.log("Not Authenticated");
-  //       console.log(error);
-  //     }
-  //   })();
-  // }, [setUser]);
+  const [session , setSession] = useState();
+  const [user, setUser] = useState({id: '', email: ''});
+  const [authenticated, setAuthenticated] = useState(false)
   //
-  // if(!session) {
-  //   return <Login setSession={setSession} />;
-  // }
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get("/@me");
+        setUser(response.data);
+        console.log(response.data, response.data.id)
+        setSession((response.data.id))
+        setAuthenticated(true)
+        console.log('user authorized')
+      } catch (error) {
+        setAuthenticated(false)
+        console.log("Not Authenticated");
+        console.log(error);
+      }
+    })();
+  }, [setUser]);
+
+  if(!session) {
+    return <Login setSession={setSession} />;
+  }
 
 
   return (
     <BrowserRouter>
       <main>
-        <Header title="React Navbar Component"/>
+        {session && <Header title="React Navbar Component" />}
         <Routes>
           <Route index element={<Home/>}/>
           <Route path="home" element={<Home/>}/>
           {/*<Route path="/home" element={<Home />} />*/}
-          <Route path="data_processing" element={<DataProcessing />} />
-          <Route path="production_report" element={<ProductionReport />} />
-          <Route path="periodic_update" element={<PeriodicUpdate />} />
-          <Route path="global_quotas" element={<Quotas />} />
-          <Route path="register" element={<Register />}/>
+          <Route path="data_processing" element={<DataProcessing/>}/>
+          <Route path="production_report" element={<ProductionReport/>} />
+          <Route path="periodic_update" element={<PeriodicUpdate/>}/>
+          <Route path="global_quotas" element={<Quotas/>}/>
+          <Route path="register" element={<Register/>}/>
+          <Route path="logout" element={<Logout/>}/>
+          <Route path="profile" element={<Profile/>}/>
+          <Route path="Settings" element={<Settings/>}/>
         </Routes>
       </main>
     </BrowserRouter>
