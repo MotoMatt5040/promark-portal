@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, make_response
+from flask import Flask, request, jsonify, session, make_response, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
@@ -10,6 +10,7 @@ from .dataProcessingRoutes import data_processor
 from .periodicUpdateRoutes import periodic_update
 from .quotaManagementModuleRoutes import quotas
 from ..auth.models import db, User
+from..auth.authorization import Authorization
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -30,6 +31,13 @@ def load_user(user_id):
     return User.get(user_id)
 
 
+@app.route('/')
+def index():
+    if 'username' in session:
+        return f'Logged in as {session["username"]}'
+    return 'You are not logged in'
+
+
 @app.route('/home', methods=['GET', 'POST', 'OPTIONS'])
 def home():
     """App home page"""
@@ -42,20 +50,31 @@ def home():
 def get_current_user():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    user_id = session.get("user_id")
-    print('\nsession ')
-    print(session)
-    print('\nuser id ')
-    print(user_id)
+    # user_id = session.get("username")
+    # print('\nsession ')
+    # print(session)
+    # print('\nuser id ')
+    # print(user_id)
 
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
+    # if not user_id:
+    #     return jsonify({"error": "Unauthorized"}), 401
+    #
+    # user = User.query.filter_by(id=user_id).first()
+    #
+    # return jsonify({
+    #     "id": user.id,
+    #     "email": user.email
+    # })
 
-    user = User.query.filter_by(id=user_id).first()
-
+    try:
+        if not Authorization(username=session['username']).isValid():
+            # print(session['username'], 'invalid')
+            return flash('Invalid credentials')
+    except:
+        return jsonify({"error": "Invalid credentials"}, 401)
     return jsonify({
-        "id": user.id,
-        "email": user.email
+        'id': 's1099',
+        'email': session['username']
     })
 
 
@@ -92,23 +111,53 @@ def login():
     # form = LoginForm()
     # if form.validate_on_submit
 
-    email = request.json['email']
-    password = request.json['password']
+    if request.method == 'POST':
+        session['username'] = request.json['email']
+        password = request.json['password']
+        session.pop('_flashes', None)
+        if not Authorization(username=session['username'], password=password).isValid():
+            # print(session['username'], password, 'invalid')
+            return flash('Invalid credentials')
+        flash('Login successful')
+        # print('session id:', session)
+        return redirect(url_for('index'))
 
-    user = User.query.filter_by(email=email).first()
-    if user is None:
-        return jsonify({"error": "Unauthorized"}), 401
 
-    if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"error": "Unauthorized"}), 401
+    # email = request.json['email']
+    # password = request.json['password']
+    #
+    # user = User.query.filter_by(email=email).first()
+    # if user is None:
+    #     return jsonify({"error": "Unauthorized"}), 401
+    #
+    # if not bcrypt.check_password_hash(user.password, password):
+    #     return jsonify({"error": "Unauthorized"}), 401
+    #
+    # session["user_id"] = user.id
 
-    session["user_id"] = user.id
+
+    # return jsonify({
+    #     "id": user.id,
+    #     "email": user.email
+    # })
+
+    return []
 
 
-    return jsonify({
-        "id": user.id,
-        "email": user.email
-    })
+@app.route('/logout', methods=["GET"])
+def logout():
+    # print('logout')
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
+    # remove the username from the session if it's there
+    try:
+        session.pop('username')
+        flash("Successfully logged out")
+        # print("logout route: ", session)
+    except:
+        pass
+
+    return redirect(url_for('login'))
 
 
 def _build_cors_preflight_response():
