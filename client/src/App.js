@@ -6,7 +6,6 @@ import Login from "./pages/auth/Login";
 import DataProcessing from "./pages/data-processing/DataProcessing";
 import ProductionReport from "./pages/production-dashboard/ProductionReport";
 import PeriodicUpdate from "./pages/production-dashboard/PeriodicUpdate";
-import Register from "./pages/auth/Register";
 import Quotas from "./pages/global-quota-module/Quotas"
 import Logout from "./pages/auth/Logout";
 import Profile from "./pages/profile/Profile";
@@ -43,7 +42,6 @@ function App() {
           <Route path="logout" element={<Logout/>}/>
           <Route index element={<Home/>}/>
           <Route path="home" element={<Home/>}/>
-          <Route path="register" element={<Register/>}/>
         </Routes>
         <a href="https://www.promarkresearch.com/privacy-policy/" style={{width: '100vw', justifyContent: 'center', position: 'fixed', display: 'flex'}}>Privacy Policy</a>
       </main>
