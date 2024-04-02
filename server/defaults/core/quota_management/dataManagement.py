@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 
 from .api import API
 import pandas as pd
@@ -20,7 +21,6 @@ class DataManagement(API):
 
     def set_data(self):
         df = pd.DataFrame(self.create_layout())
-        # df = pd.DataFrame(data)
         match self.source:
             case "com":
                 self._com_data = df
@@ -35,19 +35,9 @@ class DataManagement(API):
                 self._web_data = pd.DataFrame()
                 self._landline_data = pd.DataFrame()
                 self._cell_data = pd.DataFrame()
-        # df.to_csv(f"{self.source}.csv", encoding='utf-8', index=False)
         return df
 
     def create_layout(self):
-        # output = {
-        #     'StratumId': [],
-        #     'Status': [],
-        #     'Criterion': [],
-        #     'Objective': [],
-        #     'Frequency': [],
-        #     'To Do': []
-        # }
-
         data = self.get_data()
 
         match self.source:  # sift through the data to pull the data we want into a dict
@@ -79,7 +69,11 @@ class DataManagement(API):
                 for item in data:
                     output['Web StratumId'].append(item['StratumId'])
                     output['Web Status'].append(item['Status'])
-                    output['Criterion'].append(item['Criterion'].replace(" AND STYPE>2", ''))  # STYPE is explicit, not needed in our text
+                    output['Criterion'].append(item['Criterion']
+                                               .replace(" AND STYPE>2", '')
+                                               .replace(" AND STYPE=3", '')
+                                               .replace(" AND STYPE=4", '')
+                                               )  # STYPE is explicit, not needed in our text
                     output['Web Objective'].append(item['Objective'])
                     output['Web Frequency'].append(item['Frequency'])
                     output['Web To Do'].append((item['Objective'] - item['Frequency']) if item['Objective'] > 0 else 0)  # i dont know why i did this in this way
@@ -170,9 +164,13 @@ class DataManagement(API):
         df_ll = self._landline_data
         df_cell = self._cell_data
 
-        df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
-        df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
-        df_cwlc = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
+        try:
+            df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
+            df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
+            df_cwlc = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
+        except Exception as err:
+            print(traceback.format_exc())
+            print(err)
 
         df_cwlc['W%'] = np.round(df_cwlc['Web Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
         df_cwlc['L%'] = np.round(df_cwlc['LL Frequency'] * 100 / df_cwlc['COM Frequency'], 2)
