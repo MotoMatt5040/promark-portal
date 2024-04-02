@@ -55,7 +55,8 @@ function Quotas() {
       "/quotas/merge",
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
       })
       .then((response) => {
@@ -69,7 +70,7 @@ function Quotas() {
 
   const checkData = () => {
     console.log(webData, landlineData, cellData);
-    axios.get("/quotas/check")
+    axios.get("/quotas/check", {headers: {'X-Csrftoken': localStorage.getItem('csrftoken')}})
   }
 
   const handleSurveyIDChange = (e) => {
@@ -117,6 +118,7 @@ function Quotas() {
       {
         headers: {
           'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
     })
       .then((response) => {
@@ -169,6 +171,7 @@ function Quotas() {
       {
         headers: {
           'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
     })
       .then((response) => {

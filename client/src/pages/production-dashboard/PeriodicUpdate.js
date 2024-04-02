@@ -66,6 +66,7 @@ export default function PeriodicUpdate() {
     axios.get('/active/locations', {
       headers: {
         'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
       }
     })
     .then((response) => {
@@ -84,6 +85,7 @@ export default function PeriodicUpdate() {
     axios.get('/active/projects', {
       headers: {
         'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
       }
     })
     .then((response) => {
@@ -100,6 +102,7 @@ export default function PeriodicUpdate() {
     axios.get('/project_summary', {
       headers: {
         'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
       }
     })
     .then((response) => {
@@ -119,6 +122,7 @@ export default function PeriodicUpdate() {
       let config = {
           headers: {
             'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
           }
         }
       const response = await axios.post(

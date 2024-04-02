@@ -15,6 +15,12 @@ const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
 
 
+// TODO add tables.txt data to webpage with highlights over potential errors
+// TODO make this new feature editable
+// TODO make all copyable table fields editable (e.g. <col>) for ease of copying
+// TODO create a hierarchy sidebar for DP steps that updates a container with proper steps text/features
+
+
 function DataProcessing() {
 
   const [surveyID, setSurveyID] = useState();
@@ -47,6 +53,7 @@ function DataProcessing() {
       let config = {
           headers: {
             'Content-Type': 'application/json',
+            'X-Csrftoken': localStorage.getItem('csrftoken')
           }
         }
       const response = await axios.post(
@@ -67,7 +74,7 @@ function DataProcessing() {
       } else if (error.response.status === 401) {
         console.error('Invalid Credentials')
       } else {
-        console.error('Login Failed')
+        console.error('Checkboxes Failed')
       }
     }
     setShow(true)
@@ -135,12 +142,13 @@ function DataProcessing() {
     setSurveyIDError(value.length < 3);
     setShow(false)
     if (value.length > 2) {
-      axios.post(
+      await axios.post(
         '/data_processing/survey_name',
         { surveyID: e.target.value },
         {
           headers: {
             'Content-Type': 'application/json',
+            'X-Csrftoken': localStorage.getItem('csrftoken')
           }
       })
       .then((response) => {
@@ -190,6 +198,10 @@ function DataProcessing() {
           </div>
         </div>
         <div style={widgetContainerStyle}>
+          {/*<div id='instruction-navigator' style={instructionNavigatorStyle}>*/}
+          {/*  /!*<Instructions/>*!/*/}
+          {/*  <a href={'#'}>test</a>*/}
+          {/*</div>*/}
           <Instructions/>
           {
           show
@@ -239,6 +251,19 @@ function DataProcessing() {
     )
 }
 export default DataProcessing;
+
+const instructionNavigatorStyle = {
+  display: 'flex',
+  flexDirection: 'row',
+  width: '10%',
+  overflowY: 'auto',
+  position: 'sticky',
+  top: '0px',
+  margin: '0 0 0 0',
+  padding: '0 0 0 0',
+  borderRight: '1px solid lightgrey',
+  backgroundColor: 'white',
+}
 
 const headerStyle = {
   // border: '1px solid green',

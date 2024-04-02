@@ -11,11 +11,15 @@ export default function Logout(){
   })
 
   const handleLogout = async () => {
+    console.log('removing session')
+    localStorage.removeItem("logged_in")
+
     await axios.get(
       "/logout",
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
       })
       .then((response) => {
@@ -24,6 +28,8 @@ export default function Logout(){
       .catch((error) => {
         console.error('Error logging out: ', error);
       });
+    localStorage.removeItem("csrftoken")
+    // delete api.defaults.headers.common['X-CSRFToken'];
   }
 
   return (
