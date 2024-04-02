@@ -1,7 +1,7 @@
 import axios from '../../api/axios';
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -44,6 +44,7 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    console.log('loc: ', window.location.href)
     try {
       var config = {
           headers: {
@@ -67,10 +68,8 @@ function Login() {
         const csrfToken = response.headers['x-csrftoken'];
         axios.defaults.headers.common['X-CSRFToken'] = csrfToken; // Set CSRF token in default api headers
         localStorage.setItem('csrftoken', csrfToken);
-        console.log('token', csrfToken)
-        console.log(axios.defaults.headers);
         localStorage.setItem('logged_in', true);
-        navigate("/home");
+        window.location.href = "/home";
       }
 
     } catch (error) {
