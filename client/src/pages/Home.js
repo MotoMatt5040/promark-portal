@@ -1,20 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useEffect, useState} from "react";
 
 function Home() {
-
-  const [currentData, setData] = useState([{}])
-
-    useEffect(() => {
-        fetch("/home").then(
-            res => res.json()
-        ).then(
-            data => {
-                setData(data)
-                console.log(data, currentData)
-            }
-        )
-    }, )
 
     return (
       <main>
@@ -36,7 +22,6 @@ function Home() {
               &emsp;&emsp;&emsp;Input survey ID fields to output a table with merged quota data.<br/>
               &emsp;&emsp;&emsp;Stylized data table for quick viewing and data highlights<br/>
             </p>
-            {/*<button className="btn btn-outline-secondary" type="button">Example button</button>*/}
           </div>
           Version = {process.env.REACT_APP_VERSION}
         </div>
@@ -46,10 +31,3 @@ function Home() {
 }
 
 export default Home;
-
-// <p>TEST</p>
-//         <form>
-//           <a href="#" id="test">
-//             <button className="btn btn-primary btn-lg">{currentData}</button>
-//           </a>
-//         </form>
