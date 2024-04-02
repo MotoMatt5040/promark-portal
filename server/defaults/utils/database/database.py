@@ -5,10 +5,10 @@ class Database:
     '''Database Accessor'''
     # region constants for server info
 
-    CORESERVER = os.environ.get('coreserver')
-    COREUSER = os.environ.get("coreuser")
-    COREPASSWORD = os.environ.get("corepassword")
-    DATABASE = os.environ.get("portal_database")
+    CORESERVER = os.environ['coreserver']
+    COREUSER = os.environ["coreuser"]
+    COREPASSWORD = os.environ["corepassword"]
+    DATABASE = os.environ["caligula"]
 
     DRIVER = '{ODBC Driver 17 for SQL Server}'
 
