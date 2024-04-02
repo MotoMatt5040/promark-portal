@@ -1,18 +1,25 @@
 import json
 import shutil
 
-from flask import Blueprint, request, make_response, send_file
+from flask import Blueprint, request, make_response, send_file, session
 
 from server.defaults.utils.database.datapuller import DataPuller
 from ..quota_management.dataManagement import DataManagement
 from .config import allowed_domain
+from flask_login import login_required, current_user
 
 quotas = Blueprint('quota_management', __name__)
 dp = DataPuller()
 dm = DataManagement()
 
 
-@quotas.route('/quotas/survey_quotas', methods=['POST', 'OPTIONS'])
+@quotas.before_request
+@login_required
+def permissions():
+    pass
+
+
+@quotas.route('/survey_quotas', methods=['POST', 'OPTIONS'])
 def survey_quotas():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
@@ -38,18 +45,18 @@ def survey_quotas():
     return data.to_json()
 
 
-@quotas.route('/quotas/check', methods=['GET'])
+@quotas.route('/check', methods=['GET'])
 def check():
     dm.merge_data()
     return ''
 
 
-@quotas.route('/quotas/merge', methods=['GET'])
+@quotas.route('/merge', methods=['GET'])
 def merge():
     return dm.merge_data().to_json()
 
 
-@quotas.route('/quotas/survey_name', methods=['POST', 'OPTIONS'])
+@quotas.route('/survey_name', methods=['POST', 'OPTIONS'])
 def survey_name():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
@@ -77,7 +84,7 @@ def survey_name():
 def _build_cors_preflight_response():
     response = make_response()
     response.headers.add('Access-Control-Allow-Origin', allowed_domain)
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-CSRFToken")
     response.headers.add('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response

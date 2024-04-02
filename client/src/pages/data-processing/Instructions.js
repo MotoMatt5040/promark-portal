@@ -14,7 +14,7 @@ import Step11 from "./instruction steps/Step11";
 
 function Instructions() {
   return (
-    <Accordion style={accordionStyle}>
+    <Accordion style={accordionStyle} alwaysOpen>
       <Step1/>
       <Step2/>
       <Step3/>
