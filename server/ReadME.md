@@ -14,3 +14,5 @@ ___
 
 Change from 'testing' for 'dev' or 'prod':</br>
 &emsp;config.py -> server/defaults/core/server_routes/config.py </br>
+&emsp;&esmp;Change allowed_domain
+&emsp;&esmp;Change SESSION_REDIS
