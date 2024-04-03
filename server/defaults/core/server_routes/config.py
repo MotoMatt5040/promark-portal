@@ -29,7 +29,7 @@ class ApplicationConfig:
     SESSION_TYPE = "redis"
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
-    # SESSION_REDIS = redis.from_url("redis://redis:6379")  # FOR PRODUCTION/DEV
+    # SESSION_REDIS = redis.from_url(f"redis://:{os.environ['REDIS_PASS']}@redis:6379")  # FOR PRODUCTION/DEV
     SESSION_REDIS = redis.from_url("redis://localhost:6379")  # FOR TESTING
     SESSION_COOKIE_SAMESITE = 'None'
     SESSION_COOKIE_SECURE = True
