@@ -180,10 +180,9 @@ def login():
     if session.get("csrf_token") is None:
         session['csrf_token'] = csrf_token
     response = make_response(
-        jsonify({
-            'user': session['email'],
-            'report': 'Logged in.'
-        }), 200
+        {'user': session['email'],
+         'report': 'Logged in.'},
+        200
     )
     response.headers['X-Csrftoken'] = csrf_token
 
