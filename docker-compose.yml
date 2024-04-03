@@ -2,12 +2,12 @@ version: '3.1'
 services:
   redis:
     image: redis:7-alpine
-    restart: on-failure
+    restart: always
     environment:
-       SECRET_KEY: /run/secrets/redis-secret
+       REDIS_KEY: ${REDIS_KEY}
     ports:
       - "6379"
-    command: redis-server --save 20 1 --loglevel warning --requirepass SECRET_KEY
+    command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_KEY
     networks:
       - my-network
     secrets:
@@ -15,7 +15,7 @@ services:
   client:
     build: ./client
     container_name: promark-portal-c
-    restart: on-failure
+    restart: always
     ports:
       - "80:3000"
     volumes:
@@ -26,9 +26,9 @@ services:
   flask_server:
     build: ./server
     container_name: flask_server
-    restart: on-failure
+    restart: always
     environment:
-       SECRET_KEY: /run/secrets/redis-secret
+       REDIS_KEY: /run/secrets/redis-secret
     ports:
       - "5000:5000"
     volumes:
