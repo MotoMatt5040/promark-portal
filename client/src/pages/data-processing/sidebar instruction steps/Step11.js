@@ -6,7 +6,7 @@ export default function Step11({ defaultActiveKeys}) {
   return (
     <div style={styleContainer}>
       <h1>Step 11: Banner Setup</h1>
-      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush>
+      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush alwaysOpen>
         <Accordion.Item eventKey="11-1">
           <Accordion.Header>Banner Basics</Accordion.Header>
           <Accordion.Body>

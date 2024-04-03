@@ -15,7 +15,7 @@ export default function Step9({ defaultActiveKeys }) {
         <br/>
         For simplicity sake, every step will begin with the same command <b>-> edit all</b>
       </p>
-      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush>
+      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush alwaysOpen>
         <Accordion.Item eventKey="9-1">
           <Accordion.Header>
             <Tooltip

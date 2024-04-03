@@ -9,11 +9,11 @@ export default function Step8({ defaultActiveKeys }) {
     <div style={styleContainer}>
       <h1>Step 8: Uncle setup</h1>
       <p><i>Note: There are 2 ways to do this. Copying the project from an older file and editing the data, or creating a new file from scratch.</i></p>
-      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush>
+      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush alwaysOpen>
         <Accordion.Item eventKey="8-1">
           <Accordion.Header>Step 1: Options</Accordion.Header>
           <Accordion.Body>
-            <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.child}>
+            <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.child} alwaysOpen>
               <Accordion.Item  eventKey="8-1-1">
                 <Accordion.Header>Copy Uncle file:&nbsp;<i>Recommended for projects with standardized tables and processes (core/os, double weights)</i></Accordion.Header>
                 <Accordion.Body>

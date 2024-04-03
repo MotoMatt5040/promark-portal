@@ -9,7 +9,7 @@ export default function Step10({ defaultActiveKeys}) {
       <p>
         After stubs have been ran, there are some basic checks that need to be made.
       </p>
-      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush>
+      <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.parent} flush alwaysOpen>
         <Accordion.Item eventKey="10-1">
           <Accordion.Header>Check table order</Accordion.Header>
           <Accordion.Body>
@@ -41,7 +41,7 @@ export default function Step10({ defaultActiveKeys}) {
               Questions that have qualifiers need to have the qualifiers checked to verify that the base total for
               that question is equal to what the qualifier total should be.
             </p>
-            <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.child}>
+            <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.child} alwaysOpen>
               <Accordion.Item eventKey="10-3-1">
                 <Accordion.Header>Basic Tables</Accordion.Header>
                 <Accordion.Body>
@@ -83,7 +83,7 @@ export default function Step10({ defaultActiveKeys}) {
         <Accordion.Item eventKey="10-4">
           <Accordion.Header>Segmentation</Accordion.Header>
           <Accordion.Body>
-            <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.child}>
+            <Accordion defaultActiveKey={defaultActiveKeys && defaultActiveKeys.child} alwaysOpen>
               <Accordion.Item eventKey="10-4-1">
                 <Accordion.Header>What is segmentation?</Accordion.Header>
                 <Accordion.Body>
