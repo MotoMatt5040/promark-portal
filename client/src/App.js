@@ -11,9 +11,7 @@ import Logout from "./pages/auth/Logout";
 import Profile from "./pages/profile/Profile";
 import Settings from "./pages/profile/Settings";
 import PrivateRoutes from "./pages/auth/PrivateRoutes";
-import { useState, useEffect } from 'react';
 import AddUser from "./pages/auth/AddUser";
-import DPtest from "./pages/data-processing/DPtest";
 
 function App() {
 
