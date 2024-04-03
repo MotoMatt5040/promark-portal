@@ -13,6 +13,7 @@ import Settings from "./pages/profile/Settings";
 import PrivateRoutes from "./pages/auth/PrivateRoutes";
 import { useState, useEffect } from 'react';
 import AddUser from "./pages/auth/AddUser";
+import DPtest from "./pages/data-processing/DPtest";
 
 function App() {
 
@@ -38,7 +39,7 @@ function App() {
           </Route>
 
           {/*These are routes that can be access regardless of login status*/}
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />}/>
           <Route path="logout" element={<Logout/>}/>
           <Route index element={<Home/>}/>
           <Route path="home" element={<Home/>}/>
