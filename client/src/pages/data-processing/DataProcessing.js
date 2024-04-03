@@ -1,4 +1,3 @@
-// import Button from "react-bootstrap/Button";
 import React, {useEffect, useState} from 'react';
 import Form from "react-bootstrap/Form";
 import axios from "../../api/axios";
@@ -8,7 +7,8 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Table from 'react-bootstrap/Table';
-import Instructions from "./Instructions";
+import Sidebar from "./Sidebar";
+import Step from "./Step";
 
 const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
@@ -26,9 +26,14 @@ function DataProcessing() {
   const [surveyID, setSurveyID] = useState();
   const [isSurveyIDError, setSurveyIDError] = useState(false);
   const [questions, setQuestions] = useState([]);
-  const [show, setShow] = useState(false);
   const [selectedValues, setSelectedValues] = useState({});
   const [surveyName, setSurveyName] = useState('Please enter project info')
+
+  const [selectedSection, setSelectedSection] = useState('create-order');
+
+  const handleSelection = (section) => {
+    setSelectedSection(section);
+  };
 
   const handleCheckboxChange = (question) => {
     setSelectedValues((prevValues) => ({
@@ -66,7 +71,6 @@ function DataProcessing() {
         window.location.href="#"
         console.log('Request sent for data processing')
       }
-        // console.log(JSON.stringify(response));
       setQuestions(JSON.parse(JSON.stringify(response.data)));
     } catch (error) {
       if (!error?.response) {
@@ -77,7 +81,6 @@ function DataProcessing() {
         console.error('Checkboxes Failed')
       }
     }
-    setShow(true)
   };
 
   const handleDownload = async (event) => {
@@ -140,7 +143,7 @@ function DataProcessing() {
     const value = e.target.value;
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
-    setShow(false)
+     setQuestions([])
     if (value.length > 2) {
       await axios.post(
         '/data_processing/survey_name',
@@ -198,71 +201,79 @@ function DataProcessing() {
           </div>
         </div>
         <div style={widgetContainerStyle}>
-          {/*<div id='instruction-navigator' style={instructionNavigatorStyle}>*/}
-          {/*  /!*<Instructions/>*!/*/}
-          {/*  <a href={'#'}>test</a>*/}
-          {/*</div>*/}
-          <Instructions/>
-          {
-          show
-          &&
-          <div style={{margin: "1%"}}>
-            <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
-              <Button onClick={handleDownload}>Download</Button>
+          <div style={styleContainer}>
+            <Sidebar handleSelection={handleSelection}/>
+            <div className='steps-container' style={stepsContainerStyle}>
+              <Step selectedSection={selectedSection}/>
             </div>
-            <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
-              <label><b>Inline Total</b></label>
-              <Checkbox type="checkbox" name="total-style" id="total-style"/>
-            </h4>
-            <div style={checkboxContainerStyle}>
-              <Table style={{width: "100%"}} striped>
-                <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>
-                  <tr>
-                    <th>QNAME</th>
-                    <th>Table</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(typeof questions === 'undefined') ? (
-                      <p>Loading...</p>
-                    ) : (
-                      questions.map((question ,i) => (
-                        <tr key={i}>
-                          <td style={{verticalAlign: 'middle'}}>{question}</td>
-                          <td>
-                            <Checkbox
-                              type="checkbox"
-                              name={question}
-                              id={question}
-                              defaultChecked
-                              onChange={() => handleCheckboxChange(question)}
-                            />
-                          </td>
-                        </tr>
-                      ))
-                  )}
-                </tbody>
-              </Table>
+            <div >
+              <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
+                <Button onClick={handleDownload}>Download</Button>
+              </div>
+              <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+                <label><b>Inline Total</b></label>
+                <Checkbox type="checkbox" name="total-style" id="total-style"/>
+              </h4>
+              <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>
+                <div style={checkboxContainerStyle}>
+                  <Table style={{width: "100%"}} striped>
+                    <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>
+                      <tr>
+                        <th>QNAME</th>
+                        <th>Table</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(typeof questions === 'undefined') ? (
+                          <p>Loading...</p>
+                        ) : (
+                          questions.map((question ,i) => (
+                            <tr key={i}>
+                              <td style={{verticalAlign: 'middle'}}>{question}</td>
+                              <td>
+                                <Checkbox
+                                  type="checkbox"
+                                  name={question}
+                                  id={question}
+                                  defaultChecked
+                                  onChange={() => handleCheckboxChange(question)}
+                                />
+                              </td>
+                            </tr>
+                          ))
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              </div>
+
             </div>
           </div>
-          }
         </div>
       </div>
     )
 }
 export default DataProcessing;
 
-const instructionNavigatorStyle = {
+const styleContainer = {
   display: 'flex',
   flexDirection: 'row',
-  width: '10%',
-  overflowY: 'auto',
-  position: 'sticky',
-  top: '0px',
-  margin: '0 0 0 0',
-  padding: '0 0 0 0',
-  borderRight: '1px solid lightgrey',
-  backgroundColor: 'white',
+  height: '100%',
+  width: '100%',
+  padding: '1%',
+  // border: '1px solid orange',
+  justifyContent: 'space-between',
+}
+
+const stepsContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  minWidth: '40%',
+  height: '100%',
+  overflow: 'auto',
+  flexGrow: '1',
+  padding: "1%",
+  // border: '1px solid lightgrey',
 }
 
 const headerStyle = {
@@ -277,6 +288,7 @@ const headerStyle = {
 const widgetContainerStyle = {
   display: 'flex',
   flexDirection: 'row',
+  // border: '1px solid green'
 }
 
 const formDiv = {
@@ -323,5 +335,6 @@ const formButtons = {
 const checkboxContainerStyle = {
   display: 'block',
   height: '50vh',
-  overflowY: 'scroll'
+  overflowY: 'scroll',
+  // border: '1px solid red',
 }
