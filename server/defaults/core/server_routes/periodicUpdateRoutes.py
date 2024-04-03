@@ -50,7 +50,7 @@ def active_projects():
 def _build_cors_preflight_response():
     response = make_response()
     response.headers.add('Access-Control-Allow-Origin', allowed_domain)
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-CSRFToken")
     response.headers.add('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
