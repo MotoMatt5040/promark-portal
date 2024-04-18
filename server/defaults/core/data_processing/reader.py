@@ -22,7 +22,7 @@ class Reader:
     def request_data(self):
         match self.api.request_data():
             case 'order dne':
-                return 'order.csv could not be found or does not exist'
+                return -1
             case _:
                 return 1
 
@@ -33,7 +33,10 @@ class Reader:
         return self.api.question_names()
 
     def get_order(self):
-        return self.api.order()
+        res = self.api.order()
+        if res == 'order dne':
+            return []
+        return res
 
     def set_data_layout(self, data):
         skip = []
@@ -46,7 +49,7 @@ class Reader:
     def run(self):
 
         data = self.api.data()
-        self.api.build_extraction_task()
+        # self.api.build_extraction_task()
 
         """
         LAYOUT OF CURRENT dictionaries
