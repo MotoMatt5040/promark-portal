@@ -14,7 +14,12 @@ const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
 
-
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Csrftoken': localStorage.getItem('csrftoken')
+  }
+}
 // TODO add tables.txt data to webpage with highlights over potential errors
 // TODO make this new feature editable
 // TODO make all copyable table fields editable (e.g. <col>) for ease of copying
@@ -28,8 +33,8 @@ function DataProcessing() {
   const [questions, setQuestions] = useState([]);
   const [selectedValues, setSelectedValues] = useState({});
   const [surveyName, setSurveyName] = useState('Please enter project info')
-
   const [selectedSection, setSelectedSection] = useState('create-order');
+  const [downloadDisabled, setDownloadDisabled] = useState(true);
 
   const handleSelection = (section) => {
     setSelectedSection(section);
@@ -55,29 +60,30 @@ function DataProcessing() {
   const handleShow = async (event) => {
     event.preventDefault();
     try {
-      let config = {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Csrftoken': localStorage.getItem('csrftoken')
-          }
-        }
       const response = await axios.post(
         DATA_PROCESSING_URL + "/checkboxes",
         { surveyID },
         config
       );
+      // console.log(response)
 
       if (response.status === 200) {
         window.location.href="#"
         console.log('Request sent for data processing')
+        setQuestions(JSON.parse(JSON.stringify(response.data)));
+        setDownloadDisabled(false);
       }
-      setQuestions(JSON.parse(JSON.stringify(response.data)));
+
     } catch (error) {
+      setDownloadDisabled(true);
       if (!error?.response) {
         console.error('No Server Response')
       } else if (error.response.status === 401) {
         console.error('Invalid Credentials')
-      } else {
+      } else if (error.response.status === 404) {
+        alert(error.response.data)
+      }
+      else {
         console.error('Checkboxes Failed')
       }
     }
@@ -86,11 +92,6 @@ function DataProcessing() {
   const handleDownload = async (event) => {
     event.preventDefault();
     try {
-      let config = {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
       console.log("data")
       console.log(selectedValues);
       const response = await axios.post(
@@ -121,6 +122,7 @@ function DataProcessing() {
       responseType: 'blob',
       headers: {
             'Content-Type': 'application/json',
+            'X-Csrftoken': localStorage.getItem('csrftoken')
           }
     })
       .then((obj) => {
@@ -139,8 +141,9 @@ function DataProcessing() {
       .catch(error => console.error(error))
   }
 
-   const handleSurveyIDChange = async (e) => {
+  const handleSurveyIDChange = async (e) => {
     const value = e.target.value;
+    setDownloadDisabled(true);
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
      setQuestions([])
@@ -164,8 +167,26 @@ function DataProcessing() {
     }
   };
 
+  // const getChecklistData = async () => {
+  //   try {
+  //     const survey_n = surveyName.substring(0, surveyName.indexOf(' '));
+  //     const response = await axios.post(
+  //       DATA_PROCESSING_URL + "/checklist/status",
+  //       {surveyID: survey_n},
+  //       config
+  //     );
+  //     if (response.status === 200) {
+  //       setChecklistStatus(response.data)
+  //       console.log(response.data)
+  //     }
+  //   } catch (error) {
+  //     console.error('Checklist Failed')
+  //   }
+  // }
+
     return (
       <div>
+        {/*<Button onClick={getChecklistData}>Checklist</Button>*/}
         <div className='p-4 text-center bg-light' style={headerStyle}>
           <h4>{surveyName}</h4>
           <div className='dp-form' style={formDiv}>
@@ -208,7 +229,7 @@ function DataProcessing() {
             </div>
             <div >
               <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
-                <Button onClick={handleDownload}>Download</Button>
+                <Button onClick={handleDownload} disabled={downloadDisabled}>Download</Button>
               </div>
               <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
                 <label><b>Inline Total</b></label>
@@ -246,7 +267,6 @@ function DataProcessing() {
                   </Table>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
