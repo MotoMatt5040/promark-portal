@@ -31,6 +31,16 @@ class AcuityData(AcuityAPI):
         "SOMEWHAT OPPOSE": {"SUPPORT": [1, 2], "OPPOSE": [3, 4]},
         "STRONGLY OPPOSE": {"SUPPORT": [1, 2], "OPPOSE": [3, 4]},
 
+        "STRONGLY GOVERNMENT RESTRICT ACCESS": {"GOV RESTRICT": [1, 2], "CONS DECISION": [3, 4]},
+        "SOMEWHAT GOVERNMENT RESTRICT ACCESS": {"GOV RESTRICT": [1, 2], "CONS DECISION": [3, 4]},
+        "SOMEWHAT CONSUMERS DECISION": {"GOV RESTRICT": [1, 2], "CONS DECISION": [3, 4]},
+        "STRONGLY CONSUMERS DECISION": {"GOV RESTRICT": [1, 2], "CONS DECISION": [3, 4]},
+
+        "STRONGLY YES": {"YES": [1, 2], "NO": [3, 4]},
+        "SOMEWHAT YES": {"YES": [1, 2], "NO": [3, 4]},
+        "SOMEWHAT NO": {"YES": [1, 2], "NO": [3, 4]},
+        "STRONGLY NO": {"YES": [1, 2], "NO": [3, 4]},
+
         "STRONGLY APPROVE": {"APPROVE": [1, 2], "DISAPPROVE": [3, 4]},
         "SOMEWHAT APPROVE": {"APPROVE": [1, 2], "DISAPPROVE": [3, 4]},
         "SOMEWHAT DISAPPROVE": {"APPROVE": [1, 2], "DISAPPROVE": [3, 4]},
@@ -147,7 +157,7 @@ class AcuityData(AcuityAPI):
         try:
             return list(pd.read_csv("order.csv").columns[4:])
         except:
-            return []
+            return 'order dne'
 
     def __init__(self):
         super().__init__()
@@ -198,9 +208,11 @@ class AcuityData(AcuityAPI):
         self._dat_id = f"{self._prc_id}dat"
         self._extraction_task = requests.get(self.extraction_task_url,
                                              headers={"Authorization": f"Client {self._access_token}"}).json()
+        order = False
         for items in self._extraction_task['Extractions']:
             match items["Name"].lower():
                 case "order":
+                    order = True
                     self.order_extraction_id = items["ExtractionId"]
                 case 'testdat':
                     self.dat_extraction_id = items["ExtractionId"]
@@ -209,6 +221,8 @@ class AcuityData(AcuityAPI):
                 case _:
                     continue
         self.order_data()
+        if order is False:
+            return 'order dne'
 
     def question_names(self):
         self._variables = requests.get(
@@ -490,16 +504,17 @@ class AcuityData(AcuityAPI):
         builder.to_excel('builder.xlsx', index=False)
 
     def build_extraction_task(self):
-
         header = {
 
             "Authorization": f"Client {self.access_token}",
             "Content-Type": "application/json"
         }
         dest = f"{self._prc_id}dat"
-        v = ['CASEID', 'LASTCONNECTIONDATE', 'STARTTIMEOFLASTCONNECTION', 'TOTAL DURATION (SEC)', ]
+        v = ['$Q', 'Last Connection Date', 'Start time of last connection', 'Total Duration (sec.)', ]
         for item in self._order:
             v.append(item)
+        for item in v:
+            print(item)
         dat = json.dumps({
             "Name": dest,
             "SurveyId": self.sid,
