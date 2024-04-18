@@ -140,7 +140,7 @@ class Writer():
         return rows
 
     def rows_inline(self):
-        if self._qname == 'QPARTYID':
+        if self._qname == 'QPARTYID' or self._qname == 'QIDEOLOGY':
             return self.write_rows()
         totals = self.total_rows()
         rows = self.rows_list()
