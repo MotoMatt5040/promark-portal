@@ -38,7 +38,7 @@ export default function Step8({ defaultActiveKeys }) {
           </Accordion.Body>
         </Accordion.Item>
           <Accordion.Item eventKey="8-2">
-            <Accordion.Header>Step 2: Adjust&nbsp;<b>Title</b>&nbsp;and&nbsp;<b>CaseID Position</b></Accordion.Header>
+            <Accordion.Header id="test-id">Step 2: Adjust&nbsp;<b>Title</b>&nbsp;and&nbsp;<b>CaseID Position</b></Accordion.Header>
             <Accordion.Body>
               <p>
                 Open the uncle file (<b>.j</b>) if it is not already open<br/>
