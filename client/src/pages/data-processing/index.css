@@ -1,0 +1,12 @@
+.no-arrow .accordion-button::after {
+  background-image: initial;
+}
+
+.no-arrow .accordion-button:not(.collapsed)::after {
+  background-image: initial;
+}
+
+.--active {
+    background-color: #0d6efd;
+    color: white;
+}
