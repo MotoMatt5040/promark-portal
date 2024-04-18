@@ -6,7 +6,9 @@ from flask_login import login_required, current_user
 from server.defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
 from ..data_processing.reader import Reader
-from ..auth.models import db, User
+from ..auth.models import db, User, DataProcessingChecklist
+
+from datetime import datetime
 
 data_processor = Blueprint('data_process', __name__)
 dp = DataPuller()
@@ -33,7 +35,9 @@ def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    reader.request_data()
+    if reader.request_data() == -1:
+        return make_response('order.csv could not be found or does not exist', 404)
+
     questions = reader.get_order()
     return questions
 
@@ -67,6 +71,261 @@ def survey_name():
     reader.setUrl(survey_id)
 
     return reader.get_survey_name()
+
+
+@data_processor.route("/checklist/status", methods=['GET', 'POST', 'OPTIONS'])
+def checklist():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+    if request.json['surveyID'] is None:
+        return make_response(
+            {"report": "Project ID is required"},
+            401
+        )
+
+    if request.method == "POST":
+        checklist_exists = DataProcessingChecklist.query.filter_by(project_id=request.json['surveyID']).first() is not None
+        if not checklist_exists:
+            new_checklist = DataProcessingChecklist(
+                project_id=request.json['surveyID'],
+                date_created=datetime.now(),
+                created_by=current_user.get_id(),
+                last_updated=None,
+                updated_by=None,
+
+                order_created=False,
+                order_date_created=None,
+                order_created_by=None,
+                order_last_date_updated=None,
+                order_last_updated_by=None,
+
+                directories_created=False,
+                directories_date_created=None,
+                directories_created_by=None,
+                directories_last_date_updated=None,
+                directories_last_updated_by=None,
+
+                files_created=False,
+                files_date_created=None,
+                files_created_by=None,
+                files_last_date_updated=None,
+                files_last_updated_by=None,
+
+                project_created=False,
+                project_date_created=None,
+                project_created_by=None,
+                project_last_date_updated=None,
+                project_last_updated_by=None,
+
+                usort_created=False,
+                usort_date_created=None,
+                usort_created_by=None,
+                usort_last_date_updated=None,
+                usort_last_updated_by=None,
+
+                uncle_created=False,
+                uncle_date_created=None,
+                uncle_created_by=None,
+                uncle_last_date_updated=None,
+                uncle_last_updated_by=None,
+
+                table_cleanup_created=False,
+                table_cleanup_date_created=None,
+                table_cleanup_created_by=None,
+                table_cleanup_last_date_updated=None,
+                table_cleanup_last_updated_by=None,
+
+                stubs_checked_created=False,
+                stubs_checked_date_created=None,
+                stubs_checked_created_by=None,
+                stubs_checked_last_date_updated=None,
+                stubs_checked_last_updated_by=None,
+
+                banners_created=False,
+                banners_date_created=None,
+                banners_created_by=None,
+                banners_last_date_updated=None,
+                banners_last_updated_by=None
+            )
+
+            db.session.add(new_checklist)
+            db.session.commit()
+
+            response = make_response(
+                {"report": "Checklist created successfully"},
+                200
+            )
+            return response
+        data = DataProcessingChecklist.query.filter_by(project_id=request.json['surveyID']).first()
+        response = make_response(
+            {
+                "order": data.order_created,
+                "directories": data.directories_created,
+                "files": data.files_created,
+                "project": data.project_created,
+                "usort": data.usort_created,
+                "uncle": data.uncle_created,
+                "table_cleanup": data.table_cleanup_created,
+                "stubs_checked": data.stubs_checked_created,
+                "banners": data.banners_created
+            },
+            200
+        )
+        return response
+
+    return make_response(
+        {"report": "Checklist already exists"},
+        200
+    )
+
+
+@data_processor.route("/checklist/complete", methods=['POST', 'OPTIONS'])
+def checklist_item_complete():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+    if request.method == "POST":
+        checklist_item = DataProcessingChecklist.query.filter_by(project_id=request.json['surveyID']).first()
+        match request.json['item']:
+            case 'order':
+                if not checklist_item.order_created:
+                    checklist_item.order_date_created = datetime.now()
+                    checklist_item.order_created_by = current_user.get_id()
+                else:
+                    checklist_item.order_last_updated = datetime.now()
+                    checklist_item.order_last_updated_by = current_user.get_id()
+                checklist_item.order_created = True
+            case 'directories':
+                if not checklist_item.directories_created:
+                    checklist_item.directories_date_created = datetime.now()
+                    checklist_item.directories_created_by = current_user.get_id()
+                else:
+                    checklist_item.directories_last_updated = datetime.now()
+                    checklist_item.directories_last_updated_by = current_user.get_id()
+                checklist_item.directories_created = True
+            case 'files':
+                if not checklist_item.files_created:
+                    checklist_item.files_date_created = datetime.now()
+                    checklist_item.files_created_by = current_user.get_id()
+                else:
+                    checklist_item.files_last_updated = datetime.now()
+                    checklist_item.files_last_updated_by = current_user.get_id()
+                checklist_item.files_created = True
+            case 'project':
+                if not checklist_item.project_created:
+                    checklist_item.project_date_created = datetime.now()
+                    checklist_item.project_created_by = current_user.get_id()
+                else:
+                    checklist_item.project_last_updated = datetime.now()
+                    checklist_item.project_last_updated_by = current_user.get_id()
+                checklist_item.project_created = True
+            case 'usort':
+                if not checklist_item.usort_created:
+                    checklist_item.usort_date_created = datetime.now()
+                    checklist_item.usort_created_by = current_user.get_id()
+                else:
+                    checklist_item.usort_last_updated = datetime.now()
+                    checklist_item.usort_last_updated_by = current_user.get_id()
+                checklist_item.usort_created = True
+            case 'uncle':
+                if not checklist_item.uncle_created:
+                    checklist_item.uncle_date_created = datetime.now()
+                    checklist_item.uncle_created_by = current_user.get_id()
+                else:
+                    checklist_item.uncle_last_updated = datetime.now()
+                    checklist_item.uncle_last_updated_by = current_user.get_id()
+                checklist_item.uncle_created = True
+            case 'table_cleanup':
+                if not checklist_item.table_cleanup_created:
+                    checklist_item.table_cleanup_date_created = datetime.now()
+                    checklist_item.table_cleanup_created_by = current_user.get_id()
+                else:
+                    checklist_item.table_cleanup_last_updated = datetime.now()
+                    checklist_item.table_cleanup_last_updated_by = current_user.get_id()
+                checklist_item.table_cleanup_created = True
+            case 'stubs_checked':
+                if not checklist_item.stubs_checked_created:
+                    checklist_item.stubs_checked_date_created = datetime.now()
+                    checklist_item.stubs_checked_created_by = current_user.get_id()
+                else:
+                    checklist_item.stubs_checked_last_updated = datetime.now()
+                    checklist_item.stubs_checked_last_updated_by = current_user.get_id()
+                checklist_item.stubs_checked_created = True
+            case 'banners':
+                if not checklist_item.banners_created:
+                    checklist_item.banners_date_created = datetime.now()
+                    checklist_item.banners_created_by = current_user.get_id()
+                else:
+                    checklist_item.banners_last_updated = datetime.now()
+                    checklist_item.banners_last_updated_by = current_user.get_id()
+                checklist_item.banners_created = True
+
+            case _:
+                return make_response({
+                    'report': 'Invalid checklist item'
+                }), 401
+
+        db.session.commit()
+        return make_response(
+            {'report': 'Checklist item updated to complete successfully'},
+            200
+        )
+
+
+@data_processor.route("/checklist/incomplete", methods=['POST', 'OPTIONS'])
+def checklist_item_incomplete():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+    if request.method == "POST":
+        checklist_item = DataProcessingChecklist.query.filter_by(project_id=request.json['surveyID']).first()
+        match request.json['item']:
+            case 'order':
+                checklist_item.order_created = False
+                checklist_item.order_last_updated = datetime.now()
+                checklist_item.order_last_updated_by = current_user.get_id()
+            case 'directories':
+                checklist_item.directories_created = False
+                checklist_item.directories_last_updated = datetime.now()
+                checklist_item.directories_last_updated_by = current_user.get_id()
+            case 'files':
+                checklist_item.files_created = False
+                checklist_item.files_last_updated = datetime.now()
+                checklist_item.files_last_updated_by = current_user.get_id()
+            case 'project':
+                checklist_item.project_created = False
+                checklist_item.project_last_updated = datetime.now()
+                checklist_item.project_last_updated_by = current_user.get_id()
+            case 'usort':
+                checklist_item.usort_created = False
+                checklist_item.usort_last_updated = datetime.now()
+                checklist_item.usort_last_updated_by = current_user.get_id()
+            case 'uncle':
+                checklist_item.uncle_created = False
+                checklist_item.uncle_last_updated = datetime.now()
+                checklist_item.uncle_last_updated_by = current_user.get_id()
+            case 'table_cleanup':
+                checklist_item.table_cleanup_created = False
+                checklist_item.table_cleanup_last_updated = datetime.now()
+                checklist_item.table_cleanup_last_updated_by = current_user.get_id()
+            case 'stubs_checked':
+                checklist_item.stubs_checked_created = False
+                checklist_item.stubs_checked_last_updated = datetime.now()
+                checklist_item.stubs_checked_last_updated_by = current_user.get_id()
+            case 'banners':
+                checklist_item.banners_created = False
+                checklist_item.banners_last_updated = datetime.now()
+                checklist_item.banners_last_updated_by = current_user.get_id()
+            case _:
+                return make_response({
+                    'report': 'Invalid checklist item'
+                }), 401
+        db.session.commit()
+        return make_response(
+            {'report': 'Checklist item updated to incomplete successfully'},
+            200
+        )
 
 
 def _build_cors_preflight_response():
