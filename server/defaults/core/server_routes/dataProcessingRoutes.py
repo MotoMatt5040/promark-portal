@@ -30,6 +30,14 @@ def data_processing():
     return ''
 
 
+@data_processor.route('/uncle_tables', methods=['GET', 'OPTIONS'])
+def uncle_tables():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+
+
+
 @data_processor.route('/checkboxes', methods=['POST', 'OPTIONS'])
 def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
@@ -51,7 +59,22 @@ def process_data():
 
     shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
 
-    return ''
+    data = []
+    with open("EXTRACTION/UNCLE/tables.txt", 'r') as f:
+        for line in f.readlines():
+            data.append(line.replace('\n', ''))
+
+    print(len(data))
+    for line in data:
+        print(line)
+
+
+    res = make_response(
+        {
+            'tables': data
+        }
+    )
+    return res
 
 
 @data_processor.route("/download", methods=["GET", 'OPTIONS'])
