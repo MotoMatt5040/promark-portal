@@ -7,6 +7,7 @@ db = SQLAlchemy()
 
 class User(db.Model, UserMixin):
     __tablename__ = "tblPortalUsers"
+    
     email = db.Column(db.String(345), primary_key=True, unique=True, nullable=False)
     empid = db.Column(db.String(10), nullable=True)
 
@@ -62,3 +63,20 @@ class User(db.Model, UserMixin):
             "global_quota_module": self.global_quota_module,
             "add_user": self.add_user
         }
+
+
+class DataProcessingTasks(db.Model):
+    __tablename__ = "tblDataProcessingTasks"
+
+    task_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    task = db.Column(db.String(50), nullable=False)
+
+
+class DataProcessingChecklist(db.Model):
+    __tablename__ = "tblDataProcessingChecklist"
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    project_id = db.Column(db.String(50), nullable=False)
+    task_id = db.Column(db.Integer, nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=False)
+    updated_by = db.Column(db.String(50), nullable=False)
