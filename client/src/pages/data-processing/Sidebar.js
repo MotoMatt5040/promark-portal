@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./index.css";
 
 
-export default function Sidebar({ handleSelection}) {
+export default function Sidebar({ handleSelection }) {
 
   const [activeSection, setActiveSection] = useState(null);
   const [checklistStatus, setChecklistStatus] = useState();
