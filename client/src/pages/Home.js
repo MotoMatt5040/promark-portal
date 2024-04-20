@@ -22,6 +22,7 @@ function Home() {
               &emsp;&emsp;&emsp;Input survey ID fields to output a table with merged quota data.<br/>
               &emsp;&emsp;&emsp;Stylized data table for quick viewing and data highlights<br/>
               &emsp;&emsp;&emsp;Disabled download until order.csv is confirmed to exist<br/>
+              &emsp;&emsp;&emsp;Pressing [enter] now proceeds to the checkboxes<br/>
             </p>
           </div>
           Version = {process.env.REACT_APP_VERSION}
