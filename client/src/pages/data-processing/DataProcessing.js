@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import Table from 'react-bootstrap/Table';
 import Sidebar from "./Sidebar";
 import Step from "./Step";
+import UncleTables from "./UncleTables";
 
 const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
@@ -28,13 +29,14 @@ const config = {
 
 function DataProcessing() {
 
-  const [surveyID, setSurveyID] = useState();
+  const [surveyID, setSurveyID] = useState('');
   const [isSurveyIDError, setSurveyIDError] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [selectedValues, setSelectedValues] = useState({});
   const [surveyName, setSurveyName] = useState('Please enter project info')
   const [selectedSection, setSelectedSection] = useState('create-order');
   const [downloadDisabled, setDownloadDisabled] = useState(true);
+  const [uncleTables, setUncleTables] = useState();
 
   const handleSelection = (section) => {
     setSelectedSection(section);
@@ -106,6 +108,8 @@ function DataProcessing() {
       if (response.status === 200) {
         window.location.href="#"
         console.log('Request sent for data processing')
+        setUncleTables(response.data);
+        console.log(uncleTables)
       }
       // console.log(JSON.stringify(response));
     } catch (error) {
@@ -190,7 +194,7 @@ function DataProcessing() {
         <div className='p-4 text-center bg-light' style={headerStyle}>
           <h4>{surveyName}</h4>
           <div className='dp-form' style={formDiv}>
-            <Form
+            <div
               noValidate
               style={formStyle}>
               <div style={formTextBox}>
@@ -212,13 +216,14 @@ function DataProcessing() {
                       required
                       variant="standard"
                     />
+                    <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>
                   </Box>
                 </Form.Group>
               </div>
-              <div style={formButtons}>
-                <Button variant="primary" onClick={handleShow}>Checkboxes</Button>
-              </div>
-            </Form>
+              {/*<div style={formButtons}>*/}
+              {/*  <Button variant="primary" onClick={handleShow}>Checkboxes</Button>*/}
+              {/*</div>*/}
+            </div>
           </div>
         </div>
         <div style={widgetContainerStyle}>
@@ -270,6 +275,7 @@ function DataProcessing() {
             </div>
           </div>
         </div>
+        <UncleTables data={uncleTables}/>
       </div>
     )
 }
