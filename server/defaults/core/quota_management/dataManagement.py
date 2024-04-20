@@ -53,7 +53,8 @@ class DataManagement(API):
                 for item in data:
                     output['COM StratumId'].append(item['Position'])
                     output['COM Status'].append('Open' if item['Status'] == 0 else 'Closed')
-                    output['Criterion'].append(item['Criterion'].replace(" AND STYPE=2", ''))  # STYPE is explicit, not needed in our text
+                    output['Criterion'].append(item['Criterion'].strip())  # STYPE is explicit, not needed in our text
+                    # print(item['Criterion'], item['Criterion'].length())
                     output['COM Objective'].append(item['Quota'])
                     output['COM Frequency'].append(item['Frequence'])
                     output['COM To Do'].append((item['Quota'] - item['Frequence']) if item['Quota'] > 0 else 0)  # i dont know why i did this in this way
@@ -163,6 +164,9 @@ class DataManagement(API):
         df_web = self._web_data
         df_ll = self._landline_data
         df_cell = self._cell_data
+
+        # print(df_com.to_string())
+        # print(df_web.to_string())
 
         try:
             df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
