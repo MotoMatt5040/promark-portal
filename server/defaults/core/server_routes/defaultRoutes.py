@@ -16,7 +16,7 @@ from .config import allowed_domain
 from .dataProcessingRoutes import data_processor
 from .periodicUpdateRoutes import periodic_update
 from .quotaManagementModuleRoutes import quotas
-from ..auth.models import db, User
+from ..auth.models import db, User, DataProcessingTasks
 
 login_manager = LoginManager()
 
@@ -40,7 +40,7 @@ app.register_blueprint(quotas, url_prefix="/quotas")
 
 #  uncomment this to create needed tables from models.py
 with app.app_context():
-    # db.create_all()
+    db.create_all()
 
     admins = ['matt', 'jj', 'wayne', 'test']
     for admin in admins:
@@ -58,6 +58,26 @@ with app.app_context():
                 active_employee=True
             )
             db.session.add(new_user)
+            db.session.commit()
+    tasks = [
+        'Created order.csv',
+        'Created directories',
+        'Created files',
+        'Created project',
+        'Ran USort',
+        'Created UNCLE project',
+        'Cleaned table errors',
+        'Checked stubs',
+        'Created banners'
+    ]
+    for task in tasks:
+        task_exists = DataProcessingTasks.query.filter_by(task=task).first() is not None
+        if not task_exists:
+            new_task = DataProcessingTasks(
+                task_id=tasks.index(task) + 1,
+                task=task
+            )
+            db.session.add(new_task)
             db.session.commit()
 
 
