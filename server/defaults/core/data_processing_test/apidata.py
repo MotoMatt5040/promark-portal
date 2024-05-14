@@ -152,20 +152,37 @@ class VoxcoDataGrabber:
 
         return task_list['Extractions']
 
-    def get_target_task_data(self, extraction_id: int, task_name: str):
-        file_id = requests.get(f"{os.environ['extraction_url']}/{extraction_id}",
-                           headers={"Authorization": f"Client {self._access_token}"}).json()['FileId']
-        print("file id", file_id)
+    def get_target_task_data(self, extraction_id: int, task_name: str) -> list:
+        """
+        Get the target task data from the extraction task url. This value will return False if the task is not found.
+        |
+        Notes
+        -----
+        Two requests are made in this method. The file_id request is used to find the id of the file by using the
+        extraction task id. The second request is used to extract the file from the server.
+        :param extraction_id:
+        :param task_name:
+        :return: list of questions
+        """
+        if os.path.exists(f'{task_name}.csv'):
+            os.remove(f'{task_name}.csv')
+        try:
+            file_id = requests.get(f"{os.environ['extraction_url']}/{extraction_id}",
+                               headers={"Authorization": f"Client {self._access_token}"}).json()['FileId']
+            print("file id", file_id)
 
-        req = requests.get(f"{os.environ['extraction_url']}/file?extractionId={extraction_id}&fileId={file_id}",
-                           headers={"Authorization": f"Client {self._access_token}"})
-        # print(req.json())
-        if req.ok:
-            z = zipfile.ZipFile(io.BytesIO(req.content))
-            z.extract(f"{task_name}.csv")
-            z.close()
-        print('sid', self.sid)
-        return list(pd.read_csv(f"{task_name}.csv").columns[4:])
+            req = requests.get(f"{os.environ['extraction_url']}/file?extractionId={extraction_id}&fileId={file_id}",
+                               headers={"Authorization": f"Client {self._access_token}"})
+            if req.ok:
+                z = zipfile.ZipFile(io.BytesIO(req.content))
+                z.extract(f"{task_name}.csv")
+                z.close()
+        except Exception as err:
+            print(f"Error: {err}")
+            return []
+        checkboxes = list(pd.read_csv(f"{task_name}.csv").columns[4:])
+        os.remove(f'{task_name}.csv')
+        return checkboxes
 
 
     @property
