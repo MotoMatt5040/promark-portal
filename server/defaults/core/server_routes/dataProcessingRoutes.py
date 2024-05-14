@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from server.defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
 from ..data_processing.reader import Reader
+from ..data_processing_test.apidata import VoxcoDataGrabber
 from ..auth.models import db, User, DataProcessingChecklist
 
 from datetime import datetime
@@ -14,6 +15,20 @@ data_processor = Blueprint('data_process', __name__)
 dp = DataPuller()
 
 reader = Reader()
+dg = VoxcoDataGrabber()
+dg.sid = 450
+print(dg.survey_name())
+print(dg.target_task_list())
+
+
+
+# DPApi.sid = 450
+# print(ExtractionTask.sid, 'ext')
+# DPApi.sid = 419
+# print(ExtractionTask.sid, 'ext2')
+# ExtractionTask.sid = 12
+# DPApi.sid = 100
+# print(ExtractionTask.sid, 'ext3')
 
 
 @data_processor.before_request
@@ -25,17 +40,35 @@ def permissions():
             return "Not Authorized"
     pass
 
-@data_processor.route('/', methods=['POST', 'GET', 'OPTIONS'])
-def data_processing():
-    return ''
 
-
-@data_processor.route('/uncle_tables', methods=['GET', 'OPTIONS'])
-def uncle_tables():
+@data_processor.route("/task_list", methods=["POST", "OPTIONS"])
+def task_list():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
 
 
+
+    if request.method == "POST":
+        sid = request.json['surveyID']
+        dg.sid = sid
+
+        tasks = dg.target_task_list()
+        for t in tasks: print(t)
+        return make_response(
+            tasks
+        )
+
+
+@data_processor.route("/survey_name", methods=['POST', 'OPTIONS'])
+def survey_name():
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
+
+    survey_id = request.json['surveyID']
+    # print(survey_id)
+    reader.setUrl(survey_id)
+
+    return reader.get_survey_name()
 
 
 @data_processor.route('/checkboxes', methods=['POST', 'OPTIONS'])
@@ -43,10 +76,16 @@ def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    if reader.request_data() == -1:
-        return make_response('order.csv could not be found or does not exist', 404)
+    # print('ext', request.json['extractionId'])
 
-    questions = reader.get_order()
+    # if reader.request_data() == -1:
+    #     return make_response('order.csv could not be found or does not exist', 404)
+    questions = dg.get_target_task_data(
+        extraction_id=request.json['extractionId'],
+        task_name=request.json['taskName']
+    )
+
+    # questions = reader.get_order()
     return questions
 
 
@@ -64,9 +103,9 @@ def process_data():
         for line in f.readlines():
             data.append(line.replace('\n', ''))
 
-    print(len(data))
-    for line in data:
-        print(line)
+    # print(len(data))
+    # for line in data:
+    #     print(line)
 
 
     res = make_response(
@@ -77,23 +116,23 @@ def process_data():
     return res
 
 
+@data_processor.route('/', methods=['POST', 'GET', 'OPTIONS'])
+def data_processing():
+    return ''
+
+
+@data_processor.route('/uncle_tables', methods=['GET', 'OPTIONS'])
+def uncle_tables():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+
 @data_processor.route("/download", methods=["GET", 'OPTIONS'])
 def download():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
     sendfile = send_file(r"EXTRACTION.zip", as_attachment=True)
     return sendfile
-
-
-@data_processor.route("/survey_name", methods=['POST', 'OPTIONS'])
-def survey_name():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-
-    survey_id = request.json['surveyID']
-    reader.setUrl(survey_id)
-
-    return reader.get_survey_name()
 
 
 @data_processor.route("/checklist/status", methods=['GET', 'POST', 'OPTIONS'])
