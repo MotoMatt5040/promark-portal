@@ -10,6 +10,10 @@ import Table from 'react-bootstrap/Table';
 import Sidebar from "./Sidebar";
 import Step from "./Step";
 import UncleTables from "./UncleTables";
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
@@ -37,6 +41,9 @@ function DataProcessing() {
   const [selectedSection, setSelectedSection] = useState('create-order');
   const [downloadDisabled, setDownloadDisabled] = useState(true);
   const [uncleTables, setUncleTables] = useState();
+  const [taskList, setTaskList] = useState();
+  const [taskName, setTaskName] = useState('');
+  const [extractionId, setExtractionId] = useState('');
 
   const handleSelection = (section) => {
     setSelectedSection(section);
@@ -61,10 +68,11 @@ function DataProcessing() {
 
   const handleShow = async (event) => {
     event.preventDefault();
+
     try {
       const response = await axios.post(
         DATA_PROCESSING_URL + "/checkboxes",
-        { surveyID },
+        { extractionId, taskName },
         config
       );
       // console.log(response)
@@ -151,7 +159,7 @@ function DataProcessing() {
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
      setQuestions([])
-    if (value.length > 2) {
+    if (value.length >= 3) {
       await axios.post(
         '/data_processing/survey_name',
         { surveyID: e.target.value },
@@ -161,13 +169,37 @@ function DataProcessing() {
             'X-Csrftoken': localStorage.getItem('csrftoken')
           }
       })
-      .then((response) => {
+      .then(async (response) => {
         setSurveyName(response.data)
+        try {
+          const resp = await axios.post(
+            DATA_PROCESSING_URL + "/task_list",
+            {surveyID: e.target.value},
+            config
+          );
+          if (resp.status === 200) {
+            setTaskList(resp.data)
+          }
+          console.log(JSON.stringify(resp.data))
+
+        } catch (error) {
+          console.error('Task List Failed')
+        }
       })
       .catch((error) => {
         console.error("Error fetching survey name", error)
         setSurveyName("Invalid Survey ID")
       })
+    }
+  };
+
+  const handleTaskSelectChange = (e: SelectChangeEvent) => {
+    const selectedTaskName = e.target.value;
+    // console.log(selectedTaskId);
+    const selectedTask = taskList.find(task => task.Name === selectedTaskName);
+    if (selectedTask) {
+      setTaskName(selectedTask.Name);
+      setExtractionId(selectedTask.ExtractionId);
     }
   };
 
@@ -216,9 +248,24 @@ function DataProcessing() {
                       required
                       variant="standard"
                     />
+                    <FormControl>
+                      <InputLabel id="task-list-label">Task List</InputLabel>
+                      <Select
+                        labelId="task-list-label"
+                        id="task-list"
+                        label="Task List"
+                        onChange={handleTaskSelectChange}
+                        value={taskName}
+                      >
+                        {taskList && taskList.map((task, index) => (
+                          <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>
                   </Box>
                 </Form.Group>
+                <div>info: {extractionId}</div>
               </div>
               {/*<div style={formButtons}>*/}
               {/*  <Button variant="primary" onClick={handleShow}>Checkboxes</Button>*/}
