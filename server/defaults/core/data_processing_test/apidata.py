@@ -1,7 +1,6 @@
 import os
 from dataclasses import dataclass
 import requests
-import json
 import io
 import zipfile
 import pandas as pd
@@ -119,13 +118,24 @@ class ExtractionData:
         return f"{os.environ['extraction_url']}/{self.extraction_id}"
 
 
+class UncleFile:
+
+    def __init__(self):
+        pass
+
+    def organize(self, data):
+        pass
+
+
 class VoxcoDataGrabber:
     _access_token: str = os.environ['access_token']
     api_data = ApiData()
     extraction_data = ExtractionData()
 
     def __init__(self):
-        pass
+        self._checkboxes = None
+        self._variables = None
+        self._questions = None
 
     def survey_name(self) -> str:
         """
@@ -160,8 +170,8 @@ class VoxcoDataGrabber:
         -----
         Two requests are made in this method. The file_id request is used to find the id of the file by using the
         extraction task id. The second request is used to extract the file from the server.
-        :param extraction_id:
-        :param task_name:
+        :param extraction_id: ID of target extraction task
+        :param task_name: Name of target extraction task
         :return: list of questions
         """
         if os.path.exists(f'{task_name}.csv'):
@@ -169,7 +179,6 @@ class VoxcoDataGrabber:
         try:
             file_id = requests.get(f"{os.environ['extraction_url']}/{extraction_id}",
                                headers={"Authorization": f"Client {self._access_token}"}).json()['FileId']
-            print("file id", file_id)
 
             req = requests.get(f"{os.environ['extraction_url']}/file?extractionId={extraction_id}&fileId={file_id}",
                                headers={"Authorization": f"Client {self._access_token}"})
@@ -180,13 +189,88 @@ class VoxcoDataGrabber:
         except Exception as err:
             print(f"Error: {err}")
             return []
-        checkboxes = list(pd.read_csv(f"{task_name}.csv").columns[4:])
+        self._checkboxes = list(pd.read_csv(f"{task_name}.csv").columns[4:])
         os.remove(f'{task_name}.csv')
-        return checkboxes
+        return self._checkboxes
 
+    def raw_data(self) -> dict:
+        data = {}
+        for block in self.variables:
+            data[block['Name']] = {
+                'question': block['QuestionText'],
+                'text': block['Text'],
+                'choices': {label['Code']: label['Text'] for label in block['Choices']},
+                'qualifier': {
+                    'label': None,
+                    'logic': None
+                },
+                'code_width': block['MaxLength'],
+                'max_choice': block['MaxAnswers'],
+                'rank': True if block['MaxAnswers'] > 1 else False,
+            }
+        return data
 
     @property
-    def sid (self):
+    def variables(self):
+        """
+        Get the variables from the api.
+        |
+        Notes
+        -----
+        This property contains the following data:
+        [
+          {
+            "Id": 0,
+            "Name": "string",
+            "Type": "Discrete",
+            "Text": "string",
+            "HasOpenEnd": true,
+            "DataType": "Text",
+            "MaxAnswers": 0,
+            "MaxLength": 0,
+            "QuestionId": 0,
+            "QuestionName": "string",
+            "QuestionText": "string",
+            "Choices": [
+              {
+                "Code": "string",
+                "Text": "string",
+                "Image": "string",
+                "HasOpenEnd": true,
+                "Visible": true,
+                "Default": true
+              }
+            ]
+          }
+        ]
+        :return: variables
+        """
+        return self._variables
+
+    @variables.setter
+    def variables(self, run):
+        if not run:
+            return
+        response = requests.get(self.api_data.variables_url, headers={"Authorization": f"Client {self._access_token}"}).json()
+        self._variables = self._replace_chars_recursive(response)
+
+    @property
+    def questions(self):
+        return self._questions
+
+    @questions.setter
+    def questions(self, run):
+        if not run:
+            return
+        response = requests.get(self.api_data.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
+        self._questions = self._replace_chars_recursive(response)
+
+    @property
+    def question_names(self):
+        return [item["Name"] for item in self.variables]
+
+    @property
+    def sid(self):
         return SharedVariables.sid
 
     @sid.setter
@@ -196,6 +280,31 @@ class VoxcoDataGrabber:
     @property
     def extraction_id(self):
         return self.extraction_data.extraction_id
+
+    def _replace_chars_recursive(self, data):
+        character_replacement = {
+            "/": "//",
+            "\u2019": "'",
+            "&nbsp;": " ",
+            "&NBSP;": " ",
+            "\u2026": "...",
+            "\u200b": "",
+            "  ": " "
+        }
+        if isinstance(data, str):
+            # If data is a string, replace characters
+            for char, replacement in character_replacement.items():
+                data = data.replace(char, replacement)
+            return data
+        elif isinstance(data, dict):
+            # If data is a dictionary, recursively call this function on each value
+            return {key: self._replace_chars_recursive(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            # If data is a list, recursively call this function on each element
+            return [self._replace_chars_recursive(item) for item in data]
+        else:
+            # If data is neither a string, dictionary, nor list, return it unchanged
+            return data
 
 
 
