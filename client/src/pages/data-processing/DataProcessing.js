@@ -248,6 +248,7 @@ function DataProcessing() {
                       required
                       variant="standard"
                     />
+                    <br/>
                     <FormControl>
                       <InputLabel id="task-list-label">Task List</InputLabel>
                       <Select
@@ -262,10 +263,10 @@ function DataProcessing() {
                         ))}
                       </Select>
                     </FormControl>
+                    <br/>
                     <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>
                   </Box>
                 </Form.Group>
-                <div>info: {extractionId}</div>
               </div>
               {/*<div style={formButtons}>*/}
               {/*  <Button variant="primary" onClick={handleShow}>Checkboxes</Button>*/}
@@ -387,7 +388,7 @@ const formStyle = {
 const formTextBox = {
   // border: '1px solid green',
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: 'column',
   justifyContent: 'space-evenly',
   alignItems: 'center',
   alignContent: 'center',
