@@ -30,7 +30,6 @@ export default function Step1() {
         No further instructions for this task. Please proceed to step 2.
       </p>
     </div>
-
   )
 }
 
