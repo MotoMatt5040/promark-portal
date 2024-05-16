@@ -9,6 +9,8 @@ from ..data_processing.reader import Reader
 from ..data_processing_test.apidata import VoxcoDataGrabber
 from ..auth.models import db, User, DataProcessingChecklist
 
+import json
+
 from datetime import datetime
 
 data_processor = Blueprint('data_process', __name__)
@@ -16,11 +18,6 @@ dp = DataPuller()
 
 reader = Reader()
 dg = VoxcoDataGrabber()
-dg.sid = 450
-print(dg.survey_name())
-print(dg.target_task_list())
-
-
 
 # DPApi.sid = 450
 # print(ExtractionTask.sid, 'ext')
@@ -45,8 +42,6 @@ def permissions():
 def task_list():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
-
-
 
     if request.method == "POST":
         sid = request.json['surveyID']
@@ -86,6 +81,19 @@ def data_processing_questions():
     )
 
     # questions = reader.get_order()
+    'Use True to update the variables and questions properties'
+    dg.variables = True
+    # print(dg.variables)
+    # print(dg.question_names)
+    dg.questions = True
+    # import json
+    # print(json.dumps(dg.variables, indent=4))
+    # print("\n" * 4)
+    # print(json.dumps(dg.questions, indent=4))
+    with open("variables.txt", 'w', encoding='utf-8') as f:
+        json.dump(dg.variables, f, ensure_ascii=False, indent=4)
+    with open("questions.txt", 'w', encoding='utf-8') as f:
+        json.dump(dg.questions, f, ensure_ascii=False, indent=4)
     return questions
 
 
