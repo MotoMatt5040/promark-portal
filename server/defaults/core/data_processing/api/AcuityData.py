@@ -152,13 +152,6 @@ class AcuityData(AcuityAPI):
 
     SKIP_TABLE = []
 
-    @staticmethod
-    def order():
-        try:
-            return list(pd.read_csv("order.csv").columns[4:])
-        except:
-            return 'order dne'
-
     def __init__(self):
         super().__init__()
         self._variables = None
@@ -171,17 +164,34 @@ class AcuityData(AcuityAPI):
         self.sid = None
         self._dat_id = None
 
+    def set_sid(self, sid):
+        self.sid = sid
+        return sid
+
     def get_survey_name(self):
         survey_name = requests.get(self.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
         self._prc_id = survey_name[:survey_name.find(' ')]
         return survey_name
 
-    def set_sid(self, sid):
-        self.sid = sid
-        return sid
-
-    def set_skips(self, skips):
-        self.SKIP_TABLE = skips
+    def request_data(self):
+        self._dat_id = f"{self._prc_id}dat"
+        self._extraction_task = requests.get(self.extraction_task_url,
+                                             headers={"Authorization": f"Client {self._access_token}"}).json()
+        order = False
+        for items in self._extraction_task['Extractions']:
+            match items["Name"].lower():
+                case "order":
+                    order = True
+                    self.order_extraction_id = items["ExtractionId"]
+                case 'testdat':
+                    self.dat_extraction_id = items["ExtractionId"]
+                    requests.delete(self.dat_extraction_res_url,
+                                    headers={"Authorization": f"Client {self._access_token}"})
+                case _:
+                    continue
+        self.order_data()
+        if order is False:
+            return 'order dne'
 
     def order_data(self):
         if os.path.exists('order.csv'):
@@ -203,43 +213,15 @@ class AcuityData(AcuityAPI):
             z.extract("order.csv")
             z.close()
 
-    def request_data(self):
-
-        self._dat_id = f"{self._prc_id}dat"
-        self._extraction_task = requests.get(self.extraction_task_url,
-                                             headers={"Authorization": f"Client {self._access_token}"}).json()
-        order = False
-        for items in self._extraction_task['Extractions']:
-            match items["Name"].lower():
-                case "order":
-                    order = True
-                    self.order_extraction_id = items["ExtractionId"]
-                case 'testdat':
-                    self.dat_extraction_id = items["ExtractionId"]
-                    requests.delete(self.dat_extraction_res_url,
-                                    headers={"Authorization": f"Client {self._access_token}"})
-                case _:
-                    continue
-        self.order_data()
-        if order is False:
+    @staticmethod
+    def order():
+        try:
+            return list(pd.read_csv("order.csv").columns[4:])
+        except:
             return 'order dne'
 
-    def question_names(self):
-        self._variables = requests.get(
-            self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
-        __name = []
-        skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
-        for item in self._variables:
-            if item['Name'] in skips or "FIL1" in item["Name"] or "FIL2" in item["Name"]:
-                continue
-            __name.append(item["Name"])
-        return __name
-
-    def blocks(self):
-        __blocks = []
-        for __item in self._variables:
-            __blocks.append(__item)
-        return __blocks
+    def set_skips(self, skips):
+        self.SKIP_TABLE = skips
 
     def data(self):
         self.question_names()
@@ -301,6 +283,23 @@ class AcuityData(AcuityAPI):
         __data = self.fix_fills_skips(__data)
 
         return __data
+
+    def question_names(self):
+        self._variables = requests.get(
+            self.variables_url,  headers={"Authorization": f"Client {self._access_token}"}).json()
+        __name = []
+        skips = ["RID2", "VEND", "T1", "BATCH", "PRACE", "LRACE", "PARTIAL", "LAGE", "QAGE_1", "ACTAG", "INT99", "QUAL", "T2", "SPEEDER", "SURLEN"]
+        for item in self._variables:
+            if item['Name'] in skips or "FIL1" in item["Name"] or "FIL2" in item["Name"]:
+                continue
+            __name.append(item["Name"])
+        return __name
+
+    def blocks(self):
+        __blocks = []
+        for __item in self._variables:
+            __blocks.append(__item)
+        return __blocks
 
     def fix_fills_skips(self, data):
         __data = data
