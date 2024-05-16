@@ -194,7 +194,13 @@ class VoxcoDataGrabber:
         return self._checkboxes
 
     def raw_data(self) -> dict:
+        """
+        Get the raw data from the api. This is the base organization that is put together from the variables and
+        questions api links. This method restructures the two json files into the dictionary used to organize the data.
+        :return: dict containing the tables data
+        """
         data = {}
+        column_counter = 32
         for block in self.variables:
             data[block['Name']] = {
                 'question': block['QuestionText'],
@@ -206,8 +212,13 @@ class VoxcoDataGrabber:
                 },
                 'code_width': block['MaxLength'],
                 'max_choice': block['MaxAnswers'],
-                'rank': True if block['MaxAnswers'] > 1 else False,
+                'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
+                'start_column': column_counter,
+                'end_column': column_counter + block['MaxAnswers'] * block['MaxLength'] - 1,
+                'rows': [],
+                'totals': None
             }
+            column_counter += block['MaxLength'] + block['MaxAnswers']
         return data
 
     @property
