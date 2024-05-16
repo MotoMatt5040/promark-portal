@@ -94,6 +94,10 @@ def data_processing_questions():
         json.dump(dg.variables, f, ensure_ascii=False, indent=4)
     with open("questions.txt", 'w', encoding='utf-8') as f:
         json.dump(dg.questions, f, ensure_ascii=False, indent=4)
+
+    with open('aw_data.txt', 'w', encoding='utf-8') as f:
+        json.dump(dg.raw_data(), f, ensure_ascii=False, indent=4)
+    print(json.dumps(dg.raw_data(), indent=4))
     return questions
 
 

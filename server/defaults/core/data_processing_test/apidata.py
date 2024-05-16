@@ -202,6 +202,7 @@ class VoxcoDataGrabber:
         data = {}
         column_counter = 32
         for block in self.variables:
+            # do this for only selected block variables. Otherwise, column may have to be calculated later.
             data[block['Name']] = {
                 'question': block['QuestionText'],
                 'text': block['Text'],
