@@ -156,6 +156,8 @@ function DataProcessing() {
   const handleSurveyIDChange = async (e) => {
     const value = e.target.value;
     setDownloadDisabled(true);
+    setTaskName('');
+    setExtractionId('');
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
      setQuestions([])
