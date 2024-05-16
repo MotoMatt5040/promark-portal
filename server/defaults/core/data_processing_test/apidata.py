@@ -114,7 +114,7 @@ class ExtractionData:
     def target_extraction_task_url(self):
         """Get the target task data. This can only be called after setting the extraction id.
         """
-        print(f"{os.environ['extraction_url']}/{self.extraction_id}")
+        # print(f"{os.environ['extraction_url']}/{self.extraction_id}")
         return f"{os.environ['extraction_url']}/{self.extraction_id}"
 
 
@@ -136,6 +136,8 @@ class VoxcoDataGrabber:
         self._checkboxes = None
         self._variables = None
         self._questions = None
+        self._order = None
+        self._raw_data = None
 
     def survey_name(self) -> str:
         """
@@ -189,20 +191,29 @@ class VoxcoDataGrabber:
         except Exception as err:
             print(f"Error: {err}")
             return []
-        self._checkboxes = list(pd.read_csv(f"{task_name}.csv").columns[4:])
+        self._order = pd.read_csv(f"{task_name}.csv")
+        self._checkboxes = [item for item in list(self._order.columns[4:]) if "_M" not in item]
+        self._order = self.order.columns
         os.remove(f'{task_name}.csv')
         return self._checkboxes
 
+    @property
     def raw_data(self) -> dict:
         """
         Get the raw data from the api. This is the base organization that is put together from the variables and
         questions api links. This method restructures the two json files into the dictionary used to organize the data.
         :return: dict containing the tables data
         """
+        return self._raw_data
+
+    def fetch_raw_data(self):
         data = {}
-        column_counter = 32
+        column_counter = 1
+        # for name in self._order:
+        #     print(name)
         for block in self.variables:
             # do this for only selected block variables. Otherwise, column may have to be calculated later.
+            # print(block['Name'])
             data[block['Name']] = {
                 'question': block['QuestionText'],
                 'text': block['Text'],
@@ -213,14 +224,50 @@ class VoxcoDataGrabber:
                 },
                 'code_width': block['MaxLength'],
                 'max_choice': block['MaxAnswers'],
-                'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
-                'start_column': column_counter,
-                'end_column': column_counter + block['MaxAnswers'] * block['MaxLength'] - 1,
-                'rows': [],
-                'totals': None
+                # 'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
+                # 'rows': [],
+                # 'totals': None
             }
-            column_counter += block['MaxLength'] + block['MaxAnswers']
-        return data
+            # if block['Name'] in self._order:
+            #     data[block['Name']]['start_column'] = column_counter
+            #     data[block['Name']]['end_column'] = column_counter + block['MaxAnswers'] * block['MaxLength'] - 1
+            #     column_counter += block['MaxLength'] * block['MaxAnswers']
+        self._raw_data = data
+
+    def restructure(self):
+        restructure = {}
+        column_counter = 1
+        defaults = {
+            "CaseID": 10,
+            "LastConnectionDate": 8,
+            "Starttimeoflastconnection": 8,
+            "TotalDuration(sec.)": 5
+        }
+        for value in defaults:
+            if value not in self._raw_data:
+                self._raw_data[value] = {}
+            self._raw_data[value]['code_width'] = defaults[value]
+
+        for name in self._order:
+            if name in self._raw_data:
+                restructure[name] = self._raw_data[name]
+                restructure[name]['start_column'] = column_counter
+                restructure[name]['end_column'] = column_counter + self._raw_data[name]['code_width'] - 1
+                column_counter += self._raw_data[name]['code_width']
+                self._raw_data[name] = restructure[name]
+            else:
+                temp = name[:name.find('_M')]
+                restructure[temp] = self._raw_data[temp]
+                if 'multi_mentions' not in restructure[temp]:
+                    restructure[temp]['multi_mentions'] = {}
+                restructure[temp]['multi_mentions'][name] = {
+                    'start_column': column_counter,
+                    'end_column': column_counter + self._raw_data[temp]['code_width'] - 1
+                }
+                column_counter += self._raw_data[temp]['code_width']
+                self._raw_data[temp] = restructure[temp]
+
+        return restructure
 
     @property
     def variables(self):
@@ -259,23 +306,50 @@ class VoxcoDataGrabber:
         """
         return self._variables
 
-    @variables.setter
-    def variables(self, run):
-        if not run:
-            return
+    def fetch_variables(self):
+        """
+        Get the variables from the api.
+        |
+        Notes
+        -----
+        This property contains the following data:
+        [
+          {
+            "Id": 0,
+            "Name": "string",
+            "Type": "Discrete",
+            "Text": "string",
+            "HasOpenEnd": true,
+            "DataType": "Text",
+            "MaxAnswers": 0,
+            "MaxLength": 0,
+            "QuestionId": 0,
+            "QuestionName": "string",
+            "QuestionText": "string",
+            "Choices": [
+              {
+                "Code": "string",
+                "Text": "string",
+                "Image": "string",
+                "HasOpenEnd": true,
+                "Visible": true,
+                "Default": true
+              }
+            ]
+          }
+        ]
+        :return: variables
+        """
         response = requests.get(self.api_data.variables_url, headers={"Authorization": f"Client {self._access_token}"}).json()
         self._variables = self._replace_chars_recursive(response)
+
+    def fetch_questions(self):
+        response = requests.get(self.api_data.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
+        self._questions = self._replace_chars_recursive(response)
 
     @property
     def questions(self):
         return self._questions
-
-    @questions.setter
-    def questions(self, run):
-        if not run:
-            return
-        response = requests.get(self.api_data.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
-        self._questions = self._replace_chars_recursive(response)
 
     @property
     def question_names(self):
@@ -293,6 +367,10 @@ class VoxcoDataGrabber:
     def extraction_id(self):
         return self.extraction_data.extraction_id
 
+    @property
+    def order(self):
+        return self._order
+
     def _replace_chars_recursive(self, data):
         character_replacement = {
             "/": "//",
@@ -301,7 +379,9 @@ class VoxcoDataGrabber:
             "&NBSP;": " ",
             "\u2026": "...",
             "\u200b": "",
-            "  ": " "
+            "\u2013": "-",
+            "  ": " ",
+            "\n": " "
         }
         if isinstance(data, str):
             # If data is a string, replace characters
