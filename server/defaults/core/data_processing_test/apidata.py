@@ -114,7 +114,6 @@ class ExtractionData:
     def target_extraction_task_url(self):
         """Get the target task data. This can only be called after setting the extraction id.
         """
-        # print(f"{os.environ['extraction_url']}/{self.extraction_id}")
         return f"{os.environ['extraction_url']}/{self.extraction_id}"
 
 
@@ -138,6 +137,7 @@ class VoxcoDataGrabber:
         self._questions = None
         self._order = None
         self._raw_data = None
+        self._has_fill = {}
 
     def survey_name(self) -> str:
         """
@@ -206,16 +206,41 @@ class VoxcoDataGrabber:
         """
         return self._raw_data
 
-    def fetch_raw_data(self):
+    def fetch_preload(self):
         data = {}
-        column_counter = 1
-        # for name in self._order:
-        #     print(name)
+        for block in self._questions['blocks']:
+            for item in block['questions']:
+                data[item['name']] = {}
+                if 'preLoadActions' in item:
+                    for val in item['preLoadActions']:
+                        condition = val.get('condition')
+                        if condition:
+                            condition = condition.replace('logic:adv;', '')
+                            data[item['name']] = {'condition': condition}
+                        selections = val.get('selections')
+                        if selections:
+                            data[item['name']] = {'selections': selections[0]['value']}
+        return data
+
+
+    def fetch_raw_data(self):
+        data = self.add_default_fields()
+        preload = self.fetch_preload()
+
         for block in self.variables:
+            preload_value = preload.get(block['Name'])
+            # Check if preload value exists and has selections
+            if preload_value and preload_value.get('selections'):
+                text = block['QuestionText']
+                fill_location = text.find("["), text.find("]")
+                fill = text[fill_location[0]:fill_location[1] + 1]
+                question = text.replace(fill, preload_value['selections'])
+            else:
+                question = self.has_fill(block['Name'], block['QuestionText'])
+
             # do this for only selected block variables. Otherwise, column may have to be calculated later.
-            # print(block['Name'])
             data[block['Name']] = {
-                'question': block['QuestionText'],
+                'question': question,
                 'text': block['Text'],
                 'choices': {label['Code']: label['Text'] for label in block['Choices']},
                 'qualifier': {
@@ -224,30 +249,59 @@ class VoxcoDataGrabber:
                 },
                 'code_width': block['MaxLength'],
                 'max_choice': block['MaxAnswers'],
+                'preload': preload.get(block['Name'])
+
+                # 'skip': block['skipLogic'] if 'skipLogic' in block and block['skipLogic'] != "logic:adv;1>0" else None,
                 # 'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
                 # 'rows': [],
                 # 'totals': None
             }
-            # if block['Name'] in self._order:
-            #     data[block['Name']]['start_column'] = column_counter
-            #     data[block['Name']]['end_column'] = column_counter + block['MaxAnswers'] * block['MaxLength'] - 1
-            #     column_counter += block['MaxLength'] * block['MaxAnswers']
+
         self._raw_data = data
+        self.replace_fill()
+
+
+    def has_fill(self, question, text):
+        """
+        Store fill data
+        :param question: Question name
+        :param text: Question text
+        :return: Unmodified question text
+        """
+        # This shouldn't include SEX2, this will only happen if it is included in the dat file
+        if text is None \
+                or question not in self._order \
+                or question.lower() == 'sex2':
+            return
+        if "[" not in text:
+            return
+
+        fill_location = text.find("["), text.find("]")
+        fill_name = text[fill_location[0] + 1:fill_location[1]]
+        fill = text[fill_location[0]:fill_location[1] + 1]
+
+        self._has_fill[question] = {"text": text, "fill": fill, 'fill_name': fill_name}
+        return text
+
+    def replace_fill(self):
+        """
+        replace all fills with the actual text from the fill choices
+        :return: None
+        """
+        try:
+            for question in self._has_fill:
+                self._raw_data[question]['question'] = self._raw_data[question]['question'].\
+                    replace(
+                        self._has_fill[question]['fill'],
+                        self._raw_data[self._has_fill[question]['fill_name']]['choices']["1"]
+                    )
+        except:
+            pass
 
     def restructure(self):
         restructure = {}
         column_counter = 1
-        defaults = {
-            "CaseID": 10,
-            "LastConnectionDate": 8,
-            "Starttimeoflastconnection": 8,
-            "TotalDuration(sec.)": 5
-        }
-        for value in defaults:
-            if value not in self._raw_data:
-                self._raw_data[value] = {}
-            self._raw_data[value]['code_width'] = defaults[value]
-
+        # used to reorganize the data in the proper order and add column info
         for name in self._order:
             if name in self._raw_data:
                 restructure[name] = self._raw_data[name]
@@ -266,8 +320,16 @@ class VoxcoDataGrabber:
                 }
                 column_counter += self._raw_data[temp]['code_width']
                 self._raw_data[temp] = restructure[temp]
-
         return restructure
+
+    def has_table(self, tables):
+        for name, table in tables.items():
+            if table:
+                self._raw_data[name]['table'] = True
+
+    def fetch_logic(self):
+
+        pass
 
     @property
     def variables(self):
@@ -371,6 +433,31 @@ class VoxcoDataGrabber:
     def order(self):
         return self._order
 
+    def add_default_fields(self):
+        defaults = {
+            "CaseID": 10,
+            "LastConnectionDate": 8,
+            "Starttimeoflastconnection": 8,
+            "TotalDuration(sec.)": 5
+        }
+        d = {}
+        for value in defaults:
+            d[value] =  {
+                'question': None,
+                'text': None,
+                'choices': None,
+                'qualifier': {
+                    'label': None,
+                    'logic': None
+                },
+                'code_width': defaults[value],
+                'max_choice': 1,
+                # 'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
+                # 'rows': [],
+                # 'totals': None
+            }
+        return d
+
     def _replace_chars_recursive(self, data):
         character_replacement = {
             "/": "//",
@@ -398,7 +485,13 @@ class VoxcoDataGrabber:
             # If data is neither a string, dictionary, nor list, return it unchanged
             return data
 
-
+    def reset_data(self):
+        self._checkboxes = None
+        self._variables = None
+        self._questions = None
+        self._order = None
+        self._raw_data = None
+        self._has_fill = {}
 
 
 

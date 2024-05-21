@@ -160,7 +160,7 @@ function DataProcessing() {
     setExtractionId('');
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
-     setQuestions([])
+    setQuestions([])
     if (value.length >= 3) {
       await axios.post(
         '/data_processing/survey_name',
@@ -204,6 +204,37 @@ function DataProcessing() {
       setExtractionId(selectedTask.ExtractionId);
     }
   };
+
+  const handleHasTable = async () => {
+     try {
+      console.log("data")
+      console.log(selectedValues);
+      const response = await axios.post(
+      DATA_PROCESSING_URL + "/has_table",
+      {
+        selectedValues,
+        totalStyleChecked: document.getElementById("total-style").checked
+      },
+      config
+      );
+
+      if (response.status === 200) {
+        window.location.href="#"
+        console.log('Request sent for data processing')
+        setUncleTables(response.data);
+        console.log(uncleTables)
+      }
+      // console.log(JSON.stringify(response));
+    } catch (error) {
+       if (!error?.response) {
+        console.error('No Server Response')
+      } else if (error.response.status === 401) {
+        console.error('Invalid Credentials')
+      } else {
+        console.error('Request Failed')
+      }
+    }
+  }
 
   // const getChecklistData = async () => {
   //   try {
@@ -284,6 +315,7 @@ function DataProcessing() {
             </div>
             <div >
               <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
+                <Button onClick={handleHasTable}>Confirm Tables</Button>
                 <Button onClick={handleDownload} disabled={downloadDisabled}>Download</Button>
               </div>
               <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>

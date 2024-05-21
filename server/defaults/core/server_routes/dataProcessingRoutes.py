@@ -1,17 +1,15 @@
+import json
 import shutil
+from datetime import datetime
 
-from flask import Blueprint, request, make_response, send_file, session
+from flask import Blueprint, request, make_response, send_file
 from flask_login import login_required, current_user
 
 from server.defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
+from ..auth.models import db, User, DataProcessingChecklist
 from ..data_processing.reader import Reader
 from ..data_processing_test.apidata import VoxcoDataGrabber
-from ..auth.models import db, User, DataProcessingChecklist
-
-import json
-
-from datetime import datetime
 
 data_processor = Blueprint('data_process', __name__)
 dp = DataPuller()
@@ -48,7 +46,7 @@ def task_list():
         dg.sid = sid
 
         tasks = dg.target_task_list()
-        for t in tasks: print(t)
+        # for t in tasks: print(t)
         return make_response(
             tasks
         )
@@ -62,6 +60,7 @@ def survey_name():
     survey_id = request.json['surveyID']
     # print(survey_id)
     reader.setUrl(survey_id)
+    dg.reset_data()
 
     return reader.get_survey_name()
 
@@ -71,42 +70,52 @@ def data_processing_questions():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    # print('ext', request.json['extractionId'])
-
-    # if reader.request_data() == -1:
-    #     return make_response('order.csv could not be found or does not exist', 404)
     questions = dg.get_target_task_data(
         extraction_id=request.json['extractionId'],
         task_name=request.json['taskName']
     )
+    dg.fetch_variables()
+    dg.fetch_questions()
 
-    # questions = reader.get_order()
-    'Use True to update the variables and questions properties'
-    dg.variables = True
-    # print(dg.variables)
-    # print(dg.question_names)
-    dg.questions = True
-    # import json
-    # print(json.dumps(dg.variables, indent=4))
-    # print("\n" * 4)
-    # print(json.dumps(dg.questions, indent=4))
+    # Used to write data to files for error checking
     with open("variables.txt", 'w', encoding='utf-8') as f:
         json.dump(dg.variables, f, ensure_ascii=False, indent=4)
     with open("questions.txt", 'w', encoding='utf-8') as f:
         json.dump(dg.questions, f, ensure_ascii=False, indent=4)
 
-    with open('aw_data.txt', 'w', encoding='utf-8') as f:
-        json.dump(dg.raw_data(), f, ensure_ascii=False, indent=4)
-    print(json.dumps(dg.raw_data(), indent=4))
+    # dg.fetch_preload()
+
+    dg.fetch_raw_data()
+
     return questions
+
+
+@data_processor.route('/has_table', methods=['POST', 'OPTIONS'])
+def has_table():
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
+
+    dg.has_table(request.json['selectedValues'])
+    # print(json.dumps(dg.restructure(), indent=4))
+
+    # with open('restructure', 'w', encoding='utf-8') as f:
+    #     json.dump(dg.restructure(), f, ensure_ascii=False, indent=4)
+
+    # print(json.dumps(dg.restructure(), indent=4))
+    res = make_response({}, 200)
+    return res
 
 
 @data_processor.route('/questions/process_data', methods=['POST', 'OPTIONS'])
 def process_data():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    reader.set_data_layout(request.json)
-    reader.run()
+
+    dg.has_table(request.json['selectedValues'])
+    # print(json.dumps(dg.raw_data, indent=4))
+
+    # reader.set_data_layout(request.json)
+    # reader.run()
 
     shutil.make_archive("./defaults/core/server_routes/EXTRACTION", "zip", "EXTRACTION")
 
@@ -114,11 +123,6 @@ def process_data():
     with open("EXTRACTION/UNCLE/tables.txt", 'r') as f:
         for line in f.readlines():
             data.append(line.replace('\n', ''))
-
-    # print(len(data))
-    # for line in data:
-    #     print(line)
-
 
     res = make_response(
         {
