@@ -207,14 +207,23 @@ class VoxcoDataGrabber:
         """
         return self._raw_data
 
-    def fetch_preload(self):
+    def fetch_preload(self) -> dict:
+        """
+        Fetch the preload data from the api. This data is used to fill in the blanks for the questions.
+        :return: Dictionary of preload data
+        """
         data = {}
         for block in self._questions['blocks']:
             for item in block['questions']:
                 data[item['name']] = {}
+
+                if 'displayLogic' in item:
+                    data.setdefault(item['name'], {})['display_logic'] = item['displayLogic'].replace('logic:adv;', '')
+
                 if 'preLoadActions' in item:
                     for val in item['preLoadActions']:
                         condition = val.get('condition')
+
                         if condition:
                             condition = condition.replace('logic:adv;', '')
                             data.setdefault(item['name'], {})['condition'] = condition
@@ -224,20 +233,18 @@ class VoxcoDataGrabber:
                             name = selection_variable[0]['name']
                             data.setdefault(name, {})['selection_variable'] = name
 
-                        selections = val.get('selections')
-                        if selections:
-                            # Ensure 'name' is defined before using it as a key
-                            if selection_variable:
+                            selections = val.get('selections')
+                            if selections:
                                 data.setdefault(name, {})['selections'] = selections[0]['value']
 
         return data
 
-
     def fetch_raw_data(self):
         data = self.add_default_fields()
         preload = self.fetch_preload()
-        fills = False
         question = None
+
+        # print(json.dumps(preload, indent=4))
 
         for block in self.variables:
             # Check if preload value exists and has selections
@@ -248,7 +255,7 @@ class VoxcoDataGrabber:
                     fill_name = text[fill_location[0] + 1:fill_location[1]]
                     fill = text[fill_location[0]:fill_location[1] + 1]
                     if preload.get(fill_name):
-                        print(preload[fill_name])
+                        # print(preload[fill_name])
                         if preload[fill_name].get('selections'):
                             question = text.replace(fill, preload[fill_name]['selections'])
                         else:
@@ -275,7 +282,8 @@ class VoxcoDataGrabber:
 
         self._raw_data = data
         self.replace_fill()
-        print(json.dumps(self.final_data, indent=4))
+
+        # print(json.dumps(self.final_data, indent=4))
 
     def has_fill(self, question, text):
         """
