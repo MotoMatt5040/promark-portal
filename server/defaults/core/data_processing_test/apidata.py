@@ -4,6 +4,7 @@ import requests
 import io
 import zipfile
 import pandas as pd
+import json
 
 
 @dataclass(init=False)
@@ -216,27 +217,42 @@ class VoxcoDataGrabber:
                         condition = val.get('condition')
                         if condition:
                             condition = condition.replace('logic:adv;', '')
-                            data[item['name']] = {'condition': condition}
+                            data.setdefault(item['name'], {})['condition'] = condition
+
+                        selection_variable = val.get("selectionVariables")
+                        if selection_variable:
+                            name = selection_variable[0]['name']
+                            data.setdefault(name, {})['selection_variable'] = name
+
                         selections = val.get('selections')
                         if selections:
-                            data[item['name']] = {'selections': selections[0]['value']}
+                            # Ensure 'name' is defined before using it as a key
+                            if selection_variable:
+                                data.setdefault(name, {})['selections'] = selections[0]['value']
+
         return data
 
 
     def fetch_raw_data(self):
         data = self.add_default_fields()
         preload = self.fetch_preload()
+        fills = False
+        question = None
 
         for block in self.variables:
-            preload_value = preload.get(block['Name'])
             # Check if preload value exists and has selections
-            if preload_value and preload_value.get('selections'):
+            if block['QuestionText']:
                 text = block['QuestionText']
-                fill_location = text.find("["), text.find("]")
-                fill = text[fill_location[0]:fill_location[1] + 1]
-                question = text.replace(fill, preload_value['selections'])
-            else:
-                question = self.has_fill(block['Name'], block['QuestionText'])
+                if "[" in text:
+                    fill_location = text.find("["), text.find("]")
+                    fill_name = text[fill_location[0] + 1:fill_location[1]]
+                    fill = text[fill_location[0]:fill_location[1] + 1]
+                    if preload.get(fill_name):
+                        print(preload[fill_name])
+                        if preload[fill_name].get('selections'):
+                            question = text.replace(fill, preload[fill_name]['selections'])
+                        else:
+                            question = self.has_fill(block['Name'], block['QuestionText'])
 
             # do this for only selected block variables. Otherwise, column may have to be calculated later.
             data[block['Name']] = {
@@ -259,7 +275,7 @@ class VoxcoDataGrabber:
 
         self._raw_data = data
         self.replace_fill()
-
+        print(json.dumps(self.final_data, indent=4))
 
     def has_fill(self, question, text):
         """
@@ -273,7 +289,7 @@ class VoxcoDataGrabber:
                 or question not in self._order \
                 or question.lower() == 'sex2':
             return
-        if "[" not in text:
+        if "[" not in text:  # this is a redundant check for safety
             return
 
         fill_location = text.find("["), text.find("]")
@@ -288,15 +304,18 @@ class VoxcoDataGrabber:
         replace all fills with the actual text from the fill choices
         :return: None
         """
-        try:
-            for question in self._has_fill:
+
+        # print(json.dumps(self._has_fill, indent=4))
+        print("\033[93mWarning: apidata.VoxcoDataGrabber.replace_fill() may be deprecated in the future!\033[0m")
+        for question in self._has_fill:
+            try:
                 self._raw_data[question]['question'] = self._raw_data[question]['question'].\
                     replace(
                         self._has_fill[question]['fill'],
                         self._raw_data[self._has_fill[question]['fill_name']]['choices']["1"]
                     )
-        except:
-            pass
+            except:
+                print("Error on: ", question, self._has_fill[question]['fill'], self._raw_data[self._has_fill[question]['fill_name']]['choices'])
 
     def restructure(self):
         restructure = {}
@@ -403,11 +422,11 @@ class VoxcoDataGrabber:
         :return: variables
         """
         response = requests.get(self.api_data.variables_url, headers={"Authorization": f"Client {self._access_token}"}).json()
-        self._variables = self._replace_chars_recursive(response)
+        self._variables = response
 
     def fetch_questions(self):
         response = requests.get(self.api_data.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
-        self._questions = self._replace_chars_recursive(response)
+        self._questions = response
 
     @property
     def questions(self):
@@ -432,6 +451,10 @@ class VoxcoDataGrabber:
     @property
     def order(self):
         return self._order
+
+    @property
+    def final_data(self):
+        return self._replace_chars_recursive(self._raw_data)
 
     def add_default_fields(self):
         defaults = {
@@ -468,7 +491,9 @@ class VoxcoDataGrabber:
             "\u200b": "",
             "\u2013": "-",
             "  ": " ",
-            "\n": " "
+            "\n": " ",
+            "\u201c": '"',
+            "\u201d": '"'
         }
         if isinstance(data, str):
             # If data is a string, replace characters
