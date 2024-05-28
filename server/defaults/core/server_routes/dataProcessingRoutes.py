@@ -16,6 +16,7 @@ dp = DataPuller()
 
 reader = Reader()
 dg = VoxcoDataGrabber()
+print("DATA LAYOUT", json.dumps(dg.layout, indent=4))
 
 # DPApi.sid = 450
 # print(ExtractionTask.sid, 'ext')
@@ -87,6 +88,10 @@ def data_processing_questions():
 
     dg.fetch_raw_data()
 
+    # print(json.dumps(dg.restructure(), indent=4))
+    # print(json.dumps(dg.final_data, indent=4))
+    dg.restructure()
+
     return questions
 
 
@@ -94,14 +99,9 @@ def data_processing_questions():
 def has_table():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-
     dg.has_table(request.json['selectedValues'])
-    # print(json.dumps(dg.restructure(), indent=4))
-
-    # with open('restructure', 'w', encoding='utf-8') as f:
-    #     json.dump(dg.restructure(), f, ensure_ascii=False, indent=4)
-
-    # print(json.dumps(dg.restructure(), indent=4))
+    dg.identify_qualifiers()
+    print(json.dumps(dg.final_data, indent=4))
     res = make_response({}, 200)
     return res
 
@@ -112,6 +112,7 @@ def process_data():
         return _build_cors_preflight_response()
 
     dg.has_table(request.json['selectedValues'])
+    # print(json.dumps(dg.final_data, indent=4))
     # print(json.dumps(dg.raw_data, indent=4))
 
     # reader.set_data_layout(request.json)
