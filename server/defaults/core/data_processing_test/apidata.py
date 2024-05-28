@@ -1,4 +1,5 @@
 import os
+import re
 from dataclasses import dataclass
 import requests
 import io
@@ -32,10 +33,6 @@ class ApiData:
         * Parent Class: SharedVariables
         """
         return SharedVariables.sid
-
-    # @sid.setter
-    # def sid(self, sid):
-    #     SharedVariables.sid = sid
 
     @property
     def survey_name(self):
@@ -72,8 +69,6 @@ class ApiData:
 
 @dataclass(init=False)
 class ExtractionData:
-    # target_task_id: str
-    # target_file_id: str
 
     def __init__(self):
         self._extraction_url = None
@@ -97,10 +92,6 @@ class ExtractionData:
         Get or Set the extraction url.
         """
         return f"{os.environ['extraction_url']}?surveyId={self.sid}"
-
-    # @extraction_url.setter
-    # def extraction_url(self):
-    #     self._extraction_url = f"{os.environ['extraction_url']}?surveyId={self.sid}"
 
     @property
     def extraction_id(self):
@@ -128,6 +119,7 @@ class UncleFile:
 
 
 class VoxcoDataGrabber:
+
     _access_token: str = os.environ['access_token']
     api_data = ApiData()
     extraction_data = ExtractionData()
@@ -139,6 +131,7 @@ class VoxcoDataGrabber:
         self._order = None
         self._raw_data = None
         self._has_fill = {}
+        self._restructure = None
 
     def survey_name(self) -> str:
         """
@@ -237,6 +230,10 @@ class VoxcoDataGrabber:
                             if selections:
                                 data.setdefault(name, {})['selections'] = selections[0]['value']
 
+                        display_logic = val.get('displayLogic')
+                        if display_logic:
+                            data.setdefault(item['name'], {})['display_logic'] = display_logic.replace('logic:adv;', '')
+
         return data
 
     def fetch_raw_data(self):
@@ -244,9 +241,9 @@ class VoxcoDataGrabber:
         preload = self.fetch_preload()
         question = None
 
-        # print(json.dumps(preload, indent=4))
-
         for block in self.variables:
+            to_append = {}
+
             # Check if preload value exists and has selections
             if block['QuestionText']:
                 text = block['QuestionText']
@@ -255,35 +252,34 @@ class VoxcoDataGrabber:
                     fill_name = text[fill_location[0] + 1:fill_location[1]]
                     fill = text[fill_location[0]:fill_location[1] + 1]
                     if preload.get(fill_name):
-                        # print(preload[fill_name])
                         if preload[fill_name].get('selections'):
                             question = text.replace(fill, preload[fill_name]['selections'])
                         else:
                             question = self.has_fill(block['Name'], block['QuestionText'])
 
             # do this for only selected block variables. Otherwise, column may have to be calculated later.
-            data[block['Name']] = {
-                'question': question,
-                'text': block['Text'],
-                'choices': {label['Code']: label['Text'] for label in block['Choices']},
-                'qualifier': {
-                    'label': None,
-                    'logic': None
-                },
-                'code_width': block['MaxLength'],
-                'max_choice': block['MaxAnswers'],
-                'preload': preload.get(block['Name'])
+            if question:
+                to_append['question'] = question
 
-                # 'skip': block['skipLogic'] if 'skipLogic' in block and block['skipLogic'] != "logic:adv;1>0" else None,
-                # 'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
-                # 'rows': [],
-                # 'totals': None
-            }
+            if block['Text']:
+                to_append['text'] = block['Text']
+
+            if block['Choices']:
+                to_append['choices'] = {label['Code']: label['Text'] for label in block['Choices']}
+
+            if block['MaxLength']:
+                to_append['code_width'] = block['MaxLength']
+
+            if block['MaxAnswers']:
+                to_append['max_choice'] = block['MaxAnswers']
+
+            if preload.get(block['Name']):
+                to_append['preload'] = preload.get(block['Name'])
+
+            data[block['Name']] = to_append
 
         self._raw_data = data
         self.replace_fill()
-
-        # print(json.dumps(self.final_data, indent=4))
 
     def has_fill(self, question, text):
         """
@@ -309,10 +305,9 @@ class VoxcoDataGrabber:
 
     def replace_fill(self):
         """
-        replace all fills with the actual text from the fill choices
+        Replace all fills with the actual text from the fill choices
         :return: None
         """
-
         # print(json.dumps(self._has_fill, indent=4))
         print("\033[93mWarning: apidata.VoxcoDataGrabber.replace_fill() may be deprecated in the future!\033[0m")
         for question in self._has_fill:
@@ -327,26 +322,53 @@ class VoxcoDataGrabber:
 
     def restructure(self):
         restructure = {}
-        column_counter = 1
+        start_column = 1
         # used to reorganize the data in the proper order and add column info
-        for name in self._order:
-            if name in self._raw_data:
-                restructure[name] = self._raw_data[name]
-                restructure[name]['start_column'] = column_counter
-                restructure[name]['end_column'] = column_counter + self._raw_data[name]['code_width'] - 1
-                column_counter += self._raw_data[name]['code_width']
-                self._raw_data[name] = restructure[name]
+        prev = None
+        for i, question in enumerate(self._order):
+
+            if question in self._raw_data:
+
+                end_column = start_column + self._raw_data[question]['code_width'] - 1
+                restructure[question] = self._raw_data[question]
+                restructure[question]['start_column'] = start_column
+                if self._raw_data[question]['code_width'] > 1:
+                    restructure[question]['end_column'] = end_column
+                q = question
+
             else:
-                temp = name[:name.find('_M')]
+                temp = question[:question.find('_M')]
+                end_column = start_column + self._raw_data[temp]['code_width'] - 1
                 restructure[temp] = self._raw_data[temp]
+
                 if 'multi_mentions' not in restructure[temp]:
                     restructure[temp]['multi_mentions'] = {}
-                restructure[temp]['multi_mentions'][name] = {
-                    'start_column': column_counter,
-                    'end_column': column_counter + self._raw_data[temp]['code_width'] - 1
+
+                columns = {
+                    'start_column': start_column,
                 }
-                column_counter += self._raw_data[temp]['code_width']
-                self._raw_data[temp] = restructure[temp]
+
+                if self._raw_data[temp]['code_width'] > 1:
+                    columns['end_column'] = end_column
+
+                restructure[temp]['multi_mentions'][question] = columns
+                q = temp
+
+            start_column += self._raw_data[q]['code_width']
+            self._raw_data[q] = restructure[q]
+
+            if "_M" not in question or i == len(self._order) - 1:
+                create_rows_called = False
+                if prev is not None and "_M" in prev:
+                    self.create_rows(prev, multi_mention=True)
+                    create_rows_called = True
+
+                if not create_rows_called:
+                    self.create_rows(q)
+
+            prev = q
+
+        self._restructure = restructure
         return restructure
 
     def has_table(self, tables):
@@ -354,9 +376,103 @@ class VoxcoDataGrabber:
             if table:
                 self._raw_data[name]['table'] = True
 
-    def fetch_logic(self):
+    def identify_qualifiers(self):
+        for question in self._raw_data:
 
-        pass
+            preload = self._raw_data[question].get('preload')
+            if not preload:
+                continue
+
+            logic = preload.get('display_logic')
+            if not logic:
+                continue
+
+            logic = logic.strip()
+
+            # Regular expression to find key-value pairs
+            pattern = r'(\w+)\s*=\s*([^ ]+)'
+
+            # Find all matches in the input string
+            matches = re.findall(pattern, logic)
+
+            result = {}
+            start_column = False
+            label = 'R BASE=='
+            prev = None
+            qual = "Q "
+            for key, value in matches:
+                # Split the value by comma and convert to integers
+                values = [int(v) for v in value.split(',')]
+                start_column = self._raw_data[key].get('start_column')
+                if not start_column:
+                    continue
+                columns = [start_column]
+                end_column = self._raw_data[key].get('end_column')
+
+                if end_column:
+                    columns.append(end_column)
+                    qual += f"R({start_column}:{end_column},"
+                    values_str = ",".join(map(str, values))
+                    qual += values_str + ")"
+                else:
+                    qual += f"{start_column}-{','.join(map(str, values))}"
+
+                qual += " "
+                if prev is not None and prev != key:
+                    label += " AND "
+
+                label += f"{key}="
+                if len(values) > 1:
+                    choice_labels = [f"{choice}" for choice in values]
+                else:
+                    choice_labels = [f"{self._raw_data[key]['choices'][str(choice)]}" for choice in values]
+                label += " OR ".join(choice_labels)
+
+                if start_column:
+                    result[key] = {
+                        'column': columns,
+                        'choice': values,
+                        'label': label,
+                        'qual': qual
+                    }
+
+                prev = key
+
+            if start_column:
+                self._raw_data[question]['qualifiers'] = result
+
+    def create_rows(self, question, multi_mention=False):
+        if self._raw_data[question]['max_choice'] == 1:
+            choices = self._raw_data[question].get('choices')
+            if not choices:
+                return
+
+            start_column = self._raw_data[question]['start_column']
+            end_column = self._raw_data[question].get('end_column')
+            keys = list(choices)
+            rows = []
+
+            def append_special_cases(to_append):
+                special_cases = ["unsure", "refused", "don't know", "no opinion", "other"]
+                if any(case in to_append.lower() for case in special_cases):
+                    to_append += " ;NOR SZR"
+                return to_append
+
+            for choice in choices:
+                if self._raw_data[question]['code_width'] == 1:
+                    to_append = f"R {choices[choice]} ;{start_column}-{choice}"
+                    to_append = append_special_cases(to_append)
+                else:
+                    to_append = f"R {choices[choice]} ;R({start_column}:{end_column},{choice})"
+                    to_append = append_special_cases(to_append)
+                rows.append(to_append)
+
+            if self._raw_data[question]['code_width'] == 1:
+                rows.append(f"R NO ANSWER ;{start_column}N{keys[0]}:{keys[-1]} ;NOR SZR")
+            else:
+                rows.append(f"R NO ANSWER ;NOTR({start_column}:{end_column},{keys[0]}:{keys[-1]}) ;NOR SZR")
+
+            self._raw_data[question]['rows'] = rows
 
     @property
     def variables(self):
@@ -464,6 +580,43 @@ class VoxcoDataGrabber:
     def final_data(self):
         return self._replace_chars_recursive(self._raw_data)
 
+    @property
+    def layout(self):
+        """
+        Used to print the layout of the data structure. Some data is omitted based on specific question needs. Use JSON
+        to print in an easier to read format. Example: print(json.dumps(data, indent=4))
+        :return: dictionary of data
+        """
+        return {
+            "question name": {
+                'question': 'question text',
+                'text': 'series text',
+                'choices': {
+                    'choice number': 'choice text'
+                },
+                'code_width': 'number of columns',
+                'max_choice': 'number of choices',
+                'start_column': 'starting column',
+                'end_column': 'ending column',
+                'preload': {
+                    'display_logic': 'display logic',
+                    'condition': 'condition',
+                    'selection_variable': 'selection variable',
+                    'selections': 'selections'
+                },
+                'qualifiers': {
+                    'qualifier name': {
+                        'column': ['start column', 'end column'],
+                        'choice': ['choice number'],
+                        'label': 'qualifier label',
+                        'qual': 'qualifier'
+                    }
+                },
+                'table': 'boolean',
+                'rows': ['rows']
+            }
+        }
+
     def add_default_fields(self):
         defaults = {
             "CaseID": 10,
@@ -473,19 +626,9 @@ class VoxcoDataGrabber:
         }
         d = {}
         for value in defaults:
-            d[value] =  {
-                'question': None,
-                'text': None,
-                'choices': None,
-                'qualifier': {
-                    'label': None,
-                    'logic': None
-                },
+            d[value] = {
                 'code_width': defaults[value],
                 'max_choice': 1,
-                # 'rank': True if block['MaxAnswers'] > 1 else False,  # we may want to change this to use a checkbox instead.
-                # 'rows': [],
-                # 'totals': None
             }
         return d
 
@@ -525,6 +668,7 @@ class VoxcoDataGrabber:
         self._order = None
         self._raw_data = None
         self._has_fill = {}
+        self._restructure = None
 
 
 
