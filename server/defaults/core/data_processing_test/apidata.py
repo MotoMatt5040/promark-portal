@@ -1,5 +1,6 @@
 import os
 import re
+import traceback
 from dataclasses import dataclass
 import requests
 import io
@@ -183,7 +184,7 @@ class VoxcoDataGrabber:
                 z.extract(f"{task_name}.csv")
                 z.close()
         except Exception as err:
-            print(f"Error: {err}")
+            print(f"Error: {err}", traceback.format_exc())
             return []
         self._order = pd.read_csv(f"{task_name}.csv")
         self._checkboxes = [item for item in list(self._order.columns[4:]) if "_M" not in item]
