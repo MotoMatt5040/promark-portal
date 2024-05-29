@@ -124,6 +124,20 @@ class VoxcoDataGrabber:
     api_data = ApiData()
     extraction_data = ExtractionData()
 
+
+
+    TOTALS = {
+        'strongly support': [],
+        'strongly yes': [],
+        'strongly approve': [],
+        'strongly right direction': [],
+        'strongly agree': [],
+        'much more likely': [],
+        'much better': [],
+        'much more confident': [],
+        'very likely': []
+    }
+
     def __init__(self):
         self._checkboxes = None
         self._variables = None
@@ -360,7 +374,7 @@ class VoxcoDataGrabber:
             if "_M" not in question or i == len(self._order) - 1:
                 create_rows_called = False
                 if prev is not None and "_M" in prev:
-                    self.create_rows(prev, multi_mention=True)
+                    self.create_rows(prev)
                     create_rows_called = True
 
                 if not create_rows_called:
@@ -401,8 +415,19 @@ class VoxcoDataGrabber:
             prev = None
             qual = "Q "
             for key, value in matches:
-                # Split the value by comma and convert to integers
-                values = [int(v) for v in value.split(',')]
+                # Split the value by comma
+                values = value.split(',')
+                int_values = []
+
+                for val in values:
+                    if '-' in val:
+                        # Handle ranges
+                        start, end = val.split('-')
+                        range_values = list(range(int(start), int(end) + 1))
+                        int_values.extend(range_values)
+                    else:
+                        # Handle individual values
+                        int_values.append(int(val))
                 start_column = self._raw_data[key].get('start_column')
                 if not start_column:
                     continue
@@ -412,26 +437,26 @@ class VoxcoDataGrabber:
                 if end_column:
                     columns.append(end_column)
                     qual += f"R({start_column}:{end_column},"
-                    values_str = ",".join(map(str, values))
+                    values_str = ",".join(map(str, int_values))
                     qual += values_str + ")"
                 else:
-                    qual += f"{start_column}-{','.join(map(str, values))}"
+                    qual += f"{start_column}-{','.join(map(str, int_values))}"
 
                 qual += " "
                 if prev is not None and prev != key:
                     label += " AND "
 
                 label += f"{key}="
-                if len(values) > 1:
-                    choice_labels = [f"{choice}" for choice in values]
+                if len(int_values) > 1:
+                    choice_labels = [f"{choice}" for choice in int_values]
                 else:
-                    choice_labels = [f"{self._raw_data[key]['choices'][str(choice)]}" for choice in values]
+                    choice_labels = [f"{self._raw_data[key]['choices'][str(choice)]}" for choice in int_values]
                 label += " OR ".join(choice_labels)
 
                 if start_column:
                     result[key] = {
                         'column': columns,
-                        'choice': values,
+                        'choice': int_values,
                         'label': label,
                         'qual': qual
                     }
@@ -441,7 +466,7 @@ class VoxcoDataGrabber:
             if start_column:
                 self._raw_data[question]['qualifiers'] = result
 
-    def create_rows(self, question, multi_mention=False):
+    def create_rows(self, question):
         if self._raw_data[question]['max_choice'] == 1:
             choices = self._raw_data[question].get('choices')
             if not choices:
@@ -552,6 +577,66 @@ class VoxcoDataGrabber:
         response = requests.get(self.api_data.questions_url, headers={"Authorization": f"Client {self._access_token}"}).json()
         self._questions = response
 
+    def totals(self, question):
+        totals = self._raw_data.get(question)
+
+        if not totals:
+            return
+
+
+        pass
+
+    def partyid(self):
+        partyid = self._raw_data.get('QPARTYID')
+
+        if not partyid:
+            return "QPARTYID not found."
+
+        totals = [
+            "R *D//S (REPUBLICAN - DEMOCRAT) ;NONE ;EX (R3-R5)",
+            f"R &UT- TOTAL REPUBLICAN ;{partyid['start_column']}-1:2",
+            f"R &UT- TOTAL INDEPENDENT ;{partyid['start_column']}-3:5",
+            f"R &UT- TOTAL DEMOCRAT ;{partyid['start_column']}-6:7",
+        ]
+        # This is a list comprehension syntax used to iterate through all the items in the rows list and add indentation
+        partyid['rows'] = [
+            row.replace("R ", "R &AI2 ", 1) if i < 7 else row
+            for i, row in enumerate(partyid['rows'])
+        ]
+
+        # This is a list comprehension syntax. The [::-1] is used to reverse the list so that the items are appended
+        # as they are appended on top of the list. This is done to ensure the order is correct.
+        [partyid['rows'].insert(0, row) for row in totals[::-1]]
+
+        self._raw_data['QPARTYID'] = partyid
+        return partyid
+
+    def ideology(self):
+        ideology = self._raw_data.get('QIDEOLOGY')
+
+        if not ideology:
+            return "QIDEOLOGY not found."
+
+        totals = [
+            "R *D//S (CONSERVATIVE - LIBERAL) ;NONE ;EX (R3-R4)",
+            f"R &UT- TOTAL CONSERVATIVE ;{ideology['start_column']}-1:2",
+            f"R &UT- TOTAL LIBERAL ;{ideology['start_column']}-4:5",
+        ]
+
+        # This is a list comprehension syntax used to iterate through all the items in the rows list and add indentation
+        ideology['rows'] = [
+            row.replace("R ", "R &AI2 ", 1) if i < 5 and i != 2 else row
+            for i, row in enumerate(ideology['rows'])
+        ]
+
+        # This is a list comprehension syntax. The [::-1] is used to reverse the list so that the items are appended
+        # as they are appended on top of the list. This is done to ensure the order is correct.
+        [ideology['rows'].insert(0, row) for row in totals[::-1]]
+
+        self._raw_data['QIDEOLOGY'] = ideology
+        print(json.dumps(ideology, indent=4))
+        return ideology
+
     @property
     def questions(self):
         return self._questions
@@ -576,9 +661,16 @@ class VoxcoDataGrabber:
     def order(self):
         return self._order
 
-    @property
-    def final_data(self):
-        return self._replace_chars_recursive(self._raw_data)
+    # @property
+    # def final_data(self):
+    #     return self._replace_chars_recursive(self._raw_data)
+
+    def clean_data(self):
+        """
+        Removes unwanted characters from the data
+        :return:
+        """
+        self._raw_data = self._replace_chars_recursive(self._raw_data)
 
     @property
     def layout(self):
