@@ -14,6 +14,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import CheckboxForm from "./CheckboxForm";
+import SurveyForm from "./SurveyForm";
 
 const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
@@ -174,112 +176,123 @@ function DataProcessing() {
     setUncleTables(data || []);
   };
 
-    return (
-      <div>
-        <div className='p-4 text-center bg-light' style={headerStyle}>
-          <h4>{surveyName}</h4>
-          <div className='dp-form' style={formDiv}>
-            <div
-              style={formStyle}>
-              <div style={formTextBox}>
-                <Form.Group className="mb-3" controlId="formGroupSruveryId">
-                  <Box
-                    component="form"
-                    sx={{
-                      '& > :not(style)': { m: 1, width: '25ch' },
-                    }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <TextField
-                      error={isSurveyIDError}
-                      autoComplete="off"
-                      onChange={handleSurveyIDChange}
-                      value={surveyID}
-                      label="Acuity Survey ID"
-                      required
-                      variant="standard"
-                    />
-                    <br/>
-                    <FormControl>
-                      <InputLabel id="task-list-label">Task List</InputLabel>
-                      <Select
-                        labelId="task-list-label"
-                        id="task-list"
-                        label="Task List"
-                        onChange={handleTaskSelectChange}
-                        value={taskName}
-                      >
-                        {taskList && taskList.map((task, index) => (
-                          <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <br/>
-                    <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>
-                  </Box>
-                </Form.Group>
-              </div>
-            </div>
-          </div>
+  return (
+    <div>
+      <div className='p-4 text-center bg-light' style={headerStyle}>
+        <h4>{surveyName}</h4>
+        <div className='dp-form' style={formDiv}>
+          <SurveyForm
+            surveyID={surveyID}
+            handleSurveyIDChange={handleSurveyIDChange}
+            taskList={taskList}
+            setTaskName={setTaskName}
+            setExtractionId={setExtractionId}
+            handleShow={handleShow}
+            handleTaskSelectChange={handleTaskSelectChange}
+            taskName={taskName}
+          />
+          {/*<div*/}
+          {/*  style={formStyle}>*/}
+          {/*  <div style={formTextBox}>*/}
+          {/*    <Form.Group className="mb-3" controlId="formGroupSruveryId">*/}
+          {/*      <Box*/}
+          {/*        component="form"*/}
+          {/*        sx={{*/}
+          {/*          '& > :not(style)': { m: 1, width: '25ch' },*/}
+          {/*        }}*/}
+          {/*        noValidate*/}
+          {/*        autoComplete="off"*/}
+          {/*      >*/}
+          {/*        <TextField*/}
+          {/*          error={isSurveyIDError}*/}
+          {/*          autoComplete="off"*/}
+          {/*          onChange={handleSurveyIDChange}*/}
+          {/*          value={surveyID}*/}
+          {/*          label="Acuity Survey ID"*/}
+          {/*          required*/}
+          {/*          variant="standard"*/}
+          {/*        />*/}
+          {/*        <br/>*/}
+          {/*        <FormControl>*/}
+          {/*          <InputLabel id="task-list-label">Task List</InputLabel>*/}
+          {/*          <Select*/}
+          {/*            labelId="task-list-label"*/}
+          {/*            id="task-list"*/}
+          {/*            label="Task List"*/}
+          {/*            onChange={handleTaskSelectChange}*/}
+          {/*            value={taskName}*/}
+          {/*          >*/}
+          {/*            {taskList && taskList.map((task, index) => (*/}
+          {/*              <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>*/}
+          {/*            ))}*/}
+          {/*          </Select>*/}
+          {/*        </FormControl>*/}
+          {/*        <br/>*/}
+          {/*        <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>*/}
+          {/*      </Box>*/}
+          {/*    </Form.Group>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
         </div>
-        <div style={widgetContainerStyle}>
-          <div style={styleContainer}>
-            <Sidebar handleSelection={handleSelection}/>
-            <div className='steps-container' style={stepsContainerStyle}>
-              <Step selectedSection={selectedSection}/>
-            </div>
-            <div >
-              <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
-                <Button onClick={handleHasTable}>Confirm Tables</Button>
-                <Button onClick={handleDownload} disabled={downloadDisabled}>Download</Button>
-              </div>
-              <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
-                <label><b>Inline Total</b></label>
-                <Checkbox type="checkbox" name="total-style" id="total-style"/>
-              </h6>
-              <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
-                <label><b>Lower Case</b></label>
-                <Checkbox type="checkbox" name="case" id="case"/>
-              </h6>
-              <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>
-                <div style={checkboxContainerStyle}>
-                  <Table style={{width: "100%"}} striped>
-                    <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>
-                      <tr>
-                        <th>QNAME</th>
-                        <th>Table</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(typeof questions === 'undefined') ? (
-                          <p>Loading...</p>
-                        ) : (
-                          questions.map((question ,i) => (
-                            <tr key={i}>
-                              <td style={{verticalAlign: 'middle'}}>{question}</td>
-                              <td>
-                                <Checkbox
-                                  type="checkbox"
-                                  name={question}
-                                  id={question}
-                                  defaultChecked
-                                  onChange={() => handleCheckboxChange(question)}
-                                />
-                              </td>
-                            </tr>
-                          ))
-                      )}
-                    </tbody>
-                  </Table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <UncleTables data={uncleTables}/>
       </div>
-    )
+      <div style={widgetContainerStyle}>
+        <div style={styleContainer}>
+          <Sidebar handleSelection={handleSelection}/>
+          <div className='steps-container' style={stepsContainerStyle}>
+            <Step selectedSection={selectedSection}/>
+          </div>
+          <div >
+            <div style={{display: 'flex', width: '100%', justifyContent: 'right'}}>
+              <Button onClick={handleHasTable}>Confirm Tables</Button>
+              <Button onClick={handleDownload} disabled={downloadDisabled}>Download</Button>
+            </div>
+            <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+              <label><b>Inline Total</b></label>
+              <Checkbox type="checkbox" name="total-style" id="total-style"/>
+            </h6>
+            <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+              <label><b>Lower Case</b></label>
+              <Checkbox type="checkbox" name="case" id="case"/>
+            </h6>
+            <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>
+              <div style={checkboxContainerStyle}>
+                <CheckboxForm questions={questions} handleCheckboxChange={handleCheckboxChange}/>
+                {/*<Table style={{width: "100%"}} striped>*/}
+                {/*  <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>*/}
+                {/*    <tr>*/}
+                {/*      <th>QNAME</th>*/}
+                {/*      <th>Table</th>*/}
+                {/*    </tr>*/}
+                {/*  </thead>*/}
+                {/*  <tbody>*/}
+                {/*    {(typeof questions === 'undefined') ? (*/}
+                {/*        <p>Loading...</p>*/}
+                {/*      ) : (*/}
+                {/*        questions.map((question ,i) => (*/}
+                {/*          <tr key={i}>*/}
+                {/*            <td style={{verticalAlign: 'middle'}}>{question}</td>*/}
+                {/*            <td>*/}
+                {/*              <Checkbox*/}
+                {/*                type="checkbox"*/}
+                {/*                name={question}*/}
+                {/*                id={question}*/}
+                {/*                defaultChecked*/}
+                {/*                onChange={() => handleCheckboxChange(question)}*/}
+                {/*              />*/}
+                {/*            </td>*/}
+                {/*          </tr>*/}
+                {/*        ))*/}
+                {/*    )}*/}
+                {/*  </tbody>*/}
+                {/*</Table>*/}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <UncleTables data={uncleTables}/>
+    </div>
+  )
 }
 export default DataProcessing;
 
