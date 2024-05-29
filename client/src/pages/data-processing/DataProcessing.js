@@ -171,6 +171,7 @@ function DataProcessing() {
     const requestPayload = {
       selectedValues,
       totalStyleChecked: document.getElementById('total-style').checked,
+      case: document.getElementById('case').checked
     };
     const data = await fetchData(DATA_PROCESSING_URL + '/has_table', requestPayload);
     setUncleTables(data || []);
@@ -251,7 +252,7 @@ function DataProcessing() {
               <Checkbox type="checkbox" name="total-style" id="total-style"/>
             </h6>
             <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
-              <label><b>Lower Case</b></label>
+              <label><b>Sentence Case</b></label>
               <Checkbox type="checkbox" name="case" id="case"/>
             </h6>
             <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>

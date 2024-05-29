@@ -133,6 +133,7 @@ class VoxcoDataGrabber:
         self._raw_data = None
         self._has_fill = {}
         self._restructure = None
+        self._lower_case = False
 
     def survey_name(self) -> str:
         """
@@ -478,6 +479,8 @@ class VoxcoDataGrabber:
                 else:
                     to_append = f"R {choices[choice]} ;R({start_column}:{end_column},{choice})"
                     to_append = append_special_cases(to_append)
+                if not self._lower_case:
+                    to_append = to_append.upper()
                 rows.append(to_append)
 
             if self._raw_data[question]['code_width'] == 1:
@@ -720,8 +723,16 @@ class VoxcoDataGrabber:
                 except Exception:
                     error.append(qname)
 
-        for item in error:
-            print(item)
+        # for item in error:
+        #     print(item)
+
+    @property
+    def lower_case(self) -> bool:
+        return self._lower_case
+
+    @lower_case.setter
+    def lower_case(self, lower_case: bool):
+        self._lower_case = lower_case
 
     @property
     def questions(self):

@@ -89,6 +89,11 @@ def data_processing_questions():
 def has_table():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
+    dg.lower_case = False
+    case = request.json.get('case')
+    print(case)
+    if case:
+        dg.lower_case = True
     dg.fetch_raw_data()
     dg.restructure()
     dg.has_table(request.json['selectedValues'])
