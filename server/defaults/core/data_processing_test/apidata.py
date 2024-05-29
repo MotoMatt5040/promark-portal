@@ -246,18 +246,19 @@ class VoxcoDataGrabber:
 
             # Check if preload value exists and has selections
             if block['QuestionText']:
-                text = block['QuestionText']
-                if "[" in text:
-                    fill_location = text.find("["), text.find("]")
-                    fill_name = text[fill_location[0] + 1:fill_location[1]]
-                    fill = text[fill_location[0]:fill_location[1] + 1]
+                question = block['QuestionText']
+                if "[" in question:
+                    fill_location = question.find("["), question.find("]")
+                    fill_name = question[fill_location[0] + 1:fill_location[1]]
+                    fill = question[fill_location[0]:fill_location[1] + 1]
                     if preload.get(fill_name):
                         if preload[fill_name].get('selections'):
-                            question = text.replace(fill, preload[fill_name]['selections'])
+                            question = question.replace(fill, preload[fill_name]['selections'])
                         else:
                             question = self.has_fill(block['Name'], block['QuestionText'])
 
             # do this for only selected block variables. Otherwise, column may have to be calculated later.
+
             if question:
                 to_append['question'] = question
 
@@ -265,7 +266,7 @@ class VoxcoDataGrabber:
                 to_append['text'] = block['Text']
 
             if block['Choices']:
-                to_append['choices'] = {label['Code']: label['Text'] for label in block['Choices']}
+                to_append['choices'] = {label['Code']: label['Text'] for label in block['Choices'] if label['Code'] != ''}
 
             if block['MaxLength']:
                 to_append['code_width'] = block['MaxLength']
@@ -446,7 +447,6 @@ class VoxcoDataGrabber:
                     }
 
                 prev = key
-
 
             if start_column:
                 result['label'] = label
@@ -673,23 +673,54 @@ class VoxcoDataGrabber:
         return ideology
 
     def temp_write(self):
+        error = []
+        tnum = 1
+        qual_logic = None
+        qual_label = None
         with open('temp_tables.txt', 'w') as f:
-            tnum = 1
             for qname in self._order:
-                question = self._raw_data[qname].get('question')
-                text = self._raw_data[qname].get('text')
-                qual = self._raw_data[qname].get('qualifiers')
-
                 try:
-                    f.write(f"""*
-                    TABLE {tnum}
-                    T {qname}
-                    T {question}
-                    T /
-                    T {text}""")
-                except Exception as err:
-                    pass
+                    exists = self._raw_data.get(qname)
+                    if not exists:
+                        continue
+                    table_exists = exists.get('table')
+                    if not table_exists:
+                        continue
+                    question = self._raw_data[qname].get('question')
+                    text = self._raw_data[qname].get('text')
+                    qualifier = self._raw_data[qname].get('qualifiers')
+                    if qualifier:
+                        qual_label = qualifier.get('label')
+                        qual_logic = qualifier.get('qual')
+                    multi_mention = self._raw_data[qname].get('max_choice')
+                    rank = False
+                    if multi_mention:
+                        if int(multi_mention) > 1:
+                            rank = True
+                    base = "R BASE==TOTAL SAMPLE ;ALL ;HP NOVP"
+                    table = [
+                        "*",
+                        f"TABLE {tnum}",
+                        f"T {qname}:",
+                        f"T {question if question else ''}",
+                        "T /",
+                        f"T {text if text else ''}",
+                    ]
+                    if qualifier:
+                        table.append(qual_logic)
 
+                    if rank:
+                        table.append('O RANK')
+                    table.append(qual_label if qualifier else base)
+                    [table.append(row) for row in self._raw_data[qname]['rows']]
+                    tnum += 1
+                    for item in table:
+                        f.write(f"{item}\n")
+                except Exception:
+                    error.append(qname)
+
+        for item in error:
+            print(item)
 
     @property
     def questions(self):
@@ -786,12 +817,25 @@ class VoxcoDataGrabber:
             "  ": " ",
             "\n": " ",
             "\u201c": '"',
-            "\u201d": '"'
+            "\u201d": '"',
+            "....": '...'
         }
+
+        def replace_after_ellipsis(s):
+            index = 0
+            while "..." in s[index:]:
+                index = s.index("...", index) + 3
+                if index < len(s) and s[index] not in {" ", "."}:
+                    s = s[:index] + " " + s[index:]
+                index += 1  # Move past the inserted space
+            return s
+
         if isinstance(data, str):
             # If data is a string, replace characters
             for char, replacement in character_replacement.items():
                 data = data.replace(char, replacement)
+            # Replace characters after "..."
+            data = replace_after_ellipsis(data)
             return data
         elif isinstance(data, dict):
             # If data is a dictionary, recursively call this function on each value
