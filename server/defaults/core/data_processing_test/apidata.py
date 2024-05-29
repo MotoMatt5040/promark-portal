@@ -443,13 +443,14 @@ class VoxcoDataGrabber:
                     result[key] = {
                         'column': columns,
                         'choice': int_values,
-                        'label': label,
-                        'qual': qual
                     }
 
                 prev = key
 
+
             if start_column:
+                result['label'] = label
+                result['qual'] = qual
                 self._raw_data[question]['qualifiers'] = result
 
     def create_rows(self, question):
@@ -671,6 +672,25 @@ class VoxcoDataGrabber:
         self._raw_data['QIDEOLOGY'] = ideology
         return ideology
 
+    def temp_write(self):
+        with open('temp_tables.txt', 'w') as f:
+            tnum = 1
+            for qname in self._order:
+                question = self._raw_data[qname].get('question')
+                text = self._raw_data[qname].get('text')
+                qual = self._raw_data[qname].get('qualifiers')
+
+                try:
+                    f.write(f"""*
+                    TABLE {tnum}
+                    T {qname}
+                    T {question}
+                    T /
+                    T {text}""")
+                except Exception as err:
+                    pass
+
+
     @property
     def questions(self):
         return self._questions
@@ -694,10 +714,6 @@ class VoxcoDataGrabber:
     @property
     def order(self):
         return self._order
-
-    # @property
-    # def final_data(self):
-    #     return self._replace_chars_recursive(self._raw_data)
 
     def clean_data(self):
         """
