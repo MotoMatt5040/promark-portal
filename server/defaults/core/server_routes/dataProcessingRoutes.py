@@ -86,11 +86,11 @@ def data_processing_questions():
 
     # dg.fetch_preload()
 
-    dg.fetch_raw_data()
+
 
     # print(json.dumps(dg.restructure(), indent=4))
     # print(json.dumps(dg.final_data, indent=4))
-    dg.restructure()
+
 
     return questions
 
@@ -99,9 +99,14 @@ def data_processing_questions():
 def has_table():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
+    dg.fetch_raw_data()
+    dg.restructure()
     dg.has_table(request.json['selectedValues'])
     dg.identify_qualifiers()
-    print(json.dumps(dg.final_data, indent=4))
+    dg.clean_data()
+    dg.partyid()
+    dg.ideology()
+    # print(json.dumps(dg.raw_data, indent=4))
     res = make_response({}, 200)
     return res
 
