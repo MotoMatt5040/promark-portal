@@ -96,8 +96,8 @@ def has_table():
     dg.clean_data()
     dg.partyid()
     dg.ideology()
-    # print(json.dumps(dg.raw_data, indent=4))
     res = make_response({}, 200)
+    dg.temp_write()
     return res
 
 
