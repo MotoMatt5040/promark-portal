@@ -47,7 +47,6 @@ def task_list():
         dg.sid = sid
 
         tasks = dg.target_task_list()
-        # for t in tasks: print(t)
         return make_response(
             tasks
         )
@@ -59,7 +58,6 @@ def survey_name():
         return _build_cors_preflight_response()
 
     survey_id = request.json['surveyID']
-    # print(survey_id)
     reader.setUrl(survey_id)
     dg.reset_data()
 
@@ -79,18 +77,10 @@ def data_processing_questions():
     dg.fetch_questions()
 
     # Used to write data to files for error checking
-    with open("variables.txt", 'w', encoding='utf-8') as f:
-        json.dump(dg.variables, f, ensure_ascii=False, indent=4)
-    with open("questions.txt", 'w', encoding='utf-8') as f:
-        json.dump(dg.questions, f, ensure_ascii=False, indent=4)
-
-    # dg.fetch_preload()
-
-
-
-    # print(json.dumps(dg.restructure(), indent=4))
-    # print(json.dumps(dg.final_data, indent=4))
-
+    # with open("variables.txt", 'w', encoding='utf-8') as f:
+    #     json.dump(dg.variables, f, ensure_ascii=False, indent=4)
+    # with open("questions.txt", 'w', encoding='utf-8') as f:
+    #     json.dump(dg.questions, f, ensure_ascii=False, indent=4)
 
     return questions
 
