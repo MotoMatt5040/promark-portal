@@ -37,168 +37,128 @@ function DataProcessing() {
   const [isSurveyIDError, setSurveyIDError] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [selectedValues, setSelectedValues] = useState({});
-  const [surveyName, setSurveyName] = useState('Please enter project info')
+  const [surveyName, setSurveyName] = useState('Please enter project info');
   const [selectedSection, setSelectedSection] = useState('create-order');
   const [downloadDisabled, setDownloadDisabled] = useState(true);
   const [uncleTables, setUncleTables] = useState();
-  const [taskList, setTaskList] = useState();
+  const [taskList, setTaskList] = useState([]);
   const [taskName, setTaskName] = useState('');
   const [extractionId, setExtractionId] = useState('');
 
-  const handleSelection = (section) => {
-    setSelectedSection(section);
-  };
+  const handleSelection = (section) => setSelectedSection(section);
 
   const handleCheckboxChange = (question) => {
     setSelectedValues((prevValues) => ({
       ...prevValues,
-      [question]: !prevValues[question], // Toggle the boolean value
+      [question]: !prevValues[question],
     }));
   };
 
   useEffect(() => {
-    if (questions && questions.length > 0) {
-      const initialSelectedValues = {};
-      questions.forEach((question) => {
-        initialSelectedValues[question] = true;
-      });
+    if (questions.length > 0) {
+      const initialSelectedValues = questions.reduce((acc, question) => {
+        acc[question] = true;
+        return acc;
+      }, {});
       setSelectedValues(initialSelectedValues);
     }
   }, [questions]);
 
+  const fetchData = async (url, data) => {
+    try {
+      const response = await axios.post(url, data, config);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      handleErrors(error);
+    }
+  };
+
+  const handleErrors = (error) => {
+    if (!error?.response) {
+      console.error('No Server Response');
+    } else if (error.response.status === 401) {
+      console.error('Invalid Credentials');
+    } else {
+      console.error('Request Failed');
+    }
+  };
+
   const handleShow = async (event) => {
     event.preventDefault();
-
-    try {
-      const response = await axios.post(
-        DATA_PROCESSING_URL + "/checkboxes",
-        { extractionId, taskName },
-        config
-      );
-      // console.log(response)
-
-      if (response.status === 200) {
-        window.location.href="#"
-        console.log('Request sent for data processing')
-        setQuestions(JSON.parse(JSON.stringify(response.data)));
-        setDownloadDisabled(false);
-      }
-
-    } catch (error) {
-      setDownloadDisabled(true);
-      if (!error?.response) {
-        console.error('No Server Response')
-      } else if (error.response.status === 401) {
-        console.error('Invalid Credentials')
-      } else if (error.response.status === 404) {
-        alert(error.response.data)
-      }
-      else {
-        console.error('Checkboxes Failed')
-      }
+    const data = await fetchData(DATA_PROCESSING_URL + '/checkboxes', { extractionId, taskName });
+    if (data) {
+      setQuestions(data);
+      setDownloadDisabled(false);
     }
   };
 
   const handleDownload = async (event) => {
     event.preventDefault();
-    try {
-      console.log("data")
-      console.log(selectedValues);
-      const response = await axios.post(
-      DATA_PROCESSING_URL + PROCESS_DATA_URL,
-      {
-        selectedValues,
-        totalStyleChecked: document.getElementById("total-style").checked
-      },
-      config
-      );
-
-      if (response.status === 200) {
-        window.location.href="#"
-        console.log('Request sent for data processing')
-        setUncleTables(response.data);
-        console.log(uncleTables)
-      }
-      // console.log(JSON.stringify(response));
-    } catch (error) {
-       if (!error?.response) {
-        console.error('No Server Response')
-      } else if (error.response.status === 401) {
-        console.error('Invalid Credentials')
-      } else {
-        console.error('Request Failed')
-      }
+    const requestPayload = {
+      selectedValues,
+      totalStyleChecked: document.getElementById('total-style').checked,
+    };
+    const data = await fetchData(DATA_PROCESSING_URL + PROCESS_DATA_URL, requestPayload);
+    if (data) {
+      setUncleTables(data);
+      downloadFile(surveyName, data);
     }
+  };
 
-    axios.get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
-      responseType: 'blob',
-      headers: {
-            'Content-Type': 'application/json',
-            'X-Csrftoken': localStorage.getItem('csrftoken')
-          }
-    })
-      .then((obj) => {
-        const survey_n = surveyName.substring(0, surveyName.indexOf(' '));
-        console.log(obj.data)
-        const url = URL.createObjectURL(obj.data);
+  const downloadFile = (name, data) => {
+    axios
+      .get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken'),
+        },
+      })
+      .then((response) => {
+        const survey_n = name.split(' ')[0];
+        const url = URL.createObjectURL(response.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = survey_n + '.zip';
+        a.download = `${survey_n}.zip`;
         a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
       })
-      .catch(error => console.error(error))
-  }
+      .catch(handleErrors);
+  };
 
   const handleSurveyIDChange = async (e) => {
     const value = e.target.value;
-    setDownloadDisabled(true);
-    setTaskName('');
-    setExtractionId('');
     setSurveyID(value);
     setSurveyIDError(value.length < 3);
-    setQuestions([])
-    if (value.length >= 3) {
-      await axios.post(
-        '/data_processing/survey_name',
-        { surveyID: e.target.value },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Csrftoken': localStorage.getItem('csrftoken')
-          }
-      })
-      .then(async (response) => {
-        setSurveyName(response.data)
-        try {
-          const resp = await axios.post(
-            DATA_PROCESSING_URL + "/task_list",
-            {surveyID: e.target.value},
-            config
-          );
-          if (resp.status === 200) {
-            setTaskList(resp.data)
-          }
-          console.log(JSON.stringify(resp.data))
+    resetState();
 
-        } catch (error) {
-          console.error('Task List Failed')
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching survey name", error)
-        setSurveyName("Invalid Survey ID")
-      })
+    if (value.length >= 3) {
+      const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
+      if (surveyNameData) {
+        setSurveyName(surveyNameData);
+        const taskListData = await fetchData(DATA_PROCESSING_URL + '/task_list', { surveyID: value });
+        setTaskList(taskListData || []);
+      } else {
+        setSurveyName('Invalid Survey ID');
+      }
     }
   };
 
-  const handleTaskSelectChange = (e: SelectChangeEvent) => {
+  const resetState = () => {
+    setDownloadDisabled(true);
+    setTaskName('');
+    setExtractionId('');
+    setQuestions([]);
+  };
+
+  const handleTaskSelectChange = (e) => {
     const selectedTaskName = e.target.value;
-    // console.log(selectedTaskId);
-    const selectedTask = taskList.find(task => task.Name === selectedTaskName);
+    const selectedTask = taskList.find((task) => task.Name === selectedTaskName);
     if (selectedTask) {
       setTaskName(selectedTask.Name);
       setExtractionId(selectedTask.ExtractionId);
@@ -206,61 +166,20 @@ function DataProcessing() {
   };
 
   const handleHasTable = async () => {
-     try {
-      console.log("data")
-      console.log(selectedValues);
-      const response = await axios.post(
-      DATA_PROCESSING_URL + "/has_table",
-      {
-        selectedValues,
-        totalStyleChecked: document.getElementById("total-style").checked
-      },
-      config
-      );
-
-      if (response.status === 200) {
-        window.location.href="#"
-        console.log('Request sent for data processing')
-        setUncleTables(response.data);
-        console.log(uncleTables)
-      }
-      // console.log(JSON.stringify(response));
-    } catch (error) {
-       if (!error?.response) {
-        console.error('No Server Response')
-      } else if (error.response.status === 401) {
-        console.error('Invalid Credentials')
-      } else {
-        console.error('Request Failed')
-      }
-    }
-  }
-
-  // const getChecklistData = async () => {
-  //   try {
-  //     const survey_n = surveyName.substring(0, surveyName.indexOf(' '));
-  //     const response = await axios.post(
-  //       DATA_PROCESSING_URL + "/checklist/status",
-  //       {surveyID: survey_n},
-  //       config
-  //     );
-  //     if (response.status === 200) {
-  //       setChecklistStatus(response.data)
-  //       console.log(response.data)
-  //     }
-  //   } catch (error) {
-  //     console.error('Checklist Failed')
-  //   }
-  // }
+    const requestPayload = {
+      selectedValues,
+      totalStyleChecked: document.getElementById('total-style').checked,
+    };
+    const data = await fetchData(DATA_PROCESSING_URL + '/has_table', requestPayload);
+    setUncleTables(data || []);
+  };
 
     return (
       <div>
-        {/*<Button onClick={getChecklistData}>Checklist</Button>*/}
         <div className='p-4 text-center bg-light' style={headerStyle}>
           <h4>{surveyName}</h4>
           <div className='dp-form' style={formDiv}>
             <div
-              noValidate
               style={formStyle}>
               <div style={formTextBox}>
                 <Form.Group className="mb-3" controlId="formGroupSruveryId">
@@ -301,9 +220,6 @@ function DataProcessing() {
                   </Box>
                 </Form.Group>
               </div>
-              {/*<div style={formButtons}>*/}
-              {/*  <Button variant="primary" onClick={handleShow}>Checkboxes</Button>*/}
-              {/*</div>*/}
             </div>
           </div>
         </div>
@@ -318,10 +234,14 @@ function DataProcessing() {
                 <Button onClick={handleHasTable}>Confirm Tables</Button>
                 <Button onClick={handleDownload} disabled={downloadDisabled}>Download</Button>
               </div>
-              <h4 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+              <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
                 <label><b>Inline Total</b></label>
                 <Checkbox type="checkbox" name="total-style" id="total-style"/>
-              </h4>
+              </h6>
+              <h6 style={{display: 'flex', alignContent: 'center', alignItems: 'center', justifyContent: 'space-between'}}>
+                <label><b>Lower Case</b></label>
+                <Checkbox type="checkbox" name="case" id="case"/>
+              </h6>
               <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>
                 <div style={checkboxContainerStyle}>
                   <Table style={{width: "100%"}} striped>
