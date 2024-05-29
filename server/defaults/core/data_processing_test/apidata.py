@@ -124,20 +124,6 @@ class VoxcoDataGrabber:
     api_data = ApiData()
     extraction_data = ExtractionData()
 
-
-
-    TOTALS = {
-        'strongly support': [],
-        'strongly yes': [],
-        'strongly approve': [],
-        'strongly right direction': [],
-        'strongly agree': [],
-        'much more likely': [],
-        'much better': [],
-        'much more confident': [],
-        'very likely': []
-    }
-
     def __init__(self):
         self._checkboxes = None
         self._variables = None
@@ -478,7 +464,7 @@ class VoxcoDataGrabber:
             rows = []
 
             def append_special_cases(to_append):
-                special_cases = ["unsure", "refused", "don't know", "no opinion", "other"]
+                special_cases = ["unsure", "refused", "don't know", "no opinion", "other", 'no difference']
                 if any(case in to_append.lower() for case in special_cases):
                     to_append += " ;NOR SZR"
                 return to_append
@@ -498,6 +484,7 @@ class VoxcoDataGrabber:
                 rows.append(f"R NO ANSWER ;NOTR({start_column}:{end_column},{keys[0]}:{keys[-1]}) ;NOR SZR")
 
             self._raw_data[question]['rows'] = rows
+            self.totals(question)
 
     @property
     def variables(self):
@@ -578,13 +565,61 @@ class VoxcoDataGrabber:
         self._questions = response
 
     def totals(self, question):
-        totals = self._raw_data.get(question)
+        totals_list = {
+            'strongly support': ['support', 'oppose'],
+            'strongly government restrict access': ['gov restrict', 'cons decision'],
+            'strongly yes': ['yes', 'no'],
+            'strongly approve': ['approve', 'disapprove'],
+            'strongly right direction': ['right dir', 'wrong track'],
+            'strongly agree': ['agree', 'disagree'],
+            'much more likely': ['more likely', 'less likely'],
+            'much better': ['better', 'worse'],
+            'much more confident': ['more confident', 'less confident'],
+            'very likely': ['likely', 'unlikely'],
+            'extremely important': ['important', 'not important'],
+            'very closely': ['closely', 'not closely'],
+            'very favorable': ['favorable', 'unfavorable'],
+            'applies a great deal': ['applies', 'does not apply'],
+            'very positive': ['positive', 'negative'],
+            'very reasonable': ['reasonable', 'unreasonable'],
+            'very unique': ['unique', 'not unique'],
+            'very convincing': ['convincing', 'not convincing'],
+            'very concerned': ['concerned', 'not concerned'],
+            'very aware': ['aware', 'not aware'],
+            'very willing': ['willing', 'not willing'],
+            'great deal': ['great deal', 'not great deal'],
+            'strongly determined': ['determined by people', 'created in constitution']
+        }
 
-        if not totals:
+        que = self._raw_data.get(question)
+
+        if not que:
             return
 
+        choice = que['choices'].get('1')
+        if not choice:
+            return
 
-        pass
+        choice = choice.lower()
+        if choice not in totals_list.keys():
+            return
+
+        totals = [
+            f"R *D//S ({totals_list[choice][0].upper()} - {totals_list[choice][1].upper()}) ;NONE ;EX (R3-R4)",
+            f"R &UT-TOTAL {totals_list[choice][0].upper()} ;{que['start_column']}-1:2",
+            f"R &UT-TOTAL {totals_list[choice][1].upper()} ;{que['start_column']}-3:4",
+        ]
+
+        que['rows'] = [
+            row.replace("R ", "R &AI2 ", 1) if i < 4 else row
+            for i, row in enumerate(que['rows'])
+        ]
+
+        # This is a list comprehension syntax. The [::-1] is used to reverse the list so that the items are appended
+        # as they are appended on top of the list. This is done to ensure the order is correct.
+        [que['rows'].insert(0, row) for row in totals[::-1]]
+
+        self._raw_data[question] = que
 
     def partyid(self):
         partyid = self._raw_data.get('QPARTYID')
@@ -594,9 +629,9 @@ class VoxcoDataGrabber:
 
         totals = [
             "R *D//S (REPUBLICAN - DEMOCRAT) ;NONE ;EX (R3-R5)",
-            f"R &UT- TOTAL REPUBLICAN ;{partyid['start_column']}-1:2",
-            f"R &UT- TOTAL INDEPENDENT ;{partyid['start_column']}-3:5",
-            f"R &UT- TOTAL DEMOCRAT ;{partyid['start_column']}-6:7",
+            f"R &UT-TOTAL REPUBLICAN ;{partyid['start_column']}-1:2",
+            f"R &UT-TOTAL INDEPENDENT ;{partyid['start_column']}-3:5",
+            f"R &UT-TOTAL DEMOCRAT ;{partyid['start_column']}-6:7",
         ]
         # This is a list comprehension syntax used to iterate through all the items in the rows list and add indentation
         partyid['rows'] = [
@@ -619,8 +654,8 @@ class VoxcoDataGrabber:
 
         totals = [
             "R *D//S (CONSERVATIVE - LIBERAL) ;NONE ;EX (R3-R4)",
-            f"R &UT- TOTAL CONSERVATIVE ;{ideology['start_column']}-1:2",
-            f"R &UT- TOTAL LIBERAL ;{ideology['start_column']}-4:5",
+            f"R &UT-TOTAL CONSERVATIVE ;{ideology['start_column']}-1:2",
+            f"R &UT-TOTAL LIBERAL ;{ideology['start_column']}-4:5",
         ]
 
         # This is a list comprehension syntax used to iterate through all the items in the rows list and add indentation
@@ -634,7 +669,6 @@ class VoxcoDataGrabber:
         [ideology['rows'].insert(0, row) for row in totals[::-1]]
 
         self._raw_data['QIDEOLOGY'] = ideology
-        print(json.dumps(ideology, indent=4))
         return ideology
 
     @property
