@@ -10,3 +10,31 @@
     background-color: #0d6efd;
     color: white;
 }
+
+.data-display-wrapper {
+  display: flex;
+}
+
+.line-numbers {
+  padding-right: 10px;
+  border-right: 1px solid #ccc;
+  text-align: right;
+  line-height: 1.5; /* Match the line height with the textarea */
+}
+
+.line-number {
+  padding: 2px 5px;
+}
+
+.data-textarea {
+  flex-grow: 1;
+  width: 100%;
+  height: 400px; /* Adjust height as needed */
+  padding-left: 10px; /* Adjust padding to match the space needed for line numbers */
+  border: none;
+  resize: none;
+  outline: none;
+  font-family: monospace;
+  white-space: pre;
+  overflow: auto;
+}
