@@ -8,15 +8,15 @@ from flask_login import login_required, current_user
 from server.defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
 from ..auth.models import db, User, DataProcessingChecklist
-from ..data_processing.reader import Reader
+# from ..data_processing.reader import Reader
 from ..data_processing_test.apidata import VoxcoDataGrabber
 
 data_processor = Blueprint('data_process', __name__)
 dp = DataPuller()
 
-reader = Reader()
+# reader = Reader()
 dg = VoxcoDataGrabber()
-print("DATA LAYOUT", json.dumps(dg.layout, indent=4))
+# print("DATA LAYOUT", json.dumps(dg.json_layout, indent=4))
 
 # DPApi.sid = 450
 # print(ExtractionTask.sid, 'ext')
@@ -43,8 +43,8 @@ def task_list():
         return _build_cors_preflight_response()
 
     if request.method == "POST":
-        sid = request.json['surveyID']
-        dg.sid = sid
+        # sid = request.json['surveyID']
+        # dg.sid = sid
 
         tasks = dg.target_task_list()
         return make_response(
@@ -57,11 +57,11 @@ def survey_name():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    survey_id = request.json['surveyID']
-    reader.setUrl(survey_id)
+    sid = request.json['surveyID']
+    dg.sid = sid
     dg.reset_data()
 
-    return reader.get_survey_name()
+    return dg.survey_name()
 
 
 @data_processor.route('/checkboxes', methods=['POST', 'OPTIONS'])
@@ -89,11 +89,14 @@ def data_processing_questions():
 def has_table():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
-    dg.lower_case = False
+
     case = request.json.get('case')
-    print(case)
+
+    dg.lower_case = False
+
     if case:
         dg.lower_case = True
+
     dg.fetch_raw_data()
     dg.restructure()
     dg.has_table(request.json['selectedValues'])
