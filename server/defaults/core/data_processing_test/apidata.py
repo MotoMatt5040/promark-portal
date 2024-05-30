@@ -2,6 +2,8 @@ import os
 import re
 import traceback
 from dataclasses import dataclass
+
+import numpy as np
 import requests
 import io
 import zipfile
@@ -134,6 +136,7 @@ class VoxcoDataGrabber:
         self._has_fill = {}
         self._restructure = None
         self._lower_case = False
+        self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
 
     def survey_name(self) -> str:
         """
@@ -156,7 +159,7 @@ class VoxcoDataGrabber:
             print(f"Survey is not found. Please verify the survey exists before attempting again.\n"
                   f"\n"
                   f"ERROR: {e}")
-            return False
+            return [{}]
 
         return task_list['Extractions']
 
@@ -328,7 +331,9 @@ class VoxcoDataGrabber:
         start_column = 1
         # used to reorganize the data in the proper order and add column info
         prev = None
+        table_number = 1
         for i, question in enumerate(self._order):
+            self._layout['variable'].append(question)
 
             if question in self._raw_data:
 
@@ -357,6 +362,11 @@ class VoxcoDataGrabber:
                 restructure[temp]['multi_mentions'][question] = columns
                 q = temp
 
+            self._layout['table'].append(table_number)
+            self._layout['start'].append(start_column)
+            self._layout['end'].append(end_column)
+            self._layout['width'].append(self._raw_data[q]['code_width'])
+
             start_column += self._raw_data[q]['code_width']
             self._raw_data[q] = restructure[q]
 
@@ -371,6 +381,7 @@ class VoxcoDataGrabber:
 
             prev = q
 
+        print(pd.DataFrame(self._layout).to_string())
         self._restructure = restructure
         return restructure
 
@@ -593,7 +604,9 @@ class VoxcoDataGrabber:
             'very aware': ['aware', 'not aware'],
             'very willing': ['willing', 'not willing'],
             'great deal': ['great deal', 'not great deal'],
-            'strongly determined': ['determined by people', 'created in constitution']
+            'strongly determined': ['determined by people', 'created in constitution'],
+            'very believable': ['believable', 'not believable'],
+            'very serious': ['serious', 'not serious']
         }
 
         que = self._raw_data.get(question)
@@ -681,7 +694,7 @@ class VoxcoDataGrabber:
         tnum = 1
         qual_logic = None
         qual_label = None
-        with open('temp_tables.txt', 'w') as f:
+        with open('EXTRACTION/UNCLE/tables.txt', 'w') as f:
             for qname in self._order:
                 try:
                     exists = self._raw_data.get(qname)
@@ -767,6 +780,12 @@ class VoxcoDataGrabber:
 
     @property
     def layout(self):
+        for qname in self._order:
+            break
+        return self._layout
+
+    @property
+    def json_layout(self):
         """
         Used to print the layout of the data structure. Some data is omitted based on specific question needs. Use JSON
         to print in an easier to read format. Example: print(json.dumps(data, indent=4))
@@ -867,6 +886,7 @@ class VoxcoDataGrabber:
         self._raw_data = None
         self._has_fill = {}
         self._restructure = None
+        self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
 
 
 
