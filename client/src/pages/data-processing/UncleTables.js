@@ -31,9 +31,9 @@ export default function UncleTables({ data }) {
 
   return (
     <Container>
-      <LineNumbers>
-        {lineNumbers}
-      </LineNumbers>
+      {/*<LineNumbers>*/}
+      {/*  {lineNumbers}*/}
+      {/*</LineNumbers>*/}
       <TextareaAutosize aria-label="empty textarea" placeholder="Uncle Tables" value={tablesAsString} />
     </Container>
   );
