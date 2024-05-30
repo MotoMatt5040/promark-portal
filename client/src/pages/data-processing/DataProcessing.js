@@ -134,22 +134,24 @@ function DataProcessing() {
   };
 
   const handleSurveyIDChange = async (e) => {
-    const value = e.target.value;
-    setSurveyID(value);
-    setSurveyIDError(value.length < 3);
-    resetState();
+  const value = e.target.value;
+  setSurveyID(value);
+  setSurveyIDError(value.length < 3);
+  resetState();
 
-    if (value.length >= 3) {
-      const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
-      if (surveyNameData) {
-        setSurveyName(surveyNameData);
-        const taskListData = await fetchData(DATA_PROCESSING_URL + '/task_list', { surveyID: value });
-        setTaskList(taskListData || []);
-      } else {
-        setSurveyName('Invalid Survey ID');
-      }
+  if (value.length >= 3) {
+    const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
+    if (surveyNameData) {
+      setSurveyName(surveyNameData);
+      const taskListData = await fetchData(DATA_PROCESSING_URL + '/task_list', { surveyID: value });
+      setTaskList(taskListData || []);
+    } else {
+      setSurveyName('Invalid Survey ID');
     }
-  };
+  } else {
+    setSurveyName('Invalid Survey ID');
+  }
+};
 
   const resetState = () => {
     setDownloadDisabled(true);
