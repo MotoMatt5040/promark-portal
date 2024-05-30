@@ -82,9 +82,9 @@ class Writer():
         index = 1
         for key in keys:
             if self._code_width > 1:
-                totals.append(f"R &UT- TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})")
+                totals.append(f"R &UT-TOTAL {key} ;{self._column_text}{self._totals[key][0]}:{self._totals[key][1]})")
             else:
-                totals.append(f"R &UT- TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}")
+                totals.append(f"R &UT-TOTAL {key} ;{self._column_text}-{self._totals[key][0]}:{self._totals[key][1]}")
             totals[index] += "\n"
             index += 1
         return totals
@@ -140,7 +140,7 @@ class Writer():
         return rows
 
     def rows_inline(self):
-        if self._qname == 'QPARTYID':
+        if self._qname == 'QPARTYID' or self._qname == 'QIDEOLOGY':
             return self.write_rows()
         totals = self.total_rows()
         rows = self.rows_list()

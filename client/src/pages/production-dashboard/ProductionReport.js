@@ -35,7 +35,7 @@ function ProductionReport() {
       responseType: 'application/json',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+          'X-Csrftoken': localStorage.getItem('csrftoken')
       }
     })
       .then((obj) => {

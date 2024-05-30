@@ -1,7 +1,3 @@
-import axios from '../../api/axios';
-
-import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,16 +11,14 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useCookies } from 'react-cookie';
-
-
+import axios from "../../api/axios";
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Promark Research © '}
-      <Link color="inherit" href="https://www.promarkresearch.com/">
-        promarkresearch.com
+      {'Copyright © '}
+      <Link color="inherit" href="https://mui.com/">
+        Your Website
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -36,40 +30,28 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-function Login() {
-  const navigate = useNavigate();
-
-  const [cookies, setCookies] = useCookies(['csrftoken'])
+export default function AddUser() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log('loc: ', window.location.href)
-    try {
+     try {
       var config = {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           }
         }
       const response = await axios.post(
-        "/login",
+        "/add_user",
         {
           email: data.get('email'),
-          password: data.get('password'),
-          remember: data.get('remember')
+          session: localStorage.getItem('session')
         },
         config
       );
 
       if (response.status === 200) {
-
-        console.log('resp', response)
-        console.log('headers: ', response.headers)
-        const csrfToken = response.headers['x-csrftoken'];
-        axios.defaults.headers.common['X-CSRFToken'] = csrfToken; // Set CSRF token in default api headers
-        localStorage.setItem('csrftoken', csrfToken);
-        localStorage.setItem('logged_in', true);
-        window.location.href = "/home";
+        console.log(response)
       }
 
     } catch (error) {
@@ -81,6 +63,11 @@ function Login() {
         console.log('Login Failed');
       }
     }
+
+    console.log({
+      email: data.get('email'),
+      password: data.get('password'),
+    });
   };
 
   return (
@@ -99,59 +86,57 @@ function Login() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Add user
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControlLabel
+                  control={<Checkbox value="productionDashboard" color="primary" />}
+                  label="Production Dashboard"
+                />
+              </Grid>
+              <Grid item sx={12} sm={6}>
+                <FormControlLabel
+                  control={<Checkbox value="dataProcessing" color="primary" />}
+                  label="Data Processing"
+                />
+              </Grid>
+              <Grid item sx={12} sm={6}>
+                 <FormControlLabel
+                  control={<Checkbox value="globalQuotaModule" color="primary" />}
+                  label="Global Quota Module"
+                />
+              </Grid>
+              <Grid item sx={12} sm={6}>
+                <FormControlLabel
+                  control={<Checkbox value="addUser" color="primary" />}
+                  label="Add Users"
+                />
+              </Grid>
+            </Grid>
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Add user
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/register" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
 }
-
-export default Login;

@@ -7,55 +7,68 @@ import os
 
 
 def error_log(err):
+    print("\n\n\n")
+    print("*" * 350)
     print(err)
+    print("\n")
+    print("*" * 50)
+    print("\n")
     print(traceback.format_exc())
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")
+    print("*" * 150)
+    print("\n\n\n")
 
 
 class DataPusher:
-    """Data Pusher class"""
-    sqld = SQLDictionary()
+    def __init__(self):
+        '''Data Pusher class'''
+        self.sqld = SQLDictionary()
 
-    #  initialize database access info to connect to database
-    dbai = Database()
+        #  initialize database access info to connect to database
+        self.dbai = Database()
 
-    #  Build the connection string
-    SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
-        dbai.get_driver(),
-        dbai.get_server(),
-        dbai.get_database(),
-        dbai.get_user_id(),
-        dbai.get_password()
-    )
-    del dbai
-    dbcon = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
-    engine = create_engine(dbcon)
-    del dbcon
+        #  Build the connection string
+        self.SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
+            self.dbai.driver,
+            self.dbai.server,
+            self.dbai.database,
+            self.dbai.user_id,
+            self.dbai.password
+        )
 
-    def create_sample_table(self, samplePath: os.path):
-        status_code = None
-        if not os.path.exists(path=samplePath):
-            error_log(f"\nNOTICE:\n***OS Path does not exist, please check sample path.***\nGiven Path: {samplePath}")
-
+        self.dbcon = f'mssql+pyodbc:///?odbc_connect={self.SQL_CONNECTION}'
+        # connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": self.SQL_CONNECTION})
         try:
-            conn = self.connect()
-            with conn:
-                pass
-                # conn.create
-                # cur = conn.cursor()
-                # exe = cur.execute(f"SELECT * FROM {table} where username = '{username}'")
-                # data = exe.fetchone()
-                # if data is not None:
-                #     if datetime.now() - timedelta(hours=2) > datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S.%f'):
-                #         data = update()
-                # else:
-                #     data = update()
-
-            # return data[1]
+            # self.engine = create_engine(self.dbcon, pool_pre_ping=True)
+            self.engine = create_engine(self.dbcon)
         except Exception as err:
-                print(err)
-                return "ERROR"
-        return status_code
+            error_log(err)
+
+    def add_user(selfself, ):
+        pass
+
+
+    # def push(self, table: str, columns: [], rows: []):
+    #
+    #     try:
+    #         conn = self.connect()
+    #         with conn:
+    #             pass
+    #             conn.create()
+    #             cur = conn.cursor()
+    #             exe = cur.execute(f"SELECT * FROM {table} where username = '{username}'")
+    #             # data = exe.fetchone()
+    #             # if data is not None:
+    #             #     if datetime.now() - timedelta(hours=2) > datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S.%f'):
+    #             #         data = update()
+    #             # else:
+    #             #     data = update()
+    #
+    #         # return data[1]
+    #     except Exception as err:
+    #             print(err)
+    #             return "ERROR"
+    #     return []
 
     # def execute_query(table, username):
     #

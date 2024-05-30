@@ -3,52 +3,46 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Login from "./pages/auth/Login";
-import {useEffect, useState} from 'react';
-import axios from './api/axios';
 import DataProcessing from "./pages/data-processing/DataProcessing";
 import ProductionReport from "./pages/production-dashboard/ProductionReport";
 import PeriodicUpdate from "./pages/production-dashboard/PeriodicUpdate";
-import Register from "./pages/auth/Register";
 import Quotas from "./pages/global-quota-module/Quotas"
+import Logout from "./pages/auth/Logout";
+import Profile from "./pages/profile/Profile";
+import Settings from "./pages/profile/Settings";
+import PrivateRoutes from "./pages/auth/PrivateRoutes";
+import AddUser from "./pages/auth/AddUser";
 
 function App() {
-  // const [session , setSession] = useState();
-  // const [user, setUser] = useState({id: '', email: ''});
-  // //
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const response = await axios.get("/@me");
-  //       setUser(response.data);
-  //       console.log(response.data, response.data.id)
-  //       setSession((response.data.id))
-  //       console.log('user authorized')
-  //     } catch (error) {
-  //       console.log("Not Authenticated");
-  //       console.log(error);
-  //     }
-  //   })();
-  // }, [setUser]);
-  //
-  // if(!session) {
-  //   return <Login setSession={setSession} />;
-  // }
 
+  if (localStorage.getItem('logged_in') === null) {
+    localStorage.setItem("logged_in", false);
+  }
 
   return (
     <BrowserRouter>
       <main>
-        <Header title="React Navbar Component"/>
+        <Header title="React Navbar Component" />
         <Routes>
+          {/*These are routes that require the user to be logged in*/}
+          <Route element={<PrivateRoutes />}>
+            <Route path="data_processing" element={<DataProcessing/>}/>
+            <Route path="production_report" element={<ProductionReport/>} />
+            <Route path="periodic_update" element={<PeriodicUpdate/>}/>
+            <Route path="global_quotas" element={<Quotas/>}/>
+
+            <Route path="profile" element={<Profile/>}/>
+            <Route path="settings" element={<Settings/>}/>
+            <Route path="add_user" element={<AddUser/>}/>
+          </Route>
+
+          {/*These are routes that can be access regardless of login status*/}
+          <Route path="/login" element={<Login />}/>
+          <Route path="logout" element={<Logout/>}/>
           <Route index element={<Home/>}/>
           <Route path="home" element={<Home/>}/>
-          {/*<Route path="/home" element={<Home />} />*/}
-          <Route path="data_processing" element={<DataProcessing />} />
-          <Route path="production_report" element={<ProductionReport />} />
-          <Route path="periodic_update" element={<PeriodicUpdate />} />
-          <Route path="global_quotas" element={<Quotas />} />
-          <Route path="register" element={<Register />}/>
         </Routes>
+        <a href="https://www.promarkresearch.com/privacy-policy/" style={{width: '100vw', justifyContent: 'center', position: 'fixed', display: 'flex'}}>Privacy Policy</a>
       </main>
     </BrowserRouter>
   )

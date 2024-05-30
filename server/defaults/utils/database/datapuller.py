@@ -46,6 +46,9 @@ class DataPuller:
         except Exception as err:
             error_log(err)
 
+    def __str__(self):
+        return self.SQL_CONNECTION
+
     def pull(self, qry: str) -> pandas.DataFrame:
         conn = self.connect()
         if not conn:

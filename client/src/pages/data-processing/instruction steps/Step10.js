@@ -153,7 +153,7 @@ export default function Step10() {
                     </p>
                   </Accordion.Body>
                 </Accordion.Item>
-                                  <Accordion.Item eventKey="9-4-4">
+                <Accordion.Item eventKey="9-4-4">
                   <Accordion.Header>Create segmentation table</Accordion.Header>
                   <Accordion.Body>
                     <p>

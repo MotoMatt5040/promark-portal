@@ -1,20 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useEffect, useState} from "react";
 
 function Home() {
-
-  const [currentData, setData] = useState([{}])
-
-    useEffect(() => {
-        fetch("/home").then(
-            res => res.json()
-        ).then(
-            data => {
-                setData(data)
-                console.log(data, currentData)
-            }
-        )
-    }, )
 
     return (
       <main>
@@ -29,14 +15,15 @@ function Home() {
               <br/>
               &emsp;<a href='/data_processing'>Data Processing</a><br/>
               &emsp;&emsp;<b>New Features:</b><br/>
-              &emsp;&emsp;&emsp;UNCLE data extraction task is now auto created when 'Download' button is pressed. The 'Checkboxes' button deletes the extraction task.<br/>
+              &emsp;&emsp;&emsp;Added a sidebar for navigation<br/>
               <br/>
               &emsp;<a href='/global_quotas'>Global Quota Module</a><br/>
               &emsp;&emsp;<b>New Features:</b><br/>
               &emsp;&emsp;&emsp;Input survey ID fields to output a table with merged quota data.<br/>
               &emsp;&emsp;&emsp;Stylized data table for quick viewing and data highlights<br/>
+              &emsp;&emsp;&emsp;Disabled download until order.csv is confirmed to exist<br/>
+              &emsp;&emsp;&emsp;Pressing [enter] now proceeds to the checkboxes<br/>
             </p>
-            {/*<button className="btn btn-outline-secondary" type="button">Example button</button>*/}
           </div>
           Version = {process.env.REACT_APP_VERSION}
         </div>
@@ -46,10 +33,3 @@ function Home() {
 }
 
 export default Home;
-
-// <p>TEST</p>
-//         <form>
-//           <a href="#" id="test">
-//             <button className="btn btn-primary btn-lg">{currentData}</button>
-//           </a>
-//         </form>

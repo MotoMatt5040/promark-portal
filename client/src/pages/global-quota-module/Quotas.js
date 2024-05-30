@@ -9,18 +9,22 @@ import Table from 'react-bootstrap/Table';
 
 function Quotas() {
 
+  const [comSurveyID, setComSurveyID] = useState();
   const [webSurveyID, setWebSurveyID] = useState();
   const [landlineSurveyID, setLandlineSurveyID] = useState();
   const [cellSurveyID, setCellSurveyID] = useState();
 
-  const [webSurveyName, setWebSurveyName] = useState('Web Survey ID')
-  const [landlineSurveyName, setLandlineSurveyName] = useState('Landline Survey ID')
-  const [cellSurveyName, setCellSurveyName] = useState('Cell Survey ID')
+  const [comSurveyName, setComSurveyName] = useState('COM Survey ID');
+  const [webSurveyName, setWebSurveyName] = useState('Web Survey ID');
+  const [landlineSurveyName, setLandlineSurveyName] = useState('Landline Survey ID');
+  const [cellSurveyName, setCellSurveyName] = useState('Cell Survey ID');
 
+  const [isComSurveyIDError, setComSurveyIDError] = useState(false);
   const [isWebSurveyIDError, setWebSurveyIDError] = useState(false);
   const [isLandlineSurveyIDError, setLandlineSurveyIDError] = useState(false);
   const [isCellSurveyIDError, setCellSurveyIDError] = useState(false);
 
+  const [comData, setComData] = useState({});
   const [webData, setWebData] = useState({});
   const [landlineData, setLandlineData] = useState({});
   const [cellData, setCellData] = useState({});
@@ -31,9 +35,13 @@ function Quotas() {
   }, []);
 
   const handleRun = async () => {
+    setComData({});
     setWebData({});
     setLandlineData({});
     setCellData({});
+    if(!isComSurveyIDError) {
+      await getSurveyQuotas('com', comSurveyID);
+    }
     if(!isWebSurveyIDError) {
       await getSurveyQuotas('web', webSurveyID);
     }
@@ -47,7 +55,8 @@ function Quotas() {
       "/quotas/merge",
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
       })
       .then((response) => {
@@ -61,7 +70,7 @@ function Quotas() {
 
   const checkData = () => {
     console.log(webData, landlineData, cellData);
-    axios.get("/quotas/check")
+    axios.get("/quotas/check", {headers: {'X-Csrftoken': localStorage.getItem('csrftoken')}})
   }
 
   const handleSurveyIDChange = (e) => {
@@ -69,6 +78,13 @@ function Quotas() {
     const source_id = e.target.id;
 
     switch (source_id) {
+      case "com":
+        setComSurveyID(value);
+        setComSurveyIDError(value.length <5);
+        if(value.length > 4) {
+          getSurveyName(source_id, value);
+        }
+        break;
       case "web":
         setWebSurveyID(value);
         setWebSurveyIDError(value.length < 3);
@@ -102,10 +118,14 @@ function Quotas() {
       {
         headers: {
           'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
     })
       .then((response) => {
         switch (source) {
+          case 'com':
+            setComSurveyName(response.data);
+            break;
           case 'web':
             setWebSurveyName(response.data);
             break;
@@ -122,6 +142,10 @@ function Quotas() {
       .catch((error) => {
         console.error("Error fetching survey name", error)
         switch (source) {
+          case 'com':
+            setComSurveyName("Invalid COM Survey ID");
+            setComSurveyIDError(true)
+            break;
           case 'web':
             setWebSurveyName("Invalid Web Survey ID");
             setWebSurveyIDError(true)
@@ -147,10 +171,15 @@ function Quotas() {
       {
         headers: {
           'Content-Type': 'application/json',
+          'X-Csrftoken': localStorage.getItem('csrftoken')
         }
     })
       .then((response) => {
         switch (source) {
+          case 'com':
+            setComData({});
+            setComData(response.data);
+            break;
           case 'web':
             setWebData({});
             setWebData(response.data);
@@ -176,8 +205,28 @@ function Quotas() {
     <div>
       <div className='p-4 text-center bg-light' style={headerStyle}>
         <div className='dp-form' style={formDiv}>
-          <div
-            style={formStyle}>
+          <div style={formStyle}>
+            <Form.Group className="mb-3" controlId="formGroupSruveryId">
+              <Box
+                component="form"
+                sx={{
+                  '& > :not(style)': { m: 1, width: '25ch' },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="com"
+                  error={isComSurveyIDError}
+                  autoComplete="off"
+                  onChange={handleSurveyIDChange}
+                  value={comSurveyID}
+                  label={comSurveyName}
+                  required
+                  variant="standard"
+                />
+              </Box>
+            </Form.Group>
             <div style={formTextBox}>
               <Form.Group className="mb-3" controlId="formGroupSruveryId">
                 <Box
@@ -224,26 +273,26 @@ function Quotas() {
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formGroupSruveryId">
-                <Box
-                  component="form"
-                  sx={{
-                    '& > :not(style)': { m: 1, width: '25ch' },
-                  }}
-                  noValidate
+              <Box
+                component="form"
+                sx={{
+                  '& > :not(style)': { m: 1, width: '25ch' },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="cell"
+                  error={isCellSurveyIDError}
                   autoComplete="off"
-                >
-                  <TextField
-                    id="cell"
-                    error={isCellSurveyIDError}
-                    autoComplete="off"
-                    onChange={handleSurveyIDChange}
-                    value={cellSurveyID}
-                    label={cellSurveyName}
-                    required
-                    variant="standard"
-                  />
-                </Box>
-              </Form.Group>
+                  onChange={handleSurveyIDChange}
+                  value={cellSurveyID}
+                  label={cellSurveyName}
+                  required
+                  variant="standard"
+                />
+              </Box>
+            </Form.Group>
             </div>
           </div>
         </div>
@@ -270,7 +319,7 @@ function Quotas() {
                 {/*<TableCell>Cell StratumId</TableCell>*/}
                 {/*<TableCell>Cell Status</TableCell>*/}
                 <th style={{border: '1px solid black'}}>Criterion</th>
-                <th style={{border: '1px solid black'}}>Objective</th>
+                <th style={{border: '1px solid black'}}>Obj</th>
                 <th style={{border: '1px solid black'}}>Freq</th>
                 <th style={{border: '1px solid black'}}>To Do</th>
                 <th style={{border: '1px solid black'}}>Obj</th>
@@ -287,37 +336,31 @@ function Quotas() {
             <tbody>
               {Object.keys(data.Criterion).map((key, index) => (
                 <tr key={index}>
-                  {/*<td>{data["Web StratumId"][index]}</td>*/}
-                  {/*<td>{data["Web Status"][index]}</td>*/}
-                  {/*<td>{data["LL StratumId"][index]}</td>*/}
-                  {/*<td>{data["LL Status"][index]}</td>*/}
-                  {/*<td>{data["Cell StratumId"][index]}</td>*/}
-                  {/*<td>{data["Cell Status"][index]}</td>*/}
                   <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
-                  <td>{data.Obj[index]}</td>
-                  <td>{data.Freq[index]}</td>
-                  <td style={{borderRight: "1px solid black"}}>{data['To Do'][index]}</td>
+                  <td>{data['COM Objective'][index]}</td>
+                  <td>{data['COM Frequency'][index]}</td>
+                  <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
 
                   <td style={{
                     backgroundColor: (data['Web Status'][index] === "Open") ? "darkgreen" : "crimson",
                     color: "white"
                   }}
                   >
-                    {data['W Obj'][index]}
+                    {data['Web Objective'][index]}
                   </td>
                   <td
                   style={{
                     color:
-                      (-1 <= data["W Freq"][index] - data["W Obj"][index] && 1 >= data["W Freq"][index] - data["W Obj"][index]) ? "" :
-                        (-10 <= data["W Freq"][index] - data["W Obj"][index] && 10 >= data["W Freq"][index] - data["W Obj"][index]) ? "darkorange" :
+                      (-1 <= data["Web Frequency"][index] - data["Web Objective"][index] && 1 >= data["Web Frequency"][index] - data["Web Objective"][index]) ? "" :
+                        (-10 <= data["Web Frequency"][index] - data["Web Objective"][index] && 10 >= data["Web Frequency"][index] - data["Web Objective"][index]) ? "darkorange" :
                           "crimson",
                     backgroundColor:
-                      (-1 > data["W Freq"][index] - data["W Obj"][index]) ? "" :
-                        (-1 <= data["W Freq"][index] - data["W Obj"][index] && 1 >= data["W Freq"][index] - data["W Obj"][index]) ? "lightgreen" :
-                          (10 >= data["W Freq"][index] - data["W Obj"][index] && 2 <= data["W Freq"][index] - data["W Obj"][index]) ? "lightyellow" :
+                      (-1 > data["Web Frequency"][index] - data["Web Objective"][index]) ? "" :
+                        (-1 <= data["Web Frequency"][index] - data["Web Objective"][index] && 1 >= data["Web Frequency"][index] - data["Web Objective"][index]) ? "lightgreen" :
+                          (10 >= data["Web Frequency"][index] - data["Web Objective"][index] && 2 <= data["Web Frequency"][index] - data["Web Objective"][index]) ? "lightyellow" :
                             "lightpink"
                   }}>
-                    {data['W Freq'][index]}
+                    {data['Web Frequency'][index]}
                   </td>
                   <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}</td>
 
@@ -326,19 +369,19 @@ function Quotas() {
                     color: "white"
                   }}
                   >
-                    {data['L Obj'][index]}
+                    {data['LL Objective'][index]}
                   </td>
                   <td
                   style={{
                     color:
-                      (-1 <= data["L Freq"][index] - data["L Obj"][index] && 1 >= data["L Freq"][index] - data["L Obj"][index]) ? "" :
-                        (-10 <= data["L Freq"][index] - data["L Obj"][index] && 10 >= data["L Freq"][index] - data["L Obj"][index]) ? "darkorange" : "crimson",
+                      (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
+                        (-10 <= data["LL Frequency"][index] - data["LL Objective"][index] && 10 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "darkorange" : "crimson",
                     backgroundColor:
-                      (-1 > data["L Freq"][index] - data["L Obj"][index]) ? "" :
-                        (-1 <= data["L Freq"][index] - data["L Obj"][index] && 1 >= data["L Freq"][index] - data["L Obj"][index]) ? "lightgreen" :
-                          (10 >= data["L Freq"][index] - data["L Obj"][index] && 2 <= data["L Freq"][index] - data["L Obj"][index]) ? "lightyellow" : "lightpink"
+                      (-1 > data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
+                        (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightgreen" :
+                          (10 >= data["LL Frequency"][index] - data["LL Objective"][index] && 2 <= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightyellow" : "lightpink"
                   }}>
-                    {data['L Freq'][index]}
+                    {data['LL Frequency'][index]}
                   </td>
                   <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}</td>
 
@@ -348,19 +391,19 @@ function Quotas() {
                       color: 'white'
                   }}
                   >
-                    {data['C Obj'][index]}
+                    {data['Cell Objective'][index]}
                   </td>
                   <td
                   style={{
                     color:
-                      (-1 <= data["C Freq"][index] - data["C Obj"][index] && 1 >= data["C Freq"][index] - data["C Obj"][index]) ? "" :
-                        (-10 <= data["C Freq"][index] - data["C Obj"][index] && 10 >= data["C Freq"][index] - data["C Obj"][index]) ? "darkorange" : "crimson",
+                      (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
+                        (-10 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 10 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "darkorange" : "crimson",
                     backgroundColor:
-                      (-1 > data["C Freq"][index] - data["C Obj"][index]) ? "" :
-                        (-1 <= data["C Freq"][index] - data["C Obj"][index] && 1 >= data["C Freq"][index] - data["C Obj"][index]) ? "lightgreen" :
-                          (10 >= data["C Freq"][index] - data["C Obj"][index] && 2 <= data["C Freq"][index] - data["C Obj"][index]) ? "lightyellow" : "lightpink"
+                      (-1 > data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
+                        (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightgreen" :
+                          (10 >= data["Cell Frequency"][index] - data["Cell Objective"][index] && 2 <= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightyellow" : "lightpink"
                   }}>
-                    {data['C Freq'][index]}
+                    {data['Cell Frequency'][index]}
                   </td>
                   <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}</td>
                 </tr>
@@ -369,7 +412,6 @@ function Quotas() {
           </Table>
         )}
       </div>
-
     </div>
   )
 }
@@ -385,7 +427,7 @@ const headerStyle = {
 }
 
 const formDiv = {
-  // border: '1px solid black blue',
+  // border: '1px solid blue',
   display: 'flex',
   flexDirection: 'row',
   width: "40%",
@@ -395,10 +437,10 @@ const formDiv = {
 }
 
 const formStyle = {
-  // border: '1px solid black red',
+  // border: '1px solid red',
   display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  justifyContent: 'center',
   alignItems: 'center',
   alignContent: 'center',
   flexGrow: '1',
