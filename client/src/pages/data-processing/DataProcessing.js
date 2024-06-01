@@ -1,19 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import Form from "react-bootstrap/Form";
 import axios from "../../api/axios";
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Table from 'react-bootstrap/Table';
 import Sidebar from "./Sidebar";
 import Step from "./Step";
 import UncleTables from "./UncleTables";
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import CheckboxForm from "./CheckboxForm";
 import SurveyForm from "./SurveyForm";
 
@@ -26,17 +18,11 @@ const config = {
     'Content-Type': 'application/json',
     'X-Csrftoken': localStorage.getItem('csrftoken')
   }
-}
-// TODO add tables.txt data to webpage with highlights over potential errors
-// TODO make this new feature editable
-// TODO make all copyable table fields editable (e.g. <col>) for ease of copying
-// TODO create a hierarchy sidebar for DP steps that updates a container with proper steps text/features
-
+};
 
 function DataProcessing() {
 
   const [surveyID, setSurveyID] = useState('');
-  const [isSurveyIDError, setSurveyIDError] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [selectedValues, setSelectedValues] = useState({});
   const [surveyName, setSurveyName] = useState('Please enter project info');
@@ -46,6 +32,15 @@ function DataProcessing() {
   const [taskList, setTaskList] = useState([]);
   const [taskName, setTaskName] = useState('');
   const [extractionId, setExtractionId] = useState('');
+
+  const [comID, setComID] = useState('');
+  const [comFileName, setComFileName] = useState('');
+  const [selectedComSection, setSelectedComSection] = useState('create-order');
+  const [comDownloadDisabled, setComDownloadDisabled] = useState(true);
+  const [comTaskName, setComTaskName] = useState('');
+  const [comExtractionId, setComExtractionId] = useState('');
+  const [comQuestions, setComQuestions] = useState([]);
+  const [comTaskList, setComTaskList] = useState([]);
 
   const handleSelection = (section) => setSelectedSection(section);
 
@@ -134,30 +129,51 @@ function DataProcessing() {
   };
 
   const handleSurveyIDChange = async (e) => {
-  const value = e.target.value;
-  setSurveyID(value);
-  setSurveyIDError(value.length < 3);
-  resetState();
+    const value = e.target.value;
+    setSurveyID(value);
+    resetState();
 
-  if (value.length >= 3) {
-    const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
-    if (surveyNameData) {
-      setSurveyName(surveyNameData);
-      const taskListData = await fetchData(DATA_PROCESSING_URL + '/task_list', { surveyID: value });
-      setTaskList(taskListData || []);
+    if (value.length >= 3 && value.length <= 5) {
+      const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
+      if (surveyNameData) {
+        setSurveyName(surveyNameData);
+      } else {
+        setSurveyName('Invalid Survey ID');
+      }
     } else {
       setSurveyName('Invalid Survey ID');
     }
-  } else {
-    setSurveyName('Invalid Survey ID');
-  }
-};
+  };
+
+  const handleCOMIDChange = async (e) => {
+    const value = e.target.value;
+    setComID(value);
+    resetComState();
+
+    if (value.length >= 3 && value.length <= 5) {
+      const comNameData = await fetchData('/data_processing/com_file_name', { surveyID: value });
+      if (comNameData) {
+        comNameData(comNameData);
+      } else {
+        setSurveyName('Invalid Survey ID');
+      }
+    } else {
+      setSurveyName('Invalid Survey ID');
+    }
+  };
 
   const resetState = () => {
     setDownloadDisabled(true);
     setTaskName('');
     setExtractionId('');
     setQuestions([]);
+  };
+
+  const resetComState = () => {
+    setComDownloadDisabled(true);
+    setComTaskName('');
+    setComExtractionId('');
+    setComQuestions([]);
   };
 
   const handleTaskSelectChange = (e) => {
@@ -187,6 +203,8 @@ function DataProcessing() {
           <SurveyForm
             surveyID={surveyID}
             handleSurveyIDChange={handleSurveyIDChange}
+            comID={comID}
+            handleCOMIDChange={handleCOMIDChange}
             taskList={taskList}
             setTaskName={setTaskName}
             setExtractionId={setExtractionId}
@@ -194,48 +212,6 @@ function DataProcessing() {
             handleTaskSelectChange={handleTaskSelectChange}
             taskName={taskName}
           />
-          {/*<div*/}
-          {/*  style={formStyle}>*/}
-          {/*  <div style={formTextBox}>*/}
-          {/*    <Form.Group className="mb-3" controlId="formGroupSruveryId">*/}
-          {/*      <Box*/}
-          {/*        component="form"*/}
-          {/*        sx={{*/}
-          {/*          '& > :not(style)': { m: 1, width: '25ch' },*/}
-          {/*        }}*/}
-          {/*        noValidate*/}
-          {/*        autoComplete="off"*/}
-          {/*      >*/}
-          {/*        <TextField*/}
-          {/*          error={isSurveyIDError}*/}
-          {/*          autoComplete="off"*/}
-          {/*          onChange={handleSurveyIDChange}*/}
-          {/*          value={surveyID}*/}
-          {/*          label="Acuity Survey ID"*/}
-          {/*          required*/}
-          {/*          variant="standard"*/}
-          {/*        />*/}
-          {/*        <br/>*/}
-          {/*        <FormControl>*/}
-          {/*          <InputLabel id="task-list-label">Task List</InputLabel>*/}
-          {/*          <Select*/}
-          {/*            labelId="task-list-label"*/}
-          {/*            id="task-list"*/}
-          {/*            label="Task List"*/}
-          {/*            onChange={handleTaskSelectChange}*/}
-          {/*            value={taskName}*/}
-          {/*          >*/}
-          {/*            {taskList && taskList.map((task, index) => (*/}
-          {/*              <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>*/}
-          {/*            ))}*/}
-          {/*          </Select>*/}
-          {/*        </FormControl>*/}
-          {/*        <br/>*/}
-          {/*        <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>*/}
-          {/*      </Box>*/}
-          {/*    </Form.Group>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
         </div>
       </div>
       <div style={widgetContainerStyle}>
@@ -260,34 +236,6 @@ function DataProcessing() {
             <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>
               <div style={checkboxContainerStyle}>
                 <CheckboxForm questions={questions} handleCheckboxChange={handleCheckboxChange}/>
-                {/*<Table style={{width: "100%"}} striped>*/}
-                {/*  <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>*/}
-                {/*    <tr>*/}
-                {/*      <th>QNAME</th>*/}
-                {/*      <th>Table</th>*/}
-                {/*    </tr>*/}
-                {/*  </thead>*/}
-                {/*  <tbody>*/}
-                {/*    {(typeof questions === 'undefined') ? (*/}
-                {/*        <p>Loading...</p>*/}
-                {/*      ) : (*/}
-                {/*        questions.map((question ,i) => (*/}
-                {/*          <tr key={i}>*/}
-                {/*            <td style={{verticalAlign: 'middle'}}>{question}</td>*/}
-                {/*            <td>*/}
-                {/*              <Checkbox*/}
-                {/*                type="checkbox"*/}
-                {/*                name={question}*/}
-                {/*                id={question}*/}
-                {/*                defaultChecked*/}
-                {/*                onChange={() => handleCheckboxChange(question)}*/}
-                {/*              />*/}
-                {/*            </td>*/}
-                {/*          </tr>*/}
-                {/*        ))*/}
-                {/*    )}*/}
-                {/*  </tbody>*/}
-                {/*</Table>*/}
               </div>
             </div>
           </div>

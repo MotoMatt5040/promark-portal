@@ -8,7 +8,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 
-function SurveyForm({ surveyID, handleSurveyIDChange, taskList, setTaskName, setExtractionId, handleShow, handleTaskSelectChange, taskName }) {
+function SurveyForm({ surveyID, handleSurveyIDChange, comID, handleCOMIDChange, taskList, setTaskName, setExtractionId, handleShow, handleTaskSelectChange, taskName }) {
   return (
     <div className='dp-form'>
       <div>
@@ -25,6 +25,13 @@ function SurveyForm({ surveyID, handleSurveyIDChange, taskList, setTaskName, set
               value={surveyID}
               onChange={handleSurveyIDChange}
               label="Acuity Survey ID"
+              required
+              variant="standard"
+            />
+            <TextField
+              value={comID}
+              onChange={handleCOMIDChange}
+              label="COM File ID"
               required
               variant="standard"
             />

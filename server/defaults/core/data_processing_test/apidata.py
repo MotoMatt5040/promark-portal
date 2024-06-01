@@ -112,15 +112,6 @@ class ExtractionData:
         return f"{os.environ['extraction_url']}/{self.extraction_id}"
 
 
-class UncleFile:
-
-    def __init__(self):
-        pass
-
-    def organize(self, data):
-        pass
-
-
 class VoxcoDataGrabber:
 
     _access_token: str = os.environ['access_token']
@@ -332,8 +323,12 @@ class VoxcoDataGrabber:
         # used to reorganize the data in the proper order and add column info
         prev = None
         table_number = 1
+        x_file = [[], []]
+        first_M_encountered = False
+
         for i, question in enumerate(self._order):
             self._layout['variable'].append(question)
+            x_file[0].append(question)
 
             if question in self._raw_data:
 
@@ -352,9 +347,7 @@ class VoxcoDataGrabber:
                 if 'multi_mentions' not in restructure[temp]:
                     restructure[temp]['multi_mentions'] = {}
 
-                columns = {
-                    'start_column': start_column,
-                }
+                columns = {'start_column': start_column}
 
                 if self._raw_data[temp]['code_width'] > 1:
                     columns['end_column'] = end_column
@@ -362,10 +355,11 @@ class VoxcoDataGrabber:
                 restructure[temp]['multi_mentions'][question] = columns
                 q = temp
 
-            self._layout['table'].append(table_number)
+
             self._layout['start'].append(start_column)
             self._layout['end'].append(end_column)
             self._layout['width'].append(self._raw_data[q]['code_width'])
+            x_file[1].append('x' * int(self._raw_data[q]['code_width']))
 
             start_column += self._raw_data[q]['code_width']
             self._raw_data[q] = restructure[q]
@@ -379,9 +373,23 @@ class VoxcoDataGrabber:
                 if not create_rows_called:
                     self.create_rows(q)
 
+            if "_M" in question and not first_M_encountered:
+                self._layout['table'].append(table_number)
+                first_M_encountered = True
+                table_number += 1
+            elif self._raw_data[q].get('table'):
+                self._layout['table'].append(table_number)
+                table_number += 1
+            else:
+                self._layout['table'].append(np.nan)
+
             prev = q
 
-        print(pd.DataFrame(self._layout).to_string())
+        layout = pd.DataFrame(self._layout)
+        layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
+        xfile = pd.DataFrame(x_file, columns=x_file[0]).drop(0)
+        xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
+        # print(pd.DataFrame(self._layout).to_string())
         self._restructure = restructure
         return restructure
 
@@ -887,6 +895,50 @@ class VoxcoDataGrabber:
         self._has_fill = {}
         self._restructure = None
         self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
+
+
+class Toplines:
+    api_data = ApiData()
+    extraction_data = ExtractionData()
+
+    def __init__(self):
+        self._toplines = None
+
+    def frequency_table(self, df, column):
+        # Frequency
+        freq = df[column].value_counts(dropna=False).sort_index()
+
+        # Percent
+        percent = freq / freq.sum() * 100
+
+        # Valid Percent (excluding NaN)
+        valid_freq = df[column].value_counts().sort_index()
+        valid_percent = valid_freq / valid_freq.sum() * 100
+
+        # Cumulative Percent
+        cum_percent = valid_percent.cumsum()
+
+        # Combine all into a DataFrame
+        freq_table = pd.DataFrame({
+            'Frequency': freq,
+            'Percent': percent.round(1),
+            'Valid Percent': valid_percent.round(1),
+            'Cumulative Percent': cum_percent.round(1)
+        })
+
+        return freq_table
+
+    def print_toplines(self):
+        # List of columns to create frequency tables for
+        cols = self._toplines.columns.drop(['RecordNo', 'LtCallST'])
+
+        # Create and display frequency tables for each column
+        for column in cols:
+            print(f"Frequency Table for {column}:\n", self.frequency_table(self._toplines, column), "\n")
+
+    @property
+    def toplines(self):
+        return self._toplines
 
 
 
