@@ -34,13 +34,14 @@ function DataProcessing() {
   const [extractionId, setExtractionId] = useState('');
 
   const [comID, setComID] = useState('');
-  const [comFileName, setComFileName] = useState('');
+  const [comName, setComName] = useState('');
   const [selectedComSection, setSelectedComSection] = useState('create-order');
   const [comDownloadDisabled, setComDownloadDisabled] = useState(true);
   const [comTaskName, setComTaskName] = useState('');
   const [comExtractionId, setComExtractionId] = useState('');
   const [comQuestions, setComQuestions] = useState([]);
-  const [comTaskList, setComTaskList] = useState([]);
+  const [comTaskList, setComTaskList] = useState([])
+
 
   const handleSelection = (section) => setSelectedSection(section);
 
@@ -128,55 +129,60 @@ function DataProcessing() {
       .catch(handleErrors);
   };
 
-  const handleSurveyIDChange = async (e) => {
+  const handleIDChange = async (e, type) => {
     const value = e.target.value;
-    setSurveyID(value);
-    resetState();
 
-    if (value.length >= 3 && value.length <= 5) {
-      const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
-      if (surveyNameData) {
-        setSurveyName(surveyNameData);
+    if (type === 'survey') {
+      setSurveyID(value);
+    } else if (type === 'com') {
+      setComID(value);
+    }
+    resetState(type)
+
+    if (value.length >= 3 && value.length <= 6) {
+      const endpoint = type === 'survey' ? '/data_processing/survey_name' : '/data_processing/com_file_name';
+      const data = await fetchData(endpoint, { surveyID: value });
+      const taskListData = await fetchData('/data_processing/task_list', { surveyID: value });
+      setTaskList(taskListData || []);
+
+      // If valid data is found, set the name of the survey
+      if (data) {
+        if (type === 'survey') {
+          setSurveyName(data);
+        } else if (type === 'com') {
+          setComName(data);
+        }
       } else {
-        setSurveyName('Invalid Survey ID');
+        if (type === 'survey') {
+          setSurveyName('Invalid Survey ID');
+        } else if (type === 'com') {
+          setComName('Invalid COM ID');
+        }
       }
     } else {
-      setSurveyName('Invalid Survey ID');
+      if (type === 'survey') {
+        setSurveyName('Invalid Survey ID');
+      } else if (type === 'com') {
+        setComName('Invalid COM ID');
+      }
     }
   };
 
-  const handleCOMIDChange = async (e) => {
-    const value = e.target.value;
-    setComID(value);
-    resetComState();
-
-    if (value.length >= 3 && value.length <= 5) {
-      const comNameData = await fetchData('/data_processing/com_file_name', { surveyID: value });
-      if (comNameData) {
-        comNameData(comNameData);
-      } else {
-        setSurveyName('Invalid Survey ID');
-      }
-    } else {
-      setSurveyName('Invalid Survey ID');
+  const resetState = (type) => {
+    if (type === 'survey') {
+      setDownloadDisabled(true);
+      setTaskName('');
+      setExtractionId('');
+      setQuestions([]);
+    } else if (type === 'com') {
+      setComDownloadDisabled(true);
+      setComTaskName('');
+      setComExtractionId('');
+      setComQuestions([]);
     }
   };
 
-  const resetState = () => {
-    setDownloadDisabled(true);
-    setTaskName('');
-    setExtractionId('');
-    setQuestions([]);
-  };
-
-  const resetComState = () => {
-    setComDownloadDisabled(true);
-    setComTaskName('');
-    setComExtractionId('');
-    setComQuestions([]);
-  };
-
-  const handleTaskSelectChange = (e) => {
+  const handleTaskSelectChange = (e, setTaskName, setExtractionId, taskList) => {
     const selectedTaskName = e.target.value;
     const selectedTask = taskList.find((task) => task.Name === selectedTaskName);
     if (selectedTask) {
@@ -202,15 +208,18 @@ function DataProcessing() {
         <div className='dp-form' style={formDiv}>
           <SurveyForm
             surveyID={surveyID}
-            handleSurveyIDChange={handleSurveyIDChange}
+            handleIDChange={handleIDChange}
             comID={comID}
-            handleCOMIDChange={handleCOMIDChange}
             taskList={taskList}
+            comTaskList={comTaskList}
             setTaskName={setTaskName}
             setExtractionId={setExtractionId}
+            setComTaskName={setComTaskName}
+            setComExtractionId={setComExtractionId}
             handleShow={handleShow}
             handleTaskSelectChange={handleTaskSelectChange}
             taskName={taskName}
+            comTaskName={comTaskName}
           />
         </div>
       </div>

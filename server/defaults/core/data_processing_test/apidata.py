@@ -15,7 +15,7 @@ import json
 class SharedVariables:
     sid: str = None
     prc_id: str = None
-    survey_name = None
+    com_id: str = None
 
 
 class ApiData:
@@ -112,11 +112,59 @@ class ExtractionData:
         return f"{os.environ['extraction_url']}/{self.extraction_id}"
 
 
+class Toplines:
+    api_data = ApiData()
+    extraction_data = ExtractionData()
+
+    def __init__(self):
+        self._toplines = None
+
+    def frequency_table(self, df, column):
+        # Frequency
+        freq = df[column].value_counts(dropna=False).sort_index()
+
+        # Percent
+        percent = freq / freq.sum() * 100
+
+        # Valid Percent (excluding NaN)
+        valid_freq = df[column].value_counts().sort_index()
+        valid_percent = valid_freq / valid_freq.sum() * 100
+
+        # Cumulative Percent
+        cum_percent = valid_percent.cumsum()
+
+        # Combine all into a DataFrame
+        freq_table = pd.DataFrame({
+            'Frequency': freq,
+            'Percent': percent.round(1),
+            'Valid Percent': valid_percent.round(1),
+            'Cumulative Percent': cum_percent.round(1)
+        })
+
+        return freq_table
+
+    def print_toplines(self):
+        # List of columns to create frequency tables for
+        cols = self._toplines.columns.drop(['RecordNo', 'LtCallST'])
+
+        # Create and display frequency tables for each column
+        for column in cols:
+            print(f"Frequency Table for {column}:\n", self.frequency_table(self._toplines, column), "\n")
+
+    @property
+    def toplines(self):
+        return self._toplines
+
+    def fetch_access_key(self):
+        response = requests.get(self.api_data.survey_url, headers={"Authorization": f"Client {self.api_data._access_token}"}).json()
+
+
 class VoxcoDataGrabber:
 
     _access_token: str = os.environ['access_token']
     api_data = ApiData()
     extraction_data = ExtractionData()
+    toplines = Toplines()
 
     def __init__(self):
         self._checkboxes = None
@@ -129,14 +177,18 @@ class VoxcoDataGrabber:
         self._lower_case = False
         self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
 
-    def survey_name(self) -> str:
+    def survey_name(self, toplines=False) -> str:
         """
         Pull survey name from the api. This request must be made after the sid is set.
         :return: str: survey name
         """
-        self.api_data.survey_name = requests.get(self.api_data.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
-        # The prc id is auto set inside the API class
-        return self.api_data.survey_name
+        if not toplines:
+            self.api_data.survey_name = requests.get(self.api_data.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
+            # The prc id is auto set inside the API class
+            return self.api_data.survey_name
+        else:
+            self.toplines.fetch_access_key()
+
 
     def target_task_list(self) -> list[dict]:
         """
@@ -772,6 +824,14 @@ class VoxcoDataGrabber:
         SharedVariables.sid = sid
 
     @property
+    def com_id(self):
+        return SharedVariables.com_id
+
+    @com_id.setter
+    def com_id(self, com_id):
+        SharedVariables.com_id = com_id
+
+    @property
     def extraction_id(self):
         return self.extraction_data.extraction_id
 
@@ -896,49 +956,6 @@ class VoxcoDataGrabber:
         self._restructure = None
         self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
 
-
-class Toplines:
-    api_data = ApiData()
-    extraction_data = ExtractionData()
-
-    def __init__(self):
-        self._toplines = None
-
-    def frequency_table(self, df, column):
-        # Frequency
-        freq = df[column].value_counts(dropna=False).sort_index()
-
-        # Percent
-        percent = freq / freq.sum() * 100
-
-        # Valid Percent (excluding NaN)
-        valid_freq = df[column].value_counts().sort_index()
-        valid_percent = valid_freq / valid_freq.sum() * 100
-
-        # Cumulative Percent
-        cum_percent = valid_percent.cumsum()
-
-        # Combine all into a DataFrame
-        freq_table = pd.DataFrame({
-            'Frequency': freq,
-            'Percent': percent.round(1),
-            'Valid Percent': valid_percent.round(1),
-            'Cumulative Percent': cum_percent.round(1)
-        })
-
-        return freq_table
-
-    def print_toplines(self):
-        # List of columns to create frequency tables for
-        cols = self._toplines.columns.drop(['RecordNo', 'LtCallST'])
-
-        # Create and display frequency tables for each column
-        for column in cols:
-            print(f"Frequency Table for {column}:\n", self.frequency_table(self._toplines, column), "\n")
-
-    @property
-    def toplines(self):
-        return self._toplines
 
 
 

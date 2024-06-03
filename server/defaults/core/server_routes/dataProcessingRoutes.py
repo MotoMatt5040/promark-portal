@@ -9,13 +9,14 @@ from server.defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
 from ..auth.models import db, User, DataProcessingChecklist
 # from ..data_processing.reader import Reader
-from ..data_processing_test.apidata import VoxcoDataGrabber
+from ..data_processing_test.apidata import VoxcoDataGrabber, Toplines
 
 data_processor = Blueprint('data_process', __name__)
 dp = DataPuller()
 
 # reader = Reader()
 dg = VoxcoDataGrabber()
+toplines = Toplines()
 # print("DATA LAYOUT", json.dumps(dg.json_layout, indent=4))
 
 # DPApi.sid = 450
@@ -57,11 +58,15 @@ def survey_name():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    sid = request.json['surveyID']
-    dg.sid = sid
-    dg.reset_data()
+    if request.json['source'] == 'web':
+        sid = request.json['surveyID']
+        dg.sid = sid
+        dg.reset_data()
+        survey_name = dg.survey_name()
+    else:
 
-    return dg.survey_name()
+
+    return survey_name
 
 
 @data_processor.route('/checkboxes', methods=['POST', 'OPTIONS'])
@@ -98,8 +103,9 @@ def has_table():
         dg.lower_case = True
 
     dg.fetch_raw_data()
-    dg.restructure()
     dg.has_table(request.json['selectedValues'])
+    dg.restructure()
+
     dg.identify_qualifiers()
     dg.clean_data()
     dg.partyid()
