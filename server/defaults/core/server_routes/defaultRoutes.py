@@ -174,7 +174,6 @@ def login():
     remember = request.json['remember']
 
     user = User.query.filter_by(email=email).first()
-
     if user is None:
         flash("Login failed.")
         return jsonify({

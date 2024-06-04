@@ -58,12 +58,17 @@ def survey_name():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    if request.json['source'] == 'web':
-        sid = request.json['surveyID']
-        dg.sid = sid
-        dg.reset_data()
-        survey_name = dg.survey_name()
-    else:
+    sid = request.json['surveyID']
+    dg.sid = sid
+    dg.reset_data()
+    # survey_name = dg.survey_name()
+    # if request.json['source'] == 'web':
+    #     sid = request.json['surveyID']
+    #     dg.sid = sid
+    #     dg.reset_data()
+    #     survey_name = dg.survey_name()
+    # else:
+    #     survey_name = "toplines"
 
 
     return survey_name
