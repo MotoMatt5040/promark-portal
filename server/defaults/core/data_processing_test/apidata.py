@@ -21,7 +21,7 @@ class SharedVariables:
 class ApiData:
 
     def __init__(self):
-        self._survey_name = None
+        # self._survey_name = None
         self._url = None
         self._survey_url = None
 
@@ -37,14 +37,14 @@ class ApiData:
         """
         return SharedVariables.sid
 
-    @property
-    def survey_name(self):
-        return SharedVariables.survey_name
+    # @property
+    # def survey_name(self):
+    #     return SharedVariables.survey_name
 
-    @survey_name.setter
-    def survey_name(self, survey_name):
-        SharedVariables.survey_name = survey_name
-        SharedVariables.prc_id = survey_name[:survey_name.find(' ')]
+    # @survey_name.setter
+    # def survey_name(self, survey_name):
+    #     SharedVariables.survey_name = survey_name
+    #     SharedVariables.prc_id = survey_name[:survey_name.find(' ')]
 
     @property
     def prc_id(self):
@@ -189,7 +189,6 @@ class VoxcoDataGrabber:
         else:
             self.toplines.fetch_access_key()
 
-
     def target_task_list(self) -> list[dict]:
         """
         Get the target task data from the extraction task url. This value will return False if the task is not found.
@@ -234,7 +233,7 @@ class VoxcoDataGrabber:
             print(f"Error: {err}", traceback.format_exc())
             return []
         self._order = pd.read_csv(f"{task_name}.csv")
-        self._checkboxes = [item for item in list(self._order.columns[4:]) if "_M" not in item]
+        self._checkboxes = [item.replace("_M1", "") for item in list(self._order.columns[4:]) if "_M" not in item or "_M1" in item]
         self._order = self.order.columns
         os.remove(f'{task_name}.csv')
         return self._checkboxes
@@ -522,7 +521,7 @@ class VoxcoDataGrabber:
                 prev = key
 
             if start_column:
-                result['label'] = label
+                result['label'] = f"{label.replace('VERAB=', '')} ;ALL ;HP NOVP"
                 result['qual'] = qual
                 self._raw_data[question]['qualifiers'] = result
 
@@ -696,6 +695,7 @@ class VoxcoDataGrabber:
         # This is a list comprehension syntax. The [::-1] is used to reverse the list so that the items are appended
         # as they are appended on top of the list. This is done to ensure the order is correct.
         [que['rows'].insert(0, row) for row in totals[::-1]]
+        que['totals'] = True
 
         self._raw_data[question] = que
 
@@ -749,20 +749,29 @@ class VoxcoDataGrabber:
         self._raw_data['QIDEOLOGY'] = ideology
         return ideology
 
-    def temp_write(self):
+    def temp_write(self, style=None):
+        print("\033[93mWarning: apidata.VoxcoDataGrabber.temp_write() WILL be deprecated in the future!\033[0m")
         error = []
         tnum = 1
         qual_logic = None
         qual_label = None
+        first_M_encounter = False
         with open('EXTRACTION/UNCLE/tables.txt', 'w') as f:
             for qname in self._order:
                 try:
                     exists = self._raw_data.get(qname)
                     if not exists:
-                        continue
+                        if "_M" in qname and not first_M_encounter:
+                            first_M_encounter = True
+                            qname = qname[:qname.find('_M')]
+                            exists = self._raw_data.get(qname)
+                        else:
+                            continue
+                    # print('exists', qname)
                     table_exists = exists.get('table')
                     if not table_exists:
                         continue
+                    # print('table', qname)
                     question = self._raw_data[qname].get('question')
                     text = self._raw_data[qname].get('text')
                     qualifier = self._raw_data[qname].get('qualifiers')
@@ -789,12 +798,23 @@ class VoxcoDataGrabber:
                     if rank:
                         table.append('O RANK')
                     table.append(qual_label if qualifier else base)
-                    [table.append(row) for row in self._raw_data[qname]['rows']]
+                    rows = exists.get('rows')
+                    if rows:
+                        if not style or not self._raw_data[qname].get('totals'):
+                            [table.append(row) for row in self._raw_data[qname]['rows']]
+                        else:
+                            table.append(self._raw_data[qname]['rows'][0].replace('R3-R4', 'R3-R6'))
+                            table.append(self._raw_data[qname]['rows'][1])
+                            table.append(self._raw_data[qname]['rows'][3])
+                            table.append(self._raw_data[qname]['rows'][4])
+                            table.append(self._raw_data[qname]['rows'][2])
+                            [table.append(row) for row in self._raw_data[qname]['rows'][5:]]
                     tnum += 1
                     for item in table:
                         f.write(f"{item}\n")
-                except Exception:
+                except Exception as err:
                     error.append(qname)
+                    print("\033[93mERROR: ", err, "\033[0m")
 
         # for item in error:
         #     print(item)
