@@ -8,15 +8,17 @@ import Step from "./Step";
 import UncleTables from "./UncleTables";
 import CheckboxForm from "./CheckboxForm";
 import SurveyForm from "./SurveyForm";
+import Cookies from 'js-cookie';
 
 const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
 
+
 const config = {
   headers: {
     'Content-Type': 'application/json',
-    'X-Csrftoken': localStorage.getItem('csrftoken')
+    'X-CSRF-Token': Cookies.get("csrf_token")
   }
 };
 
@@ -64,7 +66,7 @@ function DataProcessing() {
 
   const fetchData = async (url, data) => {
     try {
-      const response = await axios.post(url, data, config);
+      const response = await axios.post(url, data, {headers: {'Content-Type': 'application/json'}});
       if (response.status === 200) {
         return response.data;
       }
@@ -109,10 +111,7 @@ function DataProcessing() {
     axios
       .get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
         responseType: 'blob',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Csrftoken': localStorage.getItem('csrftoken'),
-        },
+        config,
       })
       .then((response) => {
         const survey_n = name.split(' ')[0];
@@ -195,7 +194,8 @@ function DataProcessing() {
     const requestPayload = {
       selectedValues,
       totalStyleChecked: document.getElementById('total-style').checked,
-      case: document.getElementById('case').checked
+      case: document.getElementById('case').checked,
+      style: document.getElementById("total-style").checked
     };
     const data = await fetchData(DATA_PROCESSING_URL + '/has_table', requestPayload);
     setUncleTables(data || []);
