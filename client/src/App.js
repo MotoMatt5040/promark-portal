@@ -25,7 +25,7 @@ function App() {
         <Header title="React Navbar Component" />
         <Routes>
           {/*These are routes that require the user to be logged in*/}
-          <Route element={<PrivateRoutes />}>
+          {/*<Route element={<PrivateRoutes />}>*/}
             <Route path="data_processing" element={<DataProcessing/>}/>
             <Route path="production_report" element={<ProductionReport/>} />
             <Route path="periodic_update" element={<PeriodicUpdate/>}/>
@@ -34,7 +34,7 @@ function App() {
             <Route path="profile" element={<Profile/>}/>
             <Route path="settings" element={<Settings/>}/>
             <Route path="add_user" element={<AddUser/>}/>
-          </Route>
+          {/*</Route>*/}
 
           {/*These are routes that can be access regardless of login status*/}
           <Route path="/login" element={<Login />}/>
