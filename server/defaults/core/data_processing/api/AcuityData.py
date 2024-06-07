@@ -504,7 +504,6 @@ class AcuityData(AcuityAPI):
 
     def build_extraction_task(self):
         header = {
-
             "Authorization": f"Client {self.access_token}",
             "Content-Type": "application/json"
         }
