@@ -23,15 +23,15 @@ login_manager = LoginManager()
 app = Flask(__name__)
 
 app.config.from_object(ApplicationConfig)
-CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition", "X-CSRFToken"])
+CORS(app, supports_credentials=True, origins=[allowed_domain], expose_headers=["Content-Disposition", 'X-CSRFToken'])
 
 
-csrf = CSRFProtect(app)
+# csrf = CSRFProtect(app)
 bcrypt = Bcrypt(app)
-login_manager.init_app(app)
+# login_manager.init_app(app)
 server_session = Session(app)
 db.init_app(app)
-csrf.init_app(app)
+# csrf.init_app(app)
 login_manager.init_app(app)
 
 app.register_blueprint(periodic_update)  # This is used to allow the routes to be in other files
@@ -39,46 +39,54 @@ app.register_blueprint(data_processor, url_prefix="/data_processing")
 app.register_blueprint(quotas, url_prefix="/quotas")
 
 #  uncomment this to create needed tables from models.py
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
+#
+#     admins = ['matt', 'jj', 'wayne', 'test']
+#     for admin in admins:
+#         user_exists = User.query.filter_by(email=os.environ[f'{admin}_email']).first() is not None
+#         if not user_exists:
+#             new_user = User(
+#                 email=os.environ[f'{admin}_email'],
+#                 password=bcrypt.generate_password_hash(os.environ[f'{admin}_password']),
+#                 production_dashboard=1,
+#                 data_processing=1,
+#                 global_quota_module=1,
+#                 add_user=1,
+#                 created_by='system',
+#                 date_created=str(date.today()),
+#                 active_employee=True
+#             )
+#             db.session.add(new_user)
+#             db.session.commit()
+#     tasks = [
+#         'Created order.csv',
+#         'Created directories',
+#         'Created files',
+#         'Created project',
+#         'Ran USort',
+#         'Created UNCLE project',
+#         'Cleaned table errors',
+#         'Checked stubs',
+#         'Created banners'
+#     ]
+#     for task in tasks:
+#         task_exists = DataProcessingTasks.query.filter_by(task=task).first() is not None
+#         if not task_exists:
+#             new_task = DataProcessingTasks(
+#                 task_id=tasks.index(task) + 1,
+#                 task=task
+#             )
+#             db.session.add(new_task)
+#             db.session.commit()
 
-    admins = ['matt', 'jj', 'wayne', 'test']
-    for admin in admins:
-        user_exists = User.query.filter_by(email=os.environ[f'{admin}_email']).first() is not None
-        if not user_exists:
-            new_user = User(
-                email=os.environ[f'{admin}_email'],
-                password=bcrypt.generate_password_hash(os.environ[f'{admin}_password']),
-                production_dashboard=1,
-                data_processing=1,
-                global_quota_module=1,
-                add_user=1,
-                created_by='system',
-                date_created=str(date.today()),
-                active_employee=True
-            )
-            db.session.add(new_user)
-            db.session.commit()
-    tasks = [
-        'Created order.csv',
-        'Created directories',
-        'Created files',
-        'Created project',
-        'Ran USort',
-        'Created UNCLE project',
-        'Cleaned table errors',
-        'Checked stubs',
-        'Created banners'
-    ]
-    for task in tasks:
-        task_exists = DataProcessingTasks.query.filter_by(task=task).first() is not None
-        if not task_exists:
-            new_task = DataProcessingTasks(
-                task_id=tasks.index(task) + 1,
-                task=task
-            )
-            db.session.add(new_task)
-            db.session.commit()
+
+# @app.after_request
+# def inject_csrf_token(response):
+#     csrf_token = generate_csrf()
+#     response.set_cookie('csrf_token', csrf_token)
+#     session['csrf_token'] = csrf_token
+#     return response
 
 
 @app.route('/')
@@ -89,7 +97,7 @@ def index():
 
 
 @app.route('/home', methods=['GET', 'POST', 'OPTIONS'])
-@login_required
+# @login_required
 def home():
     """App home page"""
     if request.method == "OPTIONS":  # CORS preflight
@@ -136,25 +144,28 @@ def user():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
-    if "email" not in session:
-        return jsonify({
-            'report': 'Invalid credentials.'
-        }), 401
-
-    user = User.query.filter_by(email=session['email']).first()
-    dispatcher = {
-        '/periodic_update': user.production_dashboard,
-        '/data_processing': user.data_processing,
-        '/global_quotas': user.global_quota_module,
-        '/add_user': user.add_user
-    }
-
-    role = request.json['role']
-
-    if not dispatcher[role]:
-        return jsonify({
-            'report': 'User does not have the required authorization to perform this request'
-        }), 403
+    # if "email" not in session:
+    #     print('no email found')
+    #     print(session)
+    #     return jsonify({
+    #         'report': 'Invalid credentials.'
+    #     }), 401
+    #
+    # user = User.query.filter_by(email=session['email']).first()
+    # print(user.email)
+    # dispatcher = {
+    #     '/periodic_update': user.production_dashboard,
+    #     '/data_processing': user.data_processing,
+    #     '/global_quotas': user.global_quota_module,
+    #     '/add_user': user.add_user
+    # }
+    #
+    # role = request.json['role']
+    #
+    # if not dispatcher[role]:
+    #     return jsonify({
+    #         'report': 'User does not have the required authorization to perform this request'
+    #     }), 403
 
     return jsonify({
         'report': 'Validated.'
@@ -162,12 +173,13 @@ def user():
 
 
 @app.route('/login', methods=['POST', 'OPTIONS'])
-@csrf.exempt
+# @csrf.exempt
 def login():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
 
     session['email'] = request.json['email']
+    print(session['email'])
 
     email = request.json['email']
     password = request.json['password']
@@ -195,21 +207,25 @@ def login():
         login_user(user, remember=remember)
         flash('Login successful.')
 
-    csrf_token = generate_csrf()  # Generate CSRF token
-    if session.get("csrf_token") is None:
-        session['csrf_token'] = csrf_token
+    # csrf_token = generate_csrf()  # Generate CSRF token
+    # if session.get("csrf_token") is None:
+    #     session['csrf_token'] = csrf_token
     response = make_response(
         {'user': session['email'],
          'report': 'Logged in.'},
         200
     )
-    response.headers['X-Csrftoken'] = csrf_token
+    # response.headers['X-Csrftoken'] = csrf_token
+    # csrf_token = generate_csrf()
+    # response.set_cookie('csrf_token', csrf_token)
+    # session['csrf_token'] = csrf_token
+    # print(csrf_token)
 
     return response
 
 
 @app.route("/verify", methods=["GET", 'POST', 'OPTIONS'])
-@login_required
+# @login_required
 def verify():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
@@ -285,7 +301,7 @@ def add_user():
 
 
 @app.route('/logout', methods=["GET"])
-@login_required
+# @login_required
 def logout():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
@@ -296,7 +312,7 @@ def logout():
 
     try:
         session.pop('email', None)
-        session.pop('csrf_token', None)
+        # session.pop('csrf_token', None)
         flash("Successfully logged out.")
     except:
         pass
