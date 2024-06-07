@@ -40,16 +40,16 @@ function Quotas() {
     setLandlineData({});
     setCellData({});
     if(!isComSurveyIDError) {
-      await getSurveyQuotas('com', comSurveyID);
+      await getSurveyQuotas('COM', comSurveyID);
     }
     if(!isWebSurveyIDError) {
-      await getSurveyQuotas('web', webSurveyID);
+      await getSurveyQuotas('Web', webSurveyID);
     }
     if(!isLandlineSurveyIDError) {
-      await getSurveyQuotas('landline', landlineSurveyID);
+      await getSurveyQuotas('LL', landlineSurveyID);
     }
     if(!isCellSurveyIDError) {
-      await getSurveyQuotas('cell', cellSurveyID);
+      await getSurveyQuotas('Cell', cellSurveyID);
     }
     await axios.get(
       "/quotas/merge",
@@ -78,28 +78,28 @@ function Quotas() {
     const source_id = e.target.id;
 
     switch (source_id) {
-      case "com":
+      case "COM":
         setComSurveyID(value);
         setComSurveyIDError(value.length <5);
         if(value.length > 4) {
           getSurveyName(source_id, value);
         }
         break;
-      case "web":
+      case "Web":
         setWebSurveyID(value);
         setWebSurveyIDError(value.length < 3);
         if(value.length > 2) {
           getSurveyName(source_id, value);
         }
         break;
-      case "landline":
+      case "LL":
         setLandlineSurveyID(value);
         setLandlineSurveyIDError(value.length < 5);
         if(value.length > 4) {
           getSurveyName(source_id, value);
         }
         break;
-      case "cell":
+      case "Cell":
         setCellSurveyID(value);
         setCellSurveyIDError(value.length < 5);
         if(value.length > 4) {
@@ -123,16 +123,16 @@ function Quotas() {
     })
       .then((response) => {
         switch (source) {
-          case 'com':
+          case 'COM':
             setComSurveyName(response.data);
             break;
-          case 'web':
+          case 'Web':
             setWebSurveyName(response.data);
             break;
-          case 'landline':
+          case 'LL':
             setLandlineSurveyName(response.data);
             break;
-          case 'cell':
+          case 'Cell':
             setCellSurveyName(response.data);
             break;
           default:
@@ -142,19 +142,19 @@ function Quotas() {
       .catch((error) => {
         console.error("Error fetching survey name", error)
         switch (source) {
-          case 'com':
+          case 'COM':
             setComSurveyName("Invalid COM Survey ID");
             setComSurveyIDError(true)
             break;
-          case 'web':
+          case 'Web':
             setWebSurveyName("Invalid Web Survey ID");
             setWebSurveyIDError(true)
             break;
-          case 'landline':
+          case 'LL':
             setLandlineSurveyName("Invalid Landline Survey ID");
             setLandlineSurveyIDError(true)
             break;
-          case 'cell':
+          case 'Cell':
             setCellSurveyName("Invalid Cell Survey ID");
             setCellSurveyIDError(true)
             break;
@@ -176,19 +176,20 @@ function Quotas() {
     })
       .then((response) => {
         switch (source) {
-          case 'com':
+          case 'COM':
             setComData({});
             setComData(response.data);
+            console.log(response.data);
             break;
-          case 'web':
+          case 'Web':
             setWebData({});
             setWebData(response.data);
             break;
-          case 'landline':
+          case 'LL':
             setLandlineData({});
             setLandlineData(response.data);
             break;
-          case 'cell':
+          case 'Cell':
             setCellData({});
             setCellData(response.data);
             break;
@@ -216,7 +217,7 @@ function Quotas() {
                 autoComplete="off"
               >
                 <TextField
-                  id="com"
+                  id="COM"
                   error={isComSurveyIDError}
                   autoComplete="off"
                   onChange={handleSurveyIDChange}
@@ -238,7 +239,7 @@ function Quotas() {
                   autoComplete="off"
                 >
                   <TextField
-                    id="web"
+                    id="Web"
                     error={isWebSurveyIDError}
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
@@ -260,7 +261,7 @@ function Quotas() {
                   autoComplete="off"
                 >
                   <TextField
-                    id="landline"
+                    id="LL"
                     error={isLandlineSurveyIDError}
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
@@ -282,7 +283,7 @@ function Quotas() {
                 autoComplete="off"
               >
                 <TextField
-                  id="cell"
+                  id="Cell"
                   error={isCellSurveyIDError}
                   autoComplete="off"
                   onChange={handleSurveyIDChange}
@@ -304,8 +305,13 @@ function Quotas() {
         {Object.keys(data).length > 0 && (
           <Table style={{width: "50%", border: '1px solid black'}} striped>
             <thead>
+              {/*<tr>*/}
+              {/*  <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>*/}
+              {/*  <th scope="col" colSpan="6" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>*/}
+              {/*  <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Phone</th>*/}
+              {/*</tr>*/}
               <tr>
-                <th scope="col" colSpan="4" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>
+                <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>
                 <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>
                 <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Landline</th>
                 <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Cell</th>
@@ -319,9 +325,11 @@ function Quotas() {
                 {/*<TableCell>Cell StratumId</TableCell>*/}
                 {/*<TableCell>Cell Status</TableCell>*/}
                 <th style={{border: '1px solid black'}}>Criterion</th>
+                <th style={{border: '1px solid black'}}>Label</th>
                 <th style={{border: '1px solid black'}}>Obj</th>
                 <th style={{border: '1px solid black'}}>Freq</th>
                 <th style={{border: '1px solid black'}}>To Do</th>
+                {/*<th style={{border: '1px solid black'}}>Label</th>*/}
                 <th style={{border: '1px solid black'}}>Obj</th>
                 <th style={{border: '1px solid black'}}>Freq</th>
                 <th style={{border: '1px solid black'}}>% Global</th>
@@ -337,12 +345,13 @@ function Quotas() {
               {Object.keys(data.Criterion).map((key, index) => (
                 <tr key={index}>
                   <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
+                  <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
                   <td>{data['COM Objective'][index]}</td>
                   <td>{data['COM Frequency'][index]}</td>
                   <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
-
+                  {/*<td style={{borerLeft: "1px solid black"}}>{data['Web Label'][index]}</td>*/}
                   <td style={{
-                    backgroundColor: (data['Web Status'][index] === "Open") ? "darkgreen" : "crimson",
+                    backgroundColor: (data['Web Status'][index] === "Open") ? "#43B17B" : "#ED211C",
                     color: "white"
                   }}
                   >
@@ -365,7 +374,7 @@ function Quotas() {
                   <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}</td>
 
                   <td style={{
-                    backgroundColor: (data['LL Status'][index] === "Open") ? "darkgreen" : "crimson",
+                    backgroundColor: (data['LL Status'][index] === "Open") ? "#43B17B" : "#ED211C",
                     color: "white"
                   }}
                   >
@@ -387,7 +396,7 @@ function Quotas() {
 
                   <td
                     style={{
-                      backgroundColor: (data['Cell Status'][index] === "Open") ? "darkgreen" : "crimson",
+                      backgroundColor: (data['Cell Status'][index] === "Open") ? "#43B17B" : "#ED211C",
                       color: 'white'
                   }}
                   >
