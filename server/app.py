@@ -6,6 +6,15 @@ from defaults.core.server_routes import defaultRoutes
 from waitress import serve
 
 
+#  TODO: projects going forwards
+#  SPSS Automation (toplines, basically remove spss)
+#  banner automation
+#  weighting automation
+#  global quota module
+#  quota calculation automation
+#  sample formatting automation
+#  COM File update automation (CC3 Completes)
+
 if __name__ == '__main__':
     print("http://localhost:5000/")
     serve(
