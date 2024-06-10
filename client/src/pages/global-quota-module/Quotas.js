@@ -30,6 +30,22 @@ function Quotas() {
   const [cellData, setCellData] = useState({});
   const [data, setData] = useState({});
 
+  const [showColumns, setShowColumns] = useState({
+    web: true,
+    phone: true,
+    panel: true,
+    t2w: true,
+    landline: true,
+    cell: true
+  });
+
+  const toggleColumn = (column) => {
+    setShowColumns({
+      ...showColumns,
+      [column]: !showColumns[column]
+    });
+  };
+
   useEffect(() => {
 
   }, []);
@@ -40,16 +56,16 @@ function Quotas() {
     setLandlineData({});
     setCellData({});
     if(!isComSurveyIDError) {
-      await getSurveyQuotas('com', comSurveyID);
+      await getSurveyQuotas('COM', comSurveyID);
     }
     if(!isWebSurveyIDError) {
-      await getSurveyQuotas('web', webSurveyID);
+      await getSurveyQuotas('Web', webSurveyID);
     }
     if(!isLandlineSurveyIDError) {
-      await getSurveyQuotas('landline', landlineSurveyID);
+      await getSurveyQuotas('LL', landlineSurveyID);
     }
     if(!isCellSurveyIDError) {
-      await getSurveyQuotas('cell', cellSurveyID);
+      await getSurveyQuotas('Cell', cellSurveyID);
     }
     await axios.get(
       "/quotas/merge",
@@ -78,28 +94,28 @@ function Quotas() {
     const source_id = e.target.id;
 
     switch (source_id) {
-      case "com":
+      case "COM":
         setComSurveyID(value);
         setComSurveyIDError(value.length <5);
         if(value.length > 4) {
           getSurveyName(source_id, value);
         }
         break;
-      case "web":
+      case "Web":
         setWebSurveyID(value);
         setWebSurveyIDError(value.length < 3);
         if(value.length > 2) {
           getSurveyName(source_id, value);
         }
         break;
-      case "landline":
+      case "LL":
         setLandlineSurveyID(value);
         setLandlineSurveyIDError(value.length < 5);
         if(value.length > 4) {
           getSurveyName(source_id, value);
         }
         break;
-      case "cell":
+      case "Cell":
         setCellSurveyID(value);
         setCellSurveyIDError(value.length < 5);
         if(value.length > 4) {
@@ -123,16 +139,16 @@ function Quotas() {
     })
       .then((response) => {
         switch (source) {
-          case 'com':
+          case 'COM':
             setComSurveyName(response.data);
             break;
-          case 'web':
+          case 'Web':
             setWebSurveyName(response.data);
             break;
-          case 'landline':
+          case 'LL':
             setLandlineSurveyName(response.data);
             break;
-          case 'cell':
+          case 'Cell':
             setCellSurveyName(response.data);
             break;
           default:
@@ -142,19 +158,19 @@ function Quotas() {
       .catch((error) => {
         console.error("Error fetching survey name", error)
         switch (source) {
-          case 'com':
+          case 'COM':
             setComSurveyName("Invalid COM Survey ID");
             setComSurveyIDError(true)
             break;
-          case 'web':
+          case 'Web':
             setWebSurveyName("Invalid Web Survey ID");
             setWebSurveyIDError(true)
             break;
-          case 'landline':
+          case 'LL':
             setLandlineSurveyName("Invalid Landline Survey ID");
             setLandlineSurveyIDError(true)
             break;
-          case 'cell':
+          case 'Cell':
             setCellSurveyName("Invalid Cell Survey ID");
             setCellSurveyIDError(true)
             break;
@@ -176,19 +192,20 @@ function Quotas() {
     })
       .then((response) => {
         switch (source) {
-          case 'com':
+          case 'COM':
             setComData({});
             setComData(response.data);
+            console.log(response.data);
             break;
-          case 'web':
+          case 'Web':
             setWebData({});
             setWebData(response.data);
             break;
-          case 'landline':
+          case 'LL':
             setLandlineData({});
             setLandlineData(response.data);
             break;
-          case 'cell':
+          case 'Cell':
             setCellData({});
             setCellData(response.data);
             break;
@@ -216,7 +233,7 @@ function Quotas() {
                 autoComplete="off"
               >
                 <TextField
-                  id="com"
+                  id="COM"
                   error={isComSurveyIDError}
                   autoComplete="off"
                   onChange={handleSurveyIDChange}
@@ -238,7 +255,7 @@ function Quotas() {
                   autoComplete="off"
                 >
                   <TextField
-                    id="web"
+                    id="Web"
                     error={isWebSurveyIDError}
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
@@ -260,7 +277,7 @@ function Quotas() {
                   autoComplete="off"
                 >
                   <TextField
-                    id="landline"
+                    id="LL"
                     error={isLandlineSurveyIDError}
                     autoComplete="off"
                     onChange={handleSurveyIDChange}
@@ -282,7 +299,7 @@ function Quotas() {
                 autoComplete="off"
               >
                 <TextField
-                  id="cell"
+                  id="Cell"
                   error={isCellSurveyIDError}
                   autoComplete="off"
                   onChange={handleSurveyIDChange}
@@ -301,118 +318,226 @@ function Quotas() {
       </div>
       {/*{typeof webData !== {}*/}
       <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
+        <Table style={{width: "10%", border: '1px solid black'}} striped>
+          <thead>
+            <tr>
+              <th scope='col' colSpan='7' style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Legend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{border: '1px solid black'}}>
+              <td style={{backgroundColor: "#43B17B", color: "white", border: '1px solid black'}}>Open</td>
+              <td style={{backgroundColor: "#ED211C", color: "white", border: '1px solid black'}}>Closed</td>
+              <td style={{color: "crimson", border: '1px solid black'}}>+2% below</td>
+              <td style={{color: "darkorange", border: '1px solid black'}}>~2% below</td>
+              <td style={{backgroundColor: "lightgreen", border: '1px solid black'}}>Within 1%</td>
+              <td style={{backgroundColor: "lightyellow", border: '1px solid black', color: 'darkorange'}}>~2% above</td>
+              <td style={{backgroundColor: "lightpink", border: '1px solid black', color: 'crimson'}}>+2% above</td>
+            </tr>
+          </tbody>
+        </Table>
+      </div>
+      <div>
+        <label>Show/Hide Columns:</label>
+        <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')} /> Web
+        <input type="checkbox" checked={showColumns.phone} onChange={() => toggleColumn('phone')} /> Phone
+        <input type="checkbox" checked={showColumns.panel} onChange={() => toggleColumn('panel')} /> Panel
+        <input type="checkbox" checked={showColumns.t2w} onChange={() => toggleColumn('t2w')} /> T2W
+        <input type="checkbox" checked={showColumns.landline} onChange={() => toggleColumn('landline')} /> Landline
+        <input type="checkbox" checked={showColumns.cell} onChange={() => toggleColumn('cell')} /> Cell
+      </div>
+      <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
         {Object.keys(data).length > 0 && (
           <Table style={{width: "50%", border: '1px solid black'}} striped>
             <thead>
               <tr>
-                <th scope="col" colSpan="4" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>
-                <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>
-                <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Landline</th>
-                <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Cell</th>
+                <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}></th>
+                {showColumns.web && <th scope="col" colSpan={showColumns.panel && showColumns.t2w ? "7" : (!showColumns.panel && !showColumns.t2w ? "1" : "4")} style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>}
+                {showColumns.phone && <th scope="col" colSpan={showColumns.landline && showColumns.cell ? "7" : (!showColumns.landline && !showColumns.cell ? "1" : "4")} style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Phone</th>}
+              </tr>
+              <tr>
+                <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>
+                {showColumns.web && <>
+                  <th scope="col" colSpan="1" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Total</th>
+                  {showColumns.panel && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Panel</th>}
+                  {showColumns.t2w && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>T2W</th>}
+                </>}
+                {showColumns.phone && <>
+                  <th scope="col" colSpan="1" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Total</th>
+                  {showColumns.landline && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Landline</th>}
+                  {showColumns.cell && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Cell</th>}
+                </>}
               </tr>
 
               <tr>
-                {/*<TableCell>Web StratumId</TableCell>*/}
-                {/*<TableCell>Web Status</TableCell>*/}
-                {/*<TableCell>LL StratumId</TableCell>*/}
-                {/*<TableCell>LL Status</TableCell>*/}
-                {/*<TableCell>Cell StratumId</TableCell>*/}
-                {/*<TableCell>Cell Status</TableCell>*/}
                 <th style={{border: '1px solid black'}}>Criterion</th>
+                <th style={{border: '1px solid black'}}>Label</th>
                 <th style={{border: '1px solid black'}}>Obj</th>
                 <th style={{border: '1px solid black'}}>Freq</th>
-                <th style={{border: '1px solid black'}}>To Do</th>
-                <th style={{border: '1px solid black'}}>Obj</th>
-                <th style={{border: '1px solid black'}}>Freq</th>
-                <th style={{border: '1px solid black'}}>% Global</th>
-                <th style={{border: '1px solid black'}}>Obj</th>
-                <th style={{border: '1px solid black'}}>Freq</th>
-                <th style={{border: '1px solid black'}}>% Global</th>
-                <th style={{border: '1px solid black'}}>Obj</th>
-                <th style={{border: '1px solid black'}}>Freq</th>
-                <th style={{border: '1px solid black'}}>% Global</th>
+                <th style={{border: '1px solid black'}}>ToDo</th>
+
+                {showColumns.web && <>
+                  <th style={{border: '1px solid black'}}>%</th>
+                  {showColumns.panel && <>
+                    <th style={{border: '1px solid black'}}>Obj</th>
+                    <th style={{border: '1px solid black'}}>Freq</th>
+                    <th style={{border: '1px solid black'}}>%</th>
+                  </>}
+                  {showColumns.t2w && <>
+                    <th style={{border: '1px solid black'}}>Obj</th>
+                    <th style={{border: '1px solid black'}}>Freq</th>
+                    <th style={{border: '1px solid black'}}>%</th>
+                  </>}
+                </>}
+
+                {showColumns.phone && <>
+                  <th style={{border: '1px solid black'}}>%</th>
+                  {showColumns.landline && <>
+                    <th style={{border: '1px solid black'}}>Obj</th>
+                    <th style={{border: '1px solid black'}}>Freq</th>
+                    <th style={{border: '1px solid black'}}>%</th>
+                  </>}
+                  {showColumns.cell && <>
+                    <th style={{border: '1px solid black'}}>Obj</th>
+                    <th style={{border: '1px solid black'}}>Freq</th>
+                    <th style={{border: '1px solid black'}}>%</th>
+                  </>}
+                </>}
+
               </tr>
             </thead>
             <tbody>
               {Object.keys(data.Criterion).map((key, index) => (
                 <tr key={index}>
                   <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
+                  <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
                   <td>{data['COM Objective'][index]}</td>
                   <td>{data['COM Frequency'][index]}</td>
                   <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
+                  {/*<td style={{borerLeft: "1px solid black"}}>{data['Web Label'][index]}</td>*/}
 
-                  <td style={{
-                    backgroundColor: (data['Web Status'][index] === "Open") ? "darkgreen" : "crimson",
-                    color: "white"
-                  }}
-                  >
-                    {data['Web Objective'][index]}
-                  </td>
-                  <td
-                  style={{
-                    color:
-                      (-1 <= data["Web Frequency"][index] - data["Web Objective"][index] && 1 >= data["Web Frequency"][index] - data["Web Objective"][index]) ? "" :
-                        (-10 <= data["Web Frequency"][index] - data["Web Objective"][index] && 10 >= data["Web Frequency"][index] - data["Web Objective"][index]) ? "darkorange" :
-                          "crimson",
-                    backgroundColor:
-                      (-1 > data["Web Frequency"][index] - data["Web Objective"][index]) ? "" :
-                        (-1 <= data["Web Frequency"][index] - data["Web Objective"][index] && 1 >= data["Web Frequency"][index] - data["Web Objective"][index]) ? "lightgreen" :
-                          (10 >= data["Web Frequency"][index] - data["Web Objective"][index] && 2 <= data["Web Frequency"][index] - data["Web Objective"][index]) ? "lightyellow" :
-                            "lightpink"
-                  }}>
-                    {data['Web Frequency'][index]}
-                  </td>
-                  <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}</td>
+                  {showColumns.web && <>
+                    <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}%</td>
+                    {/*PANEL*/}
+                    {showColumns.panel && <>
+                      <td style={{
+                        backgroundColor: (data['Panel Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                        color: "white"
+                      }}
+                        >
+                      {data['Panel Objective'][index]}
+                        </td>
+                        <td
+                        style={{
+                        color:
+                        (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                        (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
+                        "crimson",
+                        backgroundColor:
+                        (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                        (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
+                        (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
+                        "lightpink"
+                      }}>
+                      {data['Panel Frequency'][index]}
+                        </td>
+                        <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
+                      {/*END PANEL*/}
+                    </>}
 
-                  <td style={{
-                    backgroundColor: (data['LL Status'][index] === "Open") ? "darkgreen" : "crimson",
-                    color: "white"
-                  }}
-                  >
-                    {data['LL Objective'][index]}
-                  </td>
-                  <td
-                  style={{
-                    color:
-                      (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
-                        (-10 <= data["LL Frequency"][index] - data["LL Objective"][index] && 10 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "darkorange" : "crimson",
-                    backgroundColor:
-                      (-1 > data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
-                        (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightgreen" :
-                          (10 >= data["LL Frequency"][index] - data["LL Objective"][index] && 2 <= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightyellow" : "lightpink"
-                  }}>
-                    {data['LL Frequency'][index]}
-                  </td>
-                  <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}</td>
+                    {showColumns.t2w && <>
+                      {/*T2W*/}
+                        <td style={{
+                        backgroundColor: (data['T2W Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                        color: "white"
+                      }}
+                        >
+                      {data['T2W Objective'][index]}
+                        </td>
+                        <td
+                        style={{
+                        color:
+                        (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
+                        (-10 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 10 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "darkorange" :
+                        "crimson",
+                        backgroundColor:
+                        (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                        (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightgreen" :
+                        (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
+                        "lightpink"
+                      }}>
+                      {data['T2W Frequency'][index]}
+                        </td>
+                        <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
+                      {/*END T2W*/}
+                    </>}
+                  </>}
 
-                  <td
-                    style={{
-                      backgroundColor: (data['Cell Status'][index] === "Open") ? "darkgreen" : "crimson",
-                      color: 'white'
-                  }}
-                  >
-                    {data['Cell Objective'][index]}
-                  </td>
-                  <td
-                  style={{
-                    color:
-                      (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
-                        (-10 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 10 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "darkorange" : "crimson",
-                    backgroundColor:
-                      (-1 > data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
-                        (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightgreen" :
-                          (10 >= data["Cell Frequency"][index] - data["Cell Objective"][index] && 2 <= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightyellow" : "lightpink"
-                  }}>
-                    {data['Cell Frequency'][index]}
-                  </td>
-                  <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}</td>
+                  {showColumns.phone && <>
+                    {/*PHONE*/}
+                    <td style={{borderRight: "1px solid black"}}>{data['Phone%'][index]}%</td>
+                    {showColumns.landline && <>
+                      {/*LANDLINE*/}
+                      <td style={{
+                        backgroundColor: (data['LL Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                        color: "white"
+                      }}
+                      >
+                        {data['LL Objective'][index]}
+                      </td>
+                      <td
+                      style={{
+                        color:
+                          (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
+                            (-10 <= data["LL Frequency"][index] - data["LL Objective"][index] && 10 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "darkorange" : "crimson",
+                        backgroundColor:
+                          (-1 > data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
+                            (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightgreen" :
+                              (10 >= data["LL Frequency"][index] - data["LL Objective"][index] && 2 <= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightyellow" : "lightpink"
+                      }}>
+                        {data['LL Frequency'][index]}
+                      </td>
+                      <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}%</td>
+                      {/*END LANDLINE*/}
+                    </>}
+                    {showColumns.cell && <>
+                      {/*CELL*/}
+                      <td
+                        style={{
+                          backgroundColor: (data['Cell Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                          color: 'white'
+                      }}
+                      >
+                        {data['Cell Objective'][index]}
+                      </td>
+                      <td
+                      style={{
+                        color:
+                          (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
+                            (-10 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 10 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "darkorange" : "crimson",
+                        backgroundColor:
+                          (-1 > data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
+                            (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightgreen" :
+                              (10 >= data["Cell Frequency"][index] - data["Cell Objective"][index] && 2 <= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightyellow" : "lightpink"
+                      }}>
+                        {data['Cell Frequency'][index]}
+                      </td>
+                      <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}%</td>
+                      {/*END CELL*/}
+                    </>}
+
+                    {/*END PHONE*/}
+                  </>}
+
                 </tr>
               ))}
             </tbody>
           </Table>
         )}
       </div>
+
     </div>
+    // </div>
   )
 }
 export default Quotas;

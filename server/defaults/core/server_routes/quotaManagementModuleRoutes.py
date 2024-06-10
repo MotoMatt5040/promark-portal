@@ -13,10 +13,10 @@ dp = DataPuller()
 dm = DataManagement()
 
 
-@quotas.before_request
-@login_required
-def permissions():
-    pass
+# @quotas.before_request
+# @login_required
+# def permissions():
+#     pass
 
 
 @quotas.route('/survey_quotas', methods=['POST', 'OPTIONS'])
@@ -29,19 +29,21 @@ def survey_quotas():
     dm.source = source
 
     match source:
-        case 'com':
+        case "COM":
             dm.com_sid = sid
-        case 'web':
+        case "Web":
             dm.web_sid = sid
-        case 'landline':
+        case "LL":
             dm.landline_sid = sid
-        case 'cell':
+        case "Cell":
             dm.cell_sid = sid
         case _:
             return {}
 
     data = dm.set_data()
 
+    if source == 'Web':
+        return [data[0].to_json(), data[1].to_json()]
     return data.to_json()
 
 
@@ -67,13 +69,13 @@ def survey_name():
     dm.source = source
 
     match source:
-        case 'com':
+        case "COM":
             dm.com_sid = sid
-        case 'web':
+        case "Web":
             dm.web_sid = sid
-        case 'landline':
+        case "LL":
             dm.landline_sid = sid
-        case 'cell':
+        case "Cell":
             dm.cell_sid = sid
         case _:
             return ''

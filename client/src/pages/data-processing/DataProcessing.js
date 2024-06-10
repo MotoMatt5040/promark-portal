@@ -1,42 +1,30 @@
 import React, {useEffect, useState} from 'react';
-import Form from "react-bootstrap/Form";
 import axios from "../../api/axios";
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Table from 'react-bootstrap/Table';
 import Sidebar from "./Sidebar";
 import Step from "./Step";
 import UncleTables from "./UncleTables";
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import CheckboxForm from "./CheckboxForm";
 import SurveyForm from "./SurveyForm";
+import Cookies from 'js-cookie';
 
 const DATA_PROCESSING_URL = '/data_processing';
 const PROCESS_DATA_URL = '/questions/process_data';
 const DOWNLOAD_URL = '/download';
 
+
 const config = {
   headers: {
     'Content-Type': 'application/json',
-    'X-Csrftoken': localStorage.getItem('csrftoken')
+    'X-CSRF-Token': Cookies.get("csrf_token")
   }
-}
-// TODO add tables.txt data to webpage with highlights over potential errors
-// TODO make this new feature editable
-// TODO make all copyable table fields editable (e.g. <col>) for ease of copying
-// TODO create a hierarchy sidebar for DP steps that updates a container with proper steps text/features
-
+};
 
 function DataProcessing() {
 
   const [surveyID, setSurveyID] = useState('');
-  const [isSurveyIDError, setSurveyIDError] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [selectedValues, setSelectedValues] = useState({});
   const [surveyName, setSurveyName] = useState('Please enter project info');
@@ -46,6 +34,16 @@ function DataProcessing() {
   const [taskList, setTaskList] = useState([]);
   const [taskName, setTaskName] = useState('');
   const [extractionId, setExtractionId] = useState('');
+
+  const [comID, setComID] = useState('');
+  const [comName, setComName] = useState('');
+  const [selectedComSection, setSelectedComSection] = useState('create-order');
+  const [comDownloadDisabled, setComDownloadDisabled] = useState(true);
+  const [comTaskName, setComTaskName] = useState('');
+  const [comExtractionId, setComExtractionId] = useState('');
+  const [comQuestions, setComQuestions] = useState([]);
+  const [comTaskList, setComTaskList] = useState([])
+
 
   const handleSelection = (section) => setSelectedSection(section);
 
@@ -68,7 +66,7 @@ function DataProcessing() {
 
   const fetchData = async (url, data) => {
     try {
-      const response = await axios.post(url, data, config);
+      const response = await axios.post(url, data, {headers: {'Content-Type': 'application/json'}});
       if (response.status === 200) {
         return response.data;
       }
@@ -113,10 +111,7 @@ function DataProcessing() {
     axios
       .get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
         responseType: 'blob',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Csrftoken': localStorage.getItem('csrftoken'),
-        },
+        config,
       })
       .then((response) => {
         const survey_n = name.split(' ')[0];
@@ -133,34 +128,60 @@ function DataProcessing() {
       .catch(handleErrors);
   };
 
-  const handleSurveyIDChange = async (e) => {
-  const value = e.target.value;
-  setSurveyID(value);
-  setSurveyIDError(value.length < 3);
-  resetState();
+  const handleIDChange = async (e, type) => {
+    const value = e.target.value;
 
-  if (value.length >= 3) {
-    const surveyNameData = await fetchData('/data_processing/survey_name', { surveyID: value });
-    if (surveyNameData) {
-      setSurveyName(surveyNameData);
-      const taskListData = await fetchData(DATA_PROCESSING_URL + '/task_list', { surveyID: value });
-      setTaskList(taskListData || []);
-    } else {
-      setSurveyName('Invalid Survey ID');
+    if (type === 'survey') {
+      setSurveyID(value);
+    } else if (type === 'com') {
+      setComID(value);
     }
-  } else {
-    setSurveyName('Invalid Survey ID');
-  }
-};
+    resetState(type)
 
-  const resetState = () => {
-    setDownloadDisabled(true);
-    setTaskName('');
-    setExtractionId('');
-    setQuestions([]);
+    if (value.length >= 3 && value.length <= 6) {
+      const endpoint = type === 'survey' ? '/data_processing/survey_name' : '/data_processing/com_file_name';
+      const data = await fetchData(endpoint, { surveyID: value });
+      const taskListData = await fetchData('/data_processing/task_list', { surveyID: value });
+      setTaskList(taskListData || []);
+
+      // If valid data is found, set the name of the survey
+      if (data) {
+        if (type === 'survey') {
+          setSurveyName(data);
+        } else if (type === 'com') {
+          setComName(data);
+        }
+      } else {
+        if (type === 'survey') {
+          setSurveyName('Invalid Survey ID');
+        } else if (type === 'com') {
+          setComName('Invalid COM ID');
+        }
+      }
+    } else {
+      if (type === 'survey') {
+        setSurveyName('Invalid Survey ID');
+      } else if (type === 'com') {
+        setComName('Invalid COM ID');
+      }
+    }
   };
 
-  const handleTaskSelectChange = (e) => {
+  const resetState = (type) => {
+    if (type === 'survey') {
+      setDownloadDisabled(true);
+      setTaskName('');
+      setExtractionId('');
+      setQuestions([]);
+    } else if (type === 'com') {
+      setComDownloadDisabled(true);
+      setComTaskName('');
+      setComExtractionId('');
+      setComQuestions([]);
+    }
+  };
+
+  const handleTaskSelectChange = (e, setTaskName, setExtractionId, taskList) => {
     const selectedTaskName = e.target.value;
     const selectedTask = taskList.find((task) => task.Name === selectedTaskName);
     if (selectedTask) {
@@ -173,7 +194,8 @@ function DataProcessing() {
     const requestPayload = {
       selectedValues,
       totalStyleChecked: document.getElementById('total-style').checked,
-      case: document.getElementById('case').checked
+      case: document.getElementById('case').checked,
+      style: document.getElementById("total-style").checked
     };
     const data = await fetchData(DATA_PROCESSING_URL + '/has_table', requestPayload);
     setUncleTables(data || []);
@@ -186,56 +208,19 @@ function DataProcessing() {
         <div className='dp-form' style={formDiv}>
           <SurveyForm
             surveyID={surveyID}
-            handleSurveyIDChange={handleSurveyIDChange}
+            handleIDChange={handleIDChange}
+            comID={comID}
             taskList={taskList}
+            comTaskList={comTaskList}
             setTaskName={setTaskName}
             setExtractionId={setExtractionId}
+            setComTaskName={setComTaskName}
+            setComExtractionId={setComExtractionId}
             handleShow={handleShow}
             handleTaskSelectChange={handleTaskSelectChange}
             taskName={taskName}
+            comTaskName={comTaskName}
           />
-          {/*<div*/}
-          {/*  style={formStyle}>*/}
-          {/*  <div style={formTextBox}>*/}
-          {/*    <Form.Group className="mb-3" controlId="formGroupSruveryId">*/}
-          {/*      <Box*/}
-          {/*        component="form"*/}
-          {/*        sx={{*/}
-          {/*          '& > :not(style)': { m: 1, width: '25ch' },*/}
-          {/*        }}*/}
-          {/*        noValidate*/}
-          {/*        autoComplete="off"*/}
-          {/*      >*/}
-          {/*        <TextField*/}
-          {/*          error={isSurveyIDError}*/}
-          {/*          autoComplete="off"*/}
-          {/*          onChange={handleSurveyIDChange}*/}
-          {/*          value={surveyID}*/}
-          {/*          label="Acuity Survey ID"*/}
-          {/*          required*/}
-          {/*          variant="standard"*/}
-          {/*        />*/}
-          {/*        <br/>*/}
-          {/*        <FormControl>*/}
-          {/*          <InputLabel id="task-list-label">Task List</InputLabel>*/}
-          {/*          <Select*/}
-          {/*            labelId="task-list-label"*/}
-          {/*            id="task-list"*/}
-          {/*            label="Task List"*/}
-          {/*            onChange={handleTaskSelectChange}*/}
-          {/*            value={taskName}*/}
-          {/*          >*/}
-          {/*            {taskList && taskList.map((task, index) => (*/}
-          {/*              <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>*/}
-          {/*            ))}*/}
-          {/*          </Select>*/}
-          {/*        </FormControl>*/}
-          {/*        <br/>*/}
-          {/*        <Button variant="primary" type="submit" onClick={handleShow}>Checkboxes</Button>*/}
-          {/*      </Box>*/}
-          {/*    </Form.Group>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
         </div>
       </div>
       <div style={widgetContainerStyle}>
@@ -260,34 +245,6 @@ function DataProcessing() {
             <div style={{borderLeft: "1px solid gray", paddingLeft: "1vw"}}>
               <div style={checkboxContainerStyle}>
                 <CheckboxForm questions={questions} handleCheckboxChange={handleCheckboxChange}/>
-                {/*<Table style={{width: "100%"}} striped>*/}
-                {/*  <thead style={{position: 'sticky', top: '0px', margin: '0 0 0 0'}}>*/}
-                {/*    <tr>*/}
-                {/*      <th>QNAME</th>*/}
-                {/*      <th>Table</th>*/}
-                {/*    </tr>*/}
-                {/*  </thead>*/}
-                {/*  <tbody>*/}
-                {/*    {(typeof questions === 'undefined') ? (*/}
-                {/*        <p>Loading...</p>*/}
-                {/*      ) : (*/}
-                {/*        questions.map((question ,i) => (*/}
-                {/*          <tr key={i}>*/}
-                {/*            <td style={{verticalAlign: 'middle'}}>{question}</td>*/}
-                {/*            <td>*/}
-                {/*              <Checkbox*/}
-                {/*                type="checkbox"*/}
-                {/*                name={question}*/}
-                {/*                id={question}*/}
-                {/*                defaultChecked*/}
-                {/*                onChange={() => handleCheckboxChange(question)}*/}
-                {/*              />*/}
-                {/*            </td>*/}
-                {/*          </tr>*/}
-                {/*        ))*/}
-                {/*    )}*/}
-                {/*  </tbody>*/}
-                {/*</Table>*/}
               </div>
             </div>
           </div>

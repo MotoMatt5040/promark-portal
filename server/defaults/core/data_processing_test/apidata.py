@@ -15,13 +15,13 @@ import json
 class SharedVariables:
     sid: str = None
     prc_id: str = None
-    survey_name = None
+    com_id: str = None
 
 
 class ApiData:
 
     def __init__(self):
-        self._survey_name = None
+        # self._survey_name = None
         self._url = None
         self._survey_url = None
 
@@ -37,14 +37,14 @@ class ApiData:
         """
         return SharedVariables.sid
 
-    @property
-    def survey_name(self):
-        return SharedVariables.survey_name
+    # @property
+    # def survey_name(self):
+    #     return SharedVariables.survey_name
 
-    @survey_name.setter
-    def survey_name(self, survey_name):
-        SharedVariables.survey_name = survey_name
-        SharedVariables.prc_id = survey_name[:survey_name.find(' ')]
+    # @survey_name.setter
+    # def survey_name(self, survey_name):
+    #     SharedVariables.survey_name = survey_name
+    #     SharedVariables.prc_id = survey_name[:survey_name.find(' ')]
 
     @property
     def prc_id(self):
@@ -112,13 +112,51 @@ class ExtractionData:
         return f"{os.environ['extraction_url']}/{self.extraction_id}"
 
 
-class UncleFile:
+class Toplines:
+    api_data = ApiData()
+    extraction_data = ExtractionData()
 
     def __init__(self):
-        pass
+        self._toplines = None
 
-    def organize(self, data):
-        pass
+    def frequency_table(self, df, column):
+        # Frequency
+        freq = df[column].value_counts(dropna=False).sort_index()
+
+        # Percent
+        percent = freq / freq.sum() * 100
+
+        # Valid Percent (excluding NaN)
+        valid_freq = df[column].value_counts().sort_index()
+        valid_percent = valid_freq / valid_freq.sum() * 100
+
+        # Cumulative Percent
+        cum_percent = valid_percent.cumsum()
+
+        # Combine all into a DataFrame
+        freq_table = pd.DataFrame({
+            'Frequency': freq,
+            'Percent': percent.round(1),
+            'Valid Percent': valid_percent.round(1),
+            'Cumulative Percent': cum_percent.round(1)
+        })
+
+        return freq_table
+
+    def print_toplines(self):
+        # List of columns to create frequency tables for
+        cols = self._toplines.columns.drop(['RecordNo', 'LtCallST'])
+
+        # Create and display frequency tables for each column
+        for column in cols:
+            print(f"Frequency Table for {column}:\n", self.frequency_table(self._toplines, column), "\n")
+
+    @property
+    def toplines(self):
+        return self._toplines
+
+    def fetch_access_key(self):
+        response = requests.get(self.api_data.survey_url, headers={"Authorization": f"Client {self.api_data._access_token}"}).json()
 
 
 class VoxcoDataGrabber:
@@ -126,6 +164,7 @@ class VoxcoDataGrabber:
     _access_token: str = os.environ['access_token']
     api_data = ApiData()
     extraction_data = ExtractionData()
+    toplines = Toplines()
 
     def __init__(self):
         self._checkboxes = None
@@ -138,14 +177,17 @@ class VoxcoDataGrabber:
         self._lower_case = False
         self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
 
-    def survey_name(self) -> str:
+    def survey_name(self, toplines=False) -> str:
         """
         Pull survey name from the api. This request must be made after the sid is set.
         :return: str: survey name
         """
-        self.api_data.survey_name = requests.get(self.api_data.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
-        # The prc id is auto set inside the API class
-        return self.api_data.survey_name
+        if not toplines:
+            self.api_data.survey_name = requests.get(self.api_data.survey_url, headers={"Authorization": f"Client {self._access_token}"}).json()['Name']
+            # The prc id is auto set inside the API class
+            return self.api_data.survey_name
+        else:
+            self.toplines.fetch_access_key()
 
     def target_task_list(self) -> list[dict]:
         """
@@ -191,7 +233,7 @@ class VoxcoDataGrabber:
             print(f"Error: {err}", traceback.format_exc())
             return []
         self._order = pd.read_csv(f"{task_name}.csv")
-        self._checkboxes = [item for item in list(self._order.columns[4:]) if "_M" not in item]
+        self._checkboxes = [item.replace("_M1", "") for item in list(self._order.columns[4:]) if "_M" not in item or "_M1" in item]
         self._order = self.order.columns
         os.remove(f'{task_name}.csv')
         return self._checkboxes
@@ -257,6 +299,9 @@ class VoxcoDataGrabber:
                     fill_name = question[fill_location[0] + 1:fill_location[1]]
                     fill = question[fill_location[0]:fill_location[1] + 1]
                     if preload.get(fill_name):
+                        # TODO Fix partyid fill, selections shows 1.
+                        # sample output from ID 507 - 12854 Ohio Statewide
+                        # {'selection_variable': 'PARTYFIL1', 'selections': '1', 'condition': '1>0'}
                         if preload[fill_name].get('selections'):
                             question = question.replace(fill, preload[fill_name]['selections'])
                         else:
@@ -332,8 +377,12 @@ class VoxcoDataGrabber:
         # used to reorganize the data in the proper order and add column info
         prev = None
         table_number = 1
+        x_file = [[], []]
+        first_M_encountered = False
+
         for i, question in enumerate(self._order):
             self._layout['variable'].append(question)
+            x_file[0].append(question)
 
             if question in self._raw_data:
 
@@ -352,9 +401,7 @@ class VoxcoDataGrabber:
                 if 'multi_mentions' not in restructure[temp]:
                     restructure[temp]['multi_mentions'] = {}
 
-                columns = {
-                    'start_column': start_column,
-                }
+                columns = {'start_column': start_column}
 
                 if self._raw_data[temp]['code_width'] > 1:
                     columns['end_column'] = end_column
@@ -362,10 +409,10 @@ class VoxcoDataGrabber:
                 restructure[temp]['multi_mentions'][question] = columns
                 q = temp
 
-            self._layout['table'].append(table_number)
             self._layout['start'].append(start_column)
             self._layout['end'].append(end_column)
             self._layout['width'].append(self._raw_data[q]['code_width'])
+            x_file[1].append('x' * int(self._raw_data[q]['code_width']))
 
             start_column += self._raw_data[q]['code_width']
             self._raw_data[q] = restructure[q]
@@ -379,9 +426,23 @@ class VoxcoDataGrabber:
                 if not create_rows_called:
                     self.create_rows(q)
 
+            if "_M" in question and not first_M_encountered:
+                self._layout['table'].append(table_number)
+                first_M_encountered = True
+                table_number += 1
+            elif self._raw_data[q].get('table'):
+                self._layout['table'].append(table_number)
+                table_number += 1
+            else:
+                self._layout['table'].append(np.nan)
+
             prev = q
 
-        print(pd.DataFrame(self._layout).to_string())
+        layout = pd.DataFrame(self._layout)
+        layout.to_excel('EXTRACTION/DATABASE/layout.xlsx', index=False)
+        xfile = pd.DataFrame(x_file, columns=x_file[0]).drop(0)
+        xfile.to_excel('EXTRACTION/DATABASE/xfile.xlsx', index=False)
+        # print(pd.DataFrame(self._layout).to_string())
         self._restructure = restructure
         return restructure
 
@@ -462,7 +523,7 @@ class VoxcoDataGrabber:
                 prev = key
 
             if start_column:
-                result['label'] = label
+                result['label'] = f"{label.replace('VERAB=', '')} ;ALL ;HP NOVP"
                 result['qual'] = qual
                 self._raw_data[question]['qualifiers'] = result
 
@@ -606,7 +667,13 @@ class VoxcoDataGrabber:
             'great deal': ['great deal', 'not great deal'],
             'strongly determined': ['determined by people', 'created in constitution'],
             'very believable': ['believable', 'not believable'],
-            'very serious': ['serious', 'not serious']
+            'very serious': ['serious', 'not serious'],
+            'very familiar': ['familiar', 'not familiar'],
+            'much more inclined': ['more inclined', 'less inclined'],
+            'very successful': ['successful', 'a failure'],
+            'quite a bit': ['heard', 'not heard'],
+            'very fair': ['fair', 'unfair'],
+            'very important': ['important', 'unimportant'],
         }
 
         que = self._raw_data.get(question)
@@ -636,6 +703,7 @@ class VoxcoDataGrabber:
         # This is a list comprehension syntax. The [::-1] is used to reverse the list so that the items are appended
         # as they are appended on top of the list. This is done to ensure the order is correct.
         [que['rows'].insert(0, row) for row in totals[::-1]]
+        que['totals'] = True
 
         self._raw_data[question] = que
 
@@ -689,20 +757,29 @@ class VoxcoDataGrabber:
         self._raw_data['QIDEOLOGY'] = ideology
         return ideology
 
-    def temp_write(self):
+    def temp_write(self, style=None):
+        print("\033[93mWarning: apidata.VoxcoDataGrabber.temp_write() WILL be deprecated in the future!\033[0m")
         error = []
         tnum = 1
         qual_logic = None
         qual_label = None
+        first_M_encounter = False
         with open('EXTRACTION/UNCLE/tables.txt', 'w') as f:
             for qname in self._order:
                 try:
                     exists = self._raw_data.get(qname)
                     if not exists:
-                        continue
+                        if "_M" in qname and not first_M_encounter:
+                            first_M_encounter = True
+                            qname = qname[:qname.find('_M')]
+                            exists = self._raw_data.get(qname)
+                        else:
+                            continue
+                    # print('exists', qname)
                     table_exists = exists.get('table')
                     if not table_exists:
                         continue
+                    # print('table', qname)
                     question = self._raw_data[qname].get('question')
                     text = self._raw_data[qname].get('text')
                     qualifier = self._raw_data[qname].get('qualifiers')
@@ -729,12 +806,23 @@ class VoxcoDataGrabber:
                     if rank:
                         table.append('O RANK')
                     table.append(qual_label if qualifier else base)
-                    [table.append(row) for row in self._raw_data[qname]['rows']]
+                    rows = exists.get('rows')
+                    if rows:
+                        if not style or not self._raw_data[qname].get('totals'):
+                            [table.append(row) for row in self._raw_data[qname]['rows']]
+                        else:
+                            table.append(self._raw_data[qname]['rows'][0].replace('R3-R4', 'R3-R6'))
+                            table.append(self._raw_data[qname]['rows'][1])
+                            table.append(self._raw_data[qname]['rows'][3])
+                            table.append(self._raw_data[qname]['rows'][4])
+                            table.append(self._raw_data[qname]['rows'][2])
+                            [table.append(row) for row in self._raw_data[qname]['rows'][5:]]
                     tnum += 1
                     for item in table:
                         f.write(f"{item}\n")
-                except Exception:
+                except Exception as err:
                     error.append(qname)
+                    print("\033[93mERROR: ", err, "\033[0m")
 
         # for item in error:
         #     print(item)
@@ -762,6 +850,14 @@ class VoxcoDataGrabber:
     @sid.setter
     def sid(self, sid):
         SharedVariables.sid = sid
+
+    @property
+    def com_id(self):
+        return SharedVariables.com_id
+
+    @com_id.setter
+    def com_id(self, com_id):
+        SharedVariables.com_id = com_id
 
     @property
     def extraction_id(self):
@@ -887,6 +983,7 @@ class VoxcoDataGrabber:
         self._has_fill = {}
         self._restructure = None
         self._layout = {'table': [], 'variable': [], 'start': [], 'end': [], 'width': []}
+
 
 
 

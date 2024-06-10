@@ -8,7 +8,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 
-function SurveyForm({ surveyID, handleSurveyIDChange, taskList, setTaskName, setExtractionId, handleShow, handleTaskSelectChange, taskName }) {
+function SurveyForm({ surveyID, handleIDChange, comID, taskList, comTaskList, setTaskName, setExtractionId, setComTaskName, setComExtractionId, handleShow, handleTaskSelectChange, taskName, comTaskName }) {
   return (
     <div className='dp-form'>
       <div>
@@ -23,8 +23,15 @@ function SurveyForm({ surveyID, handleSurveyIDChange, taskList, setTaskName, set
           >
             <TextField
               value={surveyID}
-              onChange={handleSurveyIDChange}
-              label="Acuity Survey ID"
+              onChange={(e) => handleIDChange(e, 'survey')}
+              label="Web Survey ID"
+              required
+              variant="standard"
+            />
+            <TextField
+              value={comID}
+              onChange={(e) => handleIDChange(e, 'com')}
+              label="COM File ID"
               required
               variant="standard"
             />
@@ -39,6 +46,20 @@ function SurveyForm({ surveyID, handleSurveyIDChange, taskList, setTaskName, set
                 onChange={(e) => handleTaskSelectChange(e, setTaskName, setExtractionId, taskList)}
               >
                 {taskList && taskList.map((task, index) => (
+                  <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="com-task-list-label">COM Task List</InputLabel>
+              <Select
+                labelId="com-task-list-label"
+                id="com-task-list"
+                label="COM Task List"
+                value={comTaskName}
+                onChange={(e) => handleTaskSelectChange(e, setComTaskName, setComExtractionId, comTaskList)}
+              >
+                {comTaskList && comTaskList.map((task, index) => (
                   <MenuItem key={index} value={task.Name}>{task.Name}</MenuItem>
                 ))}
               </Select>
