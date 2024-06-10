@@ -42,6 +42,8 @@ def survey_quotas():
 
     data = dm.set_data()
 
+    if source == 'Web':
+        return [data[0].to_json(), data[1].to_json()]
     return data.to_json()
 
 
