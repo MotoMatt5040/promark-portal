@@ -325,14 +325,14 @@ function Quotas() {
             </tr>
           </thead>
           <tbody>
-            <tr style={{border: '1px solid black'}}>
+            <tr style={{border: '1px solid black', textAlign: "center"}}>
               <td style={{backgroundColor: "#43B17B", color: "white", border: '1px solid black'}}>Open</td>
               <td style={{backgroundColor: "#ED211C", color: "white", border: '1px solid black'}}>Closed</td>
-              <td style={{color: "crimson", border: '1px solid black'}}>+2% below</td>
-              <td style={{color: "darkorange", border: '1px solid black'}}>~2% below</td>
-              <td style={{backgroundColor: "lightgreen", border: '1px solid black'}}>Within 1%</td>
-              <td style={{backgroundColor: "lightyellow", border: '1px solid black', color: 'darkorange'}}>~2% above</td>
-              <td style={{backgroundColor: "lightpink", border: '1px solid black', color: 'crimson'}}>+2% above</td>
+              <td style={{color: "crimson", border: '1px solid black'}}>+10 below</td>
+              <td style={{color: "darkorange", border: '1px solid black'}}>~10 below</td>
+              <td style={{backgroundColor: "lightgreen", border: '1px solid black'}}>Within 1</td>
+              <td style={{backgroundColor: "lightyellow", border: '1px solid black', color: 'darkorange'}}>~10 above</td>
+              <td style={{backgroundColor: "lightpink", border: '1px solid black', color: 'crimson'}}>+10 above</td>
             </tr>
           </tbody>
         </Table>
@@ -429,16 +429,16 @@ function Quotas() {
                         </td>
                         <td
                         style={{
-                        color:
-                        (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                        (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
-                        "crimson",
-                        backgroundColor:
-                        (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                        (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
-                        (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
-                        "lightpink"
-                      }}>
+                          color:
+                            (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                            (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
+                            "crimson",
+                          backgroundColor:
+                            (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                            (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
+                            (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
+                            "lightpink"
+                        }}>
                       {data['Panel Frequency'][index]}
                         </td>
                         <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
@@ -448,31 +448,30 @@ function Quotas() {
                     {showColumns.t2w && <>
                       {/*T2W*/}
                         <td style={{
-                        backgroundColor: (data['T2W Status'][index] === "Open") ? "#43B17B" : "#ED211C",
-                        color: "white"
-                      }}
+                          backgroundColor: (data['T2W Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                          color: "white"
+                        }}
                         >
                       {data['T2W Objective'][index]}
                         </td>
                         <td
                         style={{
-                        color:
-                        (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
-                        (-10 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 10 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "darkorange" :
-                        "crimson",
-                        backgroundColor:
-                        (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                        (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightgreen" :
-                        (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
-                        "lightpink"
-                      }}>
+                          color:
+                          (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
+                            (-10 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 10 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "darkorange" :
+                              "crimson",
+                          backgroundColor:
+                          (-1 > data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
+                            (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightgreen" :
+                              (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
+                                "lightpink"
+                        }}>
                       {data['T2W Frequency'][index]}
                         </td>
                         <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
                       {/*END T2W*/}
                     </>}
                   </>}
-
                   {showColumns.phone && <>
                     {/*PHONE*/}
                     <td style={{borderRight: "1px solid black"}}>{data['Phone%'][index]}%</td>
@@ -525,10 +524,8 @@ function Quotas() {
                       <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}%</td>
                       {/*END CELL*/}
                     </>}
-
                     {/*END PHONE*/}
                   </>}
-
                 </tr>
               ))}
             </tbody>
