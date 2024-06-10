@@ -299,6 +299,9 @@ class VoxcoDataGrabber:
                     fill_name = question[fill_location[0] + 1:fill_location[1]]
                     fill = question[fill_location[0]:fill_location[1] + 1]
                     if preload.get(fill_name):
+                        # TODO Fix partyid fill, selections shows 1.
+                        # sample output from ID 507 - 12854 Ohio Statewide
+                        # {'selection_variable': 'PARTYFIL1', 'selections': '1', 'condition': '1>0'}
                         if preload[fill_name].get('selections'):
                             question = question.replace(fill, preload[fill_name]['selections'])
                         else:
@@ -405,7 +408,6 @@ class VoxcoDataGrabber:
 
                 restructure[temp]['multi_mentions'][question] = columns
                 q = temp
-
 
             self._layout['start'].append(start_column)
             self._layout['end'].append(end_column)
@@ -665,7 +667,13 @@ class VoxcoDataGrabber:
             'great deal': ['great deal', 'not great deal'],
             'strongly determined': ['determined by people', 'created in constitution'],
             'very believable': ['believable', 'not believable'],
-            'very serious': ['serious', 'not serious']
+            'very serious': ['serious', 'not serious'],
+            'very familiar': ['familiar', 'not familiar'],
+            'much more inclined': ['more inclined', 'less inclined'],
+            'very successful': ['successful', 'a failure'],
+            'quite a bit': ['heard', 'not heard'],
+            'very fair': ['fair', 'unfair'],
+            'very important': ['important', 'unimportant'],
         }
 
         que = self._raw_data.get(question)
