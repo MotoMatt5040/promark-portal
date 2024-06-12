@@ -1,0 +1,117 @@
+.table, .table th, .table td {
+  text-align: center;
+}
+
+.table th.legend-header {
+  background-color: lightgrey;
+}
+
+.table th {
+  border: 1px solid black;
+}
+
+.table .legend th {
+  background-color: lightgrey;
+}
+
+.table .status-open {
+  background-color: #43B17B;
+  color: white;
+}
+
+.table .status-closed {
+  background-color: #ED211C;
+  color: white;
+}
+
+.table .below-10 {
+  color: crimson;
+}
+
+.table .near-10-below {
+  color: darkorange;
+}
+
+.table .within-1 {
+  background-color: lightgreen;
+}
+
+.table .near-10-above {
+  background-color: lightyellow;
+  color: darkorange;
+}
+
+.table .above-10 {
+  background-color: lightpink;
+  color: crimson;
+}
+
+.legend-table td {
+    border: 1px solid black;
+}
+
+/*.checkbox-container {*/
+/*    width: 10%;*/
+/*    justify-content: center;*/
+/*}*/
+
+/*.checkbox-container label,*/
+/*.checkbox-container input {*/
+/*    margin-left: 5px;*/
+/*}*/
+
+.upper-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.checkbox-container {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: left;
+    width: 100%;
+    position: fixed;
+}
+
+.legend-container {
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.legend-table {
+    width: 100%;
+    text-align: center;
+}
+
+/* Sticky headers styling */
+.sticky-header th {
+    position: sticky;
+    top: 0;
+    background-color: lightgrey; /* Ensure the background is opaque */
+    z-index: 2; /* Ensure it is above other content */
+    border: 1px solid black; /* Keep the border styling */
+    text-align: center; /* Center text alignment */
+}
+
+/* Specific z-index and top values for each row */
+.sticky-header tr:nth-child(1) th {
+    top: 0;
+    z-index: 4; /* Highest z-index for the first row */
+}
+
+.sticky-header tr:nth-child(2) th {
+    top: 40px; /* Adjust based on the height of the previous row */
+    z-index: 3;
+}
+
+.sticky-header tr:nth-child(3) th {
+    top: 80px; /* Adjust based on the cumulative height of the previous rows */
+    z-index: 2;
+}

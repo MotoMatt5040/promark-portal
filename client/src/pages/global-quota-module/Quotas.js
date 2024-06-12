@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Table from 'react-bootstrap/Table';
-// import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import './styles.css';
 
 function Quotas() {
 
@@ -317,39 +317,54 @@ function Quotas() {
         <Button onClick={checkData}>Check Data</Button>
       </div>
       {/*{typeof webData !== {}*/}
-      <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
-        <Table style={{width: "10%", border: '1px solid black'}} striped>
-          <thead>
-            <tr>
-              <th scope='col' colSpan='7' style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Legend</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style={{border: '1px solid black', textAlign: "center"}}>
-              <td style={{backgroundColor: "#43B17B", color: "white", border: '1px solid black'}}>Open</td>
-              <td style={{backgroundColor: "#ED211C", color: "white", border: '1px solid black'}}>Closed</td>
-              <td style={{color: "crimson", border: '1px solid black'}}>+10 below</td>
-              <td style={{color: "darkorange", border: '1px solid black'}}>~10 below</td>
-              <td style={{backgroundColor: "lightgreen", border: '1px solid black'}}>Within 1</td>
-              <td style={{backgroundColor: "lightyellow", border: '1px solid black', color: 'darkorange'}}>~10 above</td>
-              <td style={{backgroundColor: "lightpink", border: '1px solid black', color: 'crimson'}}>+10 above</td>
-            </tr>
-          </tbody>
-        </Table>
-      </div>
-      <div>
-        <label>Show/Hide Columns:</label>
-        <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')} /> Web
-        <input type="checkbox" checked={showColumns.phone} onChange={() => toggleColumn('phone')} /> Phone
-        <input type="checkbox" checked={showColumns.panel} onChange={() => toggleColumn('panel')} /> Panel
-        <input type="checkbox" checked={showColumns.t2w} onChange={() => toggleColumn('t2w')} /> T2W
-        <input type="checkbox" checked={showColumns.landline} onChange={() => toggleColumn('landline')} /> Landline
-        <input type="checkbox" checked={showColumns.cell} onChange={() => toggleColumn('cell')} /> Cell
+      <div className="upper-container">
+        <div className='checkbox-container'>
+          <label>Show/Hide Columns:</label>
+          <div>
+              <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')} /> Web
+          </div>
+          <div>
+              <input type="checkbox" checked={showColumns.phone} onChange={() => toggleColumn('phone')} /> Phone
+          </div>
+          <div>
+              <input type="checkbox" checked={showColumns.panel} onChange={() => toggleColumn('panel')} /> Panel
+          </div>
+          <div>
+              <input type="checkbox" checked={showColumns.t2w} onChange={() => toggleColumn('t2w')} /> T2W
+          </div>
+          <div>
+              <input type="checkbox" checked={showColumns.landline} onChange={() => toggleColumn('landline')} /> Landline
+          </div>
+          <div>
+              <input type="checkbox" checked={showColumns.cell} onChange={() => toggleColumn('cell')} /> Cell
+          </div>
+        </div>
+        {/*style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}*/}
+        <div className="legend-container">
+          <Table className="legend-table" style={{ width: "10%" }} striped>
+            <thead>
+              <tr>
+                <th scope='col' colSpan='7' className="legend-header">Legend</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="status-open">Open</td>
+                <td className="status-closed">Closed</td>
+                <td className="below-10">+10 below</td>
+                <td className="near-10-below">~10 below</td>
+                <td className="within-1">Within 1</td>
+                <td className="near-10-above">~10 above</td>
+                <td className="above-10">+10 above</td>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
       </div>
       <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
         {Object.keys(data).length > 0 && (
           <Table style={{width: "50%", border: '1px solid black'}} striped>
-            <thead>
+            <thead className="sticky-header">
               <tr>
                 <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}></th>
                 {showColumns.web && <th scope="col" colSpan={showColumns.panel && showColumns.t2w ? "7" : (!showColumns.panel && !showColumns.t2w ? "1" : "4")} style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>}
@@ -368,42 +383,38 @@ function Quotas() {
                   {showColumns.cell && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Cell</th>}
                 </>}
               </tr>
-
               <tr>
-                <th style={{border: '1px solid black'}}>Criterion</th>
-                <th style={{border: '1px solid black'}}>Label</th>
-                <th style={{border: '1px solid black'}}>Obj</th>
-                <th style={{border: '1px solid black'}}>Freq</th>
-                <th style={{border: '1px solid black'}}>ToDo</th>
-
+                <th>Criterion</th>
+                <th>Label</th>
+                <th>Obj</th>
+                <th>Freq</th>
+                <th>ToDo</th>
                 {showColumns.web && <>
-                  <th style={{border: '1px solid black'}}>%</th>
+                  <th>%</th>
                   {showColumns.panel && <>
-                    <th style={{border: '1px solid black'}}>Obj</th>
-                    <th style={{border: '1px solid black'}}>Freq</th>
-                    <th style={{border: '1px solid black'}}>%</th>
+                    <th>Obj</th>
+                    <th>Freq</th>
+                    <th>%</th>
                   </>}
                   {showColumns.t2w && <>
-                    <th style={{border: '1px solid black'}}>Obj</th>
-                    <th style={{border: '1px solid black'}}>Freq</th>
-                    <th style={{border: '1px solid black'}}>%</th>
+                    <th>Obj</th>
+                    <th>Freq</th>
+                    <th>%</th>
                   </>}
                 </>}
-
                 {showColumns.phone && <>
-                  <th style={{border: '1px solid black'}}>%</th>
+                  <th>%</th>
                   {showColumns.landline && <>
-                    <th style={{border: '1px solid black'}}>Obj</th>
-                    <th style={{border: '1px solid black'}}>Freq</th>
-                    <th style={{border: '1px solid black'}}>%</th>
+                    <th>Obj</th>
+                    <th>Freq</th>
+                    <th>%</th>
                   </>}
                   {showColumns.cell && <>
-                    <th style={{border: '1px solid black'}}>Obj</th>
-                    <th style={{border: '1px solid black'}}>Freq</th>
-                    <th style={{border: '1px solid black'}}>%</th>
+                    <th>Obj</th>
+                    <th>Freq</th>
+                    <th>%</th>
                   </>}
                 </>}
-
               </tr>
             </thead>
             <tbody>
@@ -414,8 +425,6 @@ function Quotas() {
                   <td>{data['COM Objective'][index]}</td>
                   <td>{data['COM Frequency'][index]}</td>
                   <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
-                  {/*<td style={{borerLeft: "1px solid black"}}>{data['Web Label'][index]}</td>*/}
-
                   {showColumns.web && <>
                     <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}%</td>
                     {/*PANEL*/}
@@ -431,20 +440,19 @@ function Quotas() {
                         style={{
                           color:
                             (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                            (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
-                            "crimson",
+                              (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
+                                "crimson",
                           backgroundColor:
                             (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                            (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
-                            (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
-                            "lightpink"
+                              (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
+                                (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
+                                  "lightpink"
                         }}>
                       {data['Panel Frequency'][index]}
                         </td>
                         <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
                       {/*END PANEL*/}
                     </>}
-
                     {showColumns.t2w && <>
                       {/*T2W*/}
                         <td style={{
@@ -532,9 +540,7 @@ function Quotas() {
           </Table>
         )}
       </div>
-
     </div>
-    // </div>
   )
 }
 export default Quotas;

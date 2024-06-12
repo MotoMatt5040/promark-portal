@@ -94,27 +94,15 @@ function DataProcessing() {
     }
   };
 
-  const handleDownload = async (event) => {
+  const handleDownload = (event) => {
     event.preventDefault();
-    const requestPayload = {
-      selectedValues,
-      totalStyleChecked: document.getElementById('total-style').checked,
-    };
-    const data = await fetchData(DATA_PROCESSING_URL + PROCESS_DATA_URL, requestPayload);
-    if (data) {
-      setUncleTables(data);
-      downloadFile(surveyName, data);
-    }
-  };
-
-  const downloadFile = (name, data) => {
     axios
       .get(DATA_PROCESSING_URL + DOWNLOAD_URL, {
         responseType: 'blob',
         config,
       })
       .then((response) => {
-        const survey_n = name.split(' ')[0];
+        const survey_n = surveyName.split(' ')[0];
         const url = URL.createObjectURL(response.data);
         const a = document.createElement('a');
         a.href = url;
@@ -191,14 +179,22 @@ function DataProcessing() {
   };
 
   const handleHasTable = async () => {
-    const requestPayload = {
+    var requestPayload = {
       selectedValues,
       totalStyleChecked: document.getElementById('total-style').checked,
       case: document.getElementById('case').checked,
       style: document.getElementById("total-style").checked
     };
-    const data = await fetchData(DATA_PROCESSING_URL + '/has_table', requestPayload);
-    setUncleTables(data || []);
+    await fetchData(DATA_PROCESSING_URL + '/has_table', requestPayload);
+
+    requestPayload = {
+      selectedValues,
+      totalStyleChecked: document.getElementById('total-style').checked,
+    };
+    const data = await fetchData(DATA_PROCESSING_URL + PROCESS_DATA_URL, requestPayload);
+    if (data) {
+      setUncleTables(data);
+    }
   };
 
   return (
