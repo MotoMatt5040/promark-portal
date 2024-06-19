@@ -22,17 +22,15 @@ class DataManagement(API):
         self._source = None
 
     def set_data(self):  # TODO panel and t2w
-        if self.source != 'Web':
-            df = pd.DataFrame(self.create_layout())
+        if self.source == 'Web':
+            self._panel_data, self._t2w_data = pd.DataFrame(self.create_layout()[0]), pd.DataFrame(self.create_layout()[1])
+            return self._panel_data, self._t2w_data
+
+        df = pd.DataFrame(self.create_layout())
 
         match self.source:
             case "COM":
                 self._com_data = df
-            case "Web":
-                self._panel_data, self._t2w_data = pd.DataFrame(self.create_layout()[0]), pd.DataFrame(self.create_layout()[1])
-                # print(self._panel_data.to_string())
-                # print(self._t2w_data.to_string())
-                return self._panel_data, self._t2w_data
             case "LL":
                 self._landline_data = df
             case "Cell":
@@ -45,16 +43,10 @@ class DataManagement(API):
                 self._landline_data = pd.DataFrame()
                 self._cell_data = pd.DataFrame()
 
-        # print(df.to_string())
         return df
 
     def create_layout(self):
         data = self.get_data()
-        # if self.source == "COM":
-            # print(self.source)
-            # print(self.com_sid)
-            # # print(self.sid)
-            # print(json.dumps(data, indent=4))
         output = {
             f'{self.source} StratumId': [],
             f'{self.source} Status': [],
@@ -66,7 +58,6 @@ class DataManagement(API):
         if self.source == 'COM':
             output['COM Label'] = []
         elif self.source == 'Web':
-            # output['Web Label'] = []
             output = {
                 'panel': {
                     f'Panel StratumId': [],
@@ -98,6 +89,8 @@ class DataManagement(API):
                     output['Criterion'].append(item['Criterion'].strip())
                 if self.source == 'Cell':
                     output['Criterion'].append(item['Criterion'].replace(" AND STYPE=2", '').strip())
+                    if item['Criterion'] == "STYPE=4":
+                        item['Frequence'] = 0
                 output[f'{self.source} Objective'].append(item['Quota'])
                 output[f'{self.source} Frequency'].append(item['Frequence'])
                 output[f'{self.source} To Do'].append((item['Quota'] - item['Frequence']) if item['Quota'] > 0 else 0)
@@ -184,6 +177,7 @@ class DataManagement(API):
         df_ll = self._landline_data
         df_cell = self._cell_data
 
+        # region print
         # print("\033[93m\ncom\033[0m")
         # print(df_com.to_string())
         #
@@ -203,18 +197,17 @@ class DataManagement(API):
 
         # print(df_com.to_string())
         # print(df_web.to_string())
+        # region print
 
         try:
             df_com_panel_merge = pd.merge(df_com, df_panel, on=["Criterion"], how='left')
             df_com_panel_tw2_merge = pd.merge(df_com_panel_merge, df_t2w, on=["Criterion"], how='left')
             df_cptll_merge = pd.merge(df_com_panel_tw2_merge, df_ll, on=["Criterion"], how='left')
             df_cptllc = pd.merge(df_cptll_merge, df_cell, on=["Criterion"], how='left')
-            # df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
-            # df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
-            # df_cptllc = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
         except Exception as err:
             print(traceback.format_exc())
             print(err)
+            return []
 
         df_cptllc.fillna(0, inplace=True)
 
@@ -228,14 +221,11 @@ class DataManagement(API):
         df_cptllc['W%'] = np.round(df_cptllc['Web Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
         df_cptllc['P%'] = np.round(df_cptllc['Panel Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
         df_cptllc['T%'] = np.round(df_cptllc['T2W Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
-        # df_cptllc['Phone%'] = np.round((df_cptllc['LL Frequency'] + df_cptllc['Cell Frequency']) * 100 / df_cptllc['COM Frequency'], 2)
 
-        #Phone %
+        # Phone %
         df_cptllc['L%'] = np.round(df_cptllc['LL Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
         df_cptllc['C%'] = np.round(df_cptllc['Cell Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
         df_cptllc['Phone%'] = np.round((df_cptllc['LL Frequency'] + df_cptllc['Cell Frequency']) * 100 / df_cptllc['COM Frequency'], 2)
-
-
 
         self.reset()
 
