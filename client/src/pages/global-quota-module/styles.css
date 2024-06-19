@@ -90,6 +90,20 @@
     text-align: center;
 }
 
+.separator {
+    border-right: 3px solid black !important;
+}
+
+.separator-left {
+    border-left: 3px solid black !important;
+}
+
+.mid-header {
+    border: 1px solid black;
+    background: lightgrey;
+    text-align: center;
+}
+
 /* Sticky headers styling */
 .sticky-header th {
     /*position: sticky;*/

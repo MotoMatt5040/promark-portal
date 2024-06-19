@@ -379,24 +379,24 @@ function Quotas() {
       </div>
       <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
         {Object.keys(data).length > 0 && (
-          <Table style={{width: "50%", border: '1px solid black'}} striped>
+          <Table className="separator-left" style={{width: "50%", border: '1px solid black'}} striped>
             <thead className="sticky-header">
               <tr>
-                <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}></th>
-                {showColumns.web && <th scope="col" colSpan={showColumns.panel && showColumns.t2w ? "7" : (!showColumns.panel && !showColumns.t2w ? "1" : "4")} style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Web</th>}
-                {showColumns.phone && <th scope="col" colSpan={showColumns.landline && showColumns.cell ? "7" : (!showColumns.landline && !showColumns.cell ? "1" : "4")} style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Phone</th>}
+                <th className="mid-header separator" scope="col" colSpan="5"></th>
+                {showColumns.web && <th className="mid-header separator" scope="col" colSpan={showColumns.panel && showColumns.t2w ? "7" : (!showColumns.panel && !showColumns.t2w ? "1" : "4")}>Web</th>}
+                {showColumns.phone && <th className="mid-header separator" scope="col" colSpan={showColumns.landline && showColumns.cell ? "7" : (!showColumns.landline && !showColumns.cell ? "1" : "4")}>Phone</th>}
               </tr>
               <tr>
-                <th scope="col" colSpan="5" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global</th>
+                <th className="mid-header separator" scope="col" colSpan="5">Global</th>
                 {showColumns.web && <>
-                  <th scope="col" colSpan="1" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Total</th>
-                  {showColumns.panel && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Panel</th>}
-                  {showColumns.t2w && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>T2W</th>}
+                  <th className="mid-header separator" scope="col" colSpan="1">Total</th>
+                  {showColumns.panel && <th className="mid-header separator" scope="col" colSpan="3">Panel</th>}
+                  {showColumns.t2w && <th className="mid-header separator" scope="col" colSpan="3">T2W</th>}
                 </>}
                 {showColumns.phone && <>
-                  <th scope="col" colSpan="1" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Total</th>
-                  {showColumns.landline && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Landline</th>}
-                  {showColumns.cell && <th scope="col" colSpan="3" style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Cell</th>}
+                  <th className="mid-header separator" scope="col" colSpan="1">Total</th>
+                  {showColumns.landline && <th className="mid-header separator" scope="col" colSpan="3">Landline</th>}
+                  {showColumns.cell && <th className="mid-header separator" scope="col" colSpan="3">Cell</th>}
                 </>}
               </tr>
               <tr>
@@ -404,31 +404,31 @@ function Quotas() {
                 <th>Label</th>
                 <th>Obj</th>
                 <th>Freq</th>
-                <th>ToDo</th>
+                <th className="separator">ToDo</th>
                 {showColumns.web && <>
-                  <th>%</th>
+                  <th className="separator">%</th>
                   {showColumns.panel && <>
                     <th>Obj</th>
                     <th>Freq</th>
-                    <th>%</th>
+                    <th className="separator">%</th>
                   </>}
                   {showColumns.t2w && <>
                     <th>Obj</th>
                     <th>Freq</th>
-                    <th>%</th>
+                    <th className="separator">%</th>
                   </>}
                 </>}
                 {showColumns.phone && <>
-                  <th>%</th>
+                  <th className="separator">%</th>
                   {showColumns.landline && <>
                     <th>Obj</th>
                     <th>Freq</th>
-                    <th>%</th>
+                    <th className="separator">%</th>
                   </>}
                   {showColumns.cell && <>
                     <th>Obj</th>
                     <th>Freq</th>
-                    <th>%</th>
+                    <th className="separator">%</th>
                   </>}
                 </>}
               </tr>
@@ -440,9 +440,9 @@ function Quotas() {
                   <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
                   <td>{data['COM Objective'][index]}</td>
                   <td>{data['COM Frequency'][index]}</td>
-                  <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
+                  <td className="separator">{data['COM To Do'][index]}</td>
                   {showColumns.web && <>
-                    <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}%</td>
+                    <td className="separator">{data['W%'][index]}%</td>
                     {/*PANEL*/}
                     {showColumns.panel && <>
                       <td style={{
@@ -466,7 +466,7 @@ function Quotas() {
                         }}>
                           {data['Panel Frequency'][index]}
                         </td>
-                        <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
+                        <td className="separator">{data['P%'][index]}%</td>
                       {/*END PANEL*/}
                     </>}
                     {showColumns.t2w && <>
@@ -492,13 +492,13 @@ function Quotas() {
                         }}>
                           {data['T2W Frequency'][index]}
                         </td>
-                        <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
+                        <td className="separator">{data['T%'][index]}%</td>
                       {/*END T2W*/}
                     </>}
                   </>}
                   {showColumns.phone && <>
                     {/*PHONE*/}
-                    <td style={{borderRight: "1px solid black"}}>{data['Phone%'][index]}%</td>
+                    <td className="separator">{data['Phone%'][index]}%</td>
                     {showColumns.landline && <>
                       {/*LANDLINE*/}
                       <td style={{
@@ -520,7 +520,7 @@ function Quotas() {
                       }}>
                         {data['LL Frequency'][index]}
                       </td>
-                      <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}%</td>
+                      <td className="separator">{data['L%'][index]}%</td>
                       {/*END LANDLINE*/}
                     </>}
                     {showColumns.cell && <>
@@ -545,7 +545,7 @@ function Quotas() {
                       }}>
                         {data['Cell Frequency'][index]}
                       </td>
-                      <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}%</td>
+                      <td className="separator">{data['C%'][index]}%</td>
                       {/*END CELL*/}
                     </>}
                     {/*END PHONE*/}
