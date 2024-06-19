@@ -47,7 +47,18 @@ function Quotas() {
   };
 
   useEffect(() => {
-
+    const com = localStorage.getItem('comSurveyID')
+    const web = localStorage.getItem('webSurveyID')
+    const ll = localStorage.getItem('landlineSurveyID')
+    const cell = localStorage.getItem('cellSurveyID')
+    setComSurveyID(com)
+    setWebSurveyID(web)
+    setLandlineSurveyID(ll)
+    setCellSurveyID(cell)
+    getSurveyName('COM', com)
+    getSurveyName('Web', web)
+    getSurveyName('LL', ll)
+    getSurveyName('Cell', cell)
   }, []);
 
   const handleRun = async () => {
@@ -98,6 +109,7 @@ function Quotas() {
         setComSurveyID(value);
         setComSurveyIDError(value.length <5);
         if(value.length > 4) {
+          localStorage.setItem("comSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -105,6 +117,7 @@ function Quotas() {
         setWebSurveyID(value);
         setWebSurveyIDError(value.length < 3);
         if(value.length > 2) {
+          localStorage.setItem("webSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -112,6 +125,7 @@ function Quotas() {
         setLandlineSurveyID(value);
         setLandlineSurveyIDError(value.length < 5);
         if(value.length > 4) {
+          localStorage.setItem("landlineSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -119,6 +133,7 @@ function Quotas() {
         setCellSurveyID(value);
         setCellSurveyIDError(value.length < 5);
         if(value.length > 4) {
+          localStorage.setItem("cellSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -128,6 +143,7 @@ function Quotas() {
   }
 
   const getSurveyName = async (source, surveyID) => {
+    console.log(source, surveyID)
     axios.post(
       '/quotas/survey_name',
       { source, surveyID },
@@ -434,7 +450,7 @@ function Quotas() {
                         color: "white"
                       }}
                         >
-                      {data['Panel Objective'][index]}
+                          {data['Panel Objective'][index]}
                         </td>
                         <td
                         style={{
@@ -448,7 +464,7 @@ function Quotas() {
                                 (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
                                   "lightpink"
                         }}>
-                      {data['Panel Frequency'][index]}
+                          {data['Panel Frequency'][index]}
                         </td>
                         <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
                       {/*END PANEL*/}
@@ -460,7 +476,7 @@ function Quotas() {
                           color: "white"
                         }}
                         >
-                      {data['T2W Objective'][index]}
+                          {data['T2W Objective'][index]}
                         </td>
                         <td
                         style={{
@@ -474,7 +490,7 @@ function Quotas() {
                               (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
                                 "lightpink"
                         }}>
-                      {data['T2W Frequency'][index]}
+                          {data['T2W Frequency'][index]}
                         </td>
                         <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
                       {/*END T2W*/}

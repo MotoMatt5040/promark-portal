@@ -92,7 +92,7 @@
 
 /* Sticky headers styling */
 .sticky-header th {
-    position: sticky;
+    /*position: sticky;*/
     top: 0;
     background-color: lightgrey; /* Ensure the background is opaque */
     z-index: 2; /* Ensure it is above other content */
