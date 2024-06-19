@@ -690,7 +690,7 @@ class VoxcoDataGrabber:
             return
 
         totals = [
-            f"R *D//S ({totals_list[choice][0].upper()} - {totals_list[choice][1].upper()}) ;NONE ;EX (R3-R4)",
+            f"R *D/S ({totals_list[choice][0].upper()} - {totals_list[choice][1].upper()}) ;NONE ;EX (R3-R4)",
             f"R &UT-TOTAL {totals_list[choice][0].upper()} ;{que['start_column']}-1:2",
             f"R &UT-TOTAL {totals_list[choice][1].upper()} ;{que['start_column']}-3:4",
         ]
@@ -714,7 +714,7 @@ class VoxcoDataGrabber:
             return "QPARTYID not found."
 
         totals = [
-            "R *D//S (REPUBLICAN - DEMOCRAT) ;NONE ;EX (R3-R5)",
+            "R *D/S (REPUBLICAN - DEMOCRAT) ;NONE ;EX (R3-R5)",
             f"R &UT-TOTAL REPUBLICAN ;{partyid['start_column']}-1:2",
             f"R &UT-TOTAL INDEPENDENT ;{partyid['start_column']}-3:5",
             f"R &UT-TOTAL DEMOCRAT ;{partyid['start_column']}-6:7",
@@ -739,7 +739,7 @@ class VoxcoDataGrabber:
             return "QIDEOLOGY not found."
 
         totals = [
-            "R *D//S (CONSERVATIVE - LIBERAL) ;NONE ;EX (R3-R4)",
+            "R *D/S (CONSERVATIVE - LIBERAL) ;NONE ;EX (R3-R4)",
             f"R &UT-TOTAL CONSERVATIVE ;{ideology['start_column']}-1:2",
             f"R &UT-TOTAL LIBERAL ;{ideology['start_column']}-4:5",
         ]
