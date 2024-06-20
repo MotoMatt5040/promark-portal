@@ -80,6 +80,9 @@ class DataManagement(API):
             }
 
         for item in data:
+            # TODO add a search bar
+            # if 'HARRIS' not in item['Label'].upper():
+            #     continue
             if self.source != 'Web':
                 output[f'{self.source} StratumId'].append(item['Position'])
                 output[f'{self.source} Status'].append('Open' if item['Status'] == 0 else 'Closed')
@@ -227,6 +230,8 @@ class DataManagement(API):
         df_cptllc['C%'] = np.round(df_cptllc['Cell Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
         df_cptllc['Phone%'] = np.round((df_cptllc['LL Frequency'] + df_cptllc['Cell Frequency']) * 100 / df_cptllc['COM Frequency'], 2)
 
+        df_cptllc['G%'] = np.round(df_cptllc['COM Frequency'] * 100 / df_cptllc['COM Objective'], 2)
+
         self.reset()
 
         # print(df_cptllc.to_string())
@@ -249,5 +254,3 @@ class DataManagement(API):
         self._landline_data = pd.DataFrame()
         self._cell_data = pd.DataFrame()
         self._source = None
-
-
