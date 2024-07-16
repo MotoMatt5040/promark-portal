@@ -91,7 +91,10 @@ class DataManagement(API):
                 if self.source == "COM" or self.source == "LL":
                     output['Criterion'].append(item['Criterion'].strip())
                 if self.source == 'Cell':
-                    output['Criterion'].append(item['Criterion'].replace(" AND STYPE=2", '').strip())
+                    output['Criterion'].append(item['Criterion']
+                                               .replace(" AND STYPE=2", '')
+                                               .replace("STYPE=2 AND ", '')
+                                               .strip())
                     if item['Criterion'] == "STYPE=4":
                         item['Frequence'] = 0
                 output[f'{self.source} Objective'].append(item['Quota'])
@@ -105,9 +108,9 @@ class DataManagement(API):
                     output['panel']['Panel Status'].append(item['Status'])
                     output['panel']['Panel Label'].append(item['Label'])
                     output['panel']['Criterion'].append(item['Criterion']
-                                               .replace(" AND STYPE>2", '')
-                                               .replace(" AND STYPE=3", '')
-                                               .replace(" AND STYPE=4", ''))
+                                                        .replace(" AND STYPE>2", '')
+                                                        .replace(" AND STYPE=3", '')
+                                                        .replace(" AND STYPE=4", ''))
                     output['panel']['Panel Objective'].append(item['Objective'])
                     output['panel']['Panel Frequency'].append(item['Frequency'])
                     output['panel']['Panel To Do'].append((item['Objective'] - item['Frequency']) if item['Objective'] > 0 else 0)
@@ -117,9 +120,10 @@ class DataManagement(API):
                     output['t2w']['T2W Status'].append(item['Status'])
                     output['t2w']['T2W Label'].append(item['Label'])
                     output['t2w']['Criterion'].append(item['Criterion']
-                                               .replace(" AND STYPE>2", '')
-                                               .replace(" AND STYPE=3", '')
-                                               .replace(" AND STYPE=4", ''))
+                                                      .replace(" AND STYPE>2", '')
+                                                      .replace(" AND STYPE=3", '')
+                                                      .replace(" AND STYPE=4", '')
+                                                      .replace("STYPE=4 AND ", ''))
                     output['t2w']['T2W Objective'].append(item['Objective'])
                     output['t2w']['T2W Frequency'].append(item['Frequency'])
                     output['t2w']['T2W To Do'].append((item['Objective'] - item['Frequency']) if item['Objective'] > 0 else 0)
@@ -181,6 +185,8 @@ class DataManagement(API):
         df_cell = self._cell_data
 
         # region print
+        # TODO dfs
+
         # print("\033[93m\ncom\033[0m")
         # print(df_com.to_string())
         #
@@ -198,9 +204,8 @@ class DataManagement(API):
         # print("\033[93m\ncell\033[0m")
         # print(df_cell.to_string())
 
-        # print(df_com.to_string())
-        # print(df_web.to_string())
-        # region print
+        # TODO dfs
+        # endregion print
 
         try:
             df_com_panel_merge = pd.merge(df_com, df_panel, on=["Criterion"], how='left')
