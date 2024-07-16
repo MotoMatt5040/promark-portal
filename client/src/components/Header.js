@@ -49,8 +49,8 @@ const Header = (props) => {
                 <Nav.Link onClick={() => replaceCurrentUrl("/login")} style={{color: 'blue'}}>Sign In</Nav.Link>
               )
             )}
+            <Nav.Link href="https://github.com/MotoMatt5040/promark-portal/issues">Report Issue</Nav.Link>
           </Nav>
-          <Nav.Link href="https://github.com/MotoMatt5040/promark-portal/issues">Report Issue</Nav.Link>
         </Navbar.Collapse>
       </Container>
     </Navbar>
