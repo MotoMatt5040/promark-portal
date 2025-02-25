@@ -208,19 +208,6 @@ class DataManagement(API):
         df = pd.merge(df, df_ll, on=["Criterion"], how='left')
         df = pd.merge(df, df_cell, on=["Criterion"], how='left')
         df = df[df["COM Objective"] != 0].reset_index(drop=True)
-            
-
-        # try:
-        #     df_com_panel_merge = pd.merge(df_com, df_panel, on=["Criterion"], how='left')
-        #     df_com_panel_tw2_merge = pd.merge(df_com_panel_merge, df_t2w, on=["Criterion"], how='left')
-        #     df_cptll_merge = pd.merge(df_com_panel_tw2_merge, df_ll, on=["Criterion"], how='left')
-        #     df = pd.merge(df_cptll_merge, df_cell, on=["Criterion"], how='left')
-        #     df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
-        #     df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
-        #     df = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
-        # except Exception as err:
-        #     print(traceback.format_exc())
-        #     print(err)
 
         df.fillna(0, inplace=True)
 
@@ -242,14 +229,7 @@ class DataManagement(API):
         df['C%'] = np.round(df['Cell Frequency'] * 100 / df['COM Frequency'], 2)
         df['Phone%'] = np.round((df['LL Frequency'] + df['Cell Frequency']) * 100 / df['COM Frequency'], 2)
 
-
-
         self.reset()
-
-        print(df.to_string())
-        print()
-        print()
-        print(df.shape[0])
 
         return df
 
