@@ -23,17 +23,15 @@ class DataManagement(API):
         self._source = None
 
     def set_data(self):  # TODO panel and t2w
-        if self.source != 'Web':
-            df = pd.DataFrame(self.create_layout())
+        if self.source == 'Web':
+            self._panel_data, self._t2w_data = pd.DataFrame(self.create_layout()[0]), pd.DataFrame(self.create_layout()[1])
+            return self._panel_data, self._t2w_data
+
+        df = pd.DataFrame(self.create_layout())
 
         match self.source:
             case "COM":
                 self._com_data = df
-            case "Web":
-                self._panel_data, self._t2w_data = pd.DataFrame(self.create_layout()[0]), pd.DataFrame(self.create_layout()[1])
-                # print(self._panel_data.to_string())
-                # print(self._t2w_data.to_string())
-                return self._panel_data, self._t2w_data
             case "LL":
                 self._landline_data = df
             case "Cell":
@@ -46,16 +44,10 @@ class DataManagement(API):
                 self._landline_data = pd.DataFrame()
                 self._cell_data = pd.DataFrame()
 
-        # print(df.to_string())
         return df
 
     def create_layout(self):
         data = self.get_data()
-        # if self.source == "COM":
-            # print(self.source)
-            # print(self.com_sid)
-            # # print(self.sid)
-            # print(json.dumps(data, indent=4))
         output = {
             f'{self.source} StratumId': [],
             f'{self.source} Status': [],
@@ -67,7 +59,6 @@ class DataManagement(API):
         if self.source == 'COM':
             output['COM Label'] = []
         elif self.source == 'Web':
-            # output['Web Label'] = []
             output = {
                 'panel': {
                     f'Panel StratumId': [],
@@ -90,6 +81,9 @@ class DataManagement(API):
             }
 
         for item in data:
+            # TODO add a search bar
+            # if 'HARRIS' not in item['Label'].upper():
+            #     continue
             if self.source != 'Web':
                 output[f'{self.source} StratumId'].append(item['Position'])
                 output[f'{self.source} Status'].append('Open' if item['Status'] == 0 else 'Closed')
@@ -98,7 +92,12 @@ class DataManagement(API):
                 if self.source == "COM" or self.source == "LL":
                     output['Criterion'].append(item['Criterion'].strip())
                 if self.source == 'Cell':
-                    output['Criterion'].append(item['Criterion'].replace(" AND STYPE=2", '').strip())
+                    output['Criterion'].append(item['Criterion']
+                                               .replace(" AND STYPE=2", '')
+                                               .replace("STYPE=2 AND ", '')
+                                               .strip())
+                    if item['Criterion'] == "STYPE=4":
+                        item['Frequence'] = 0
                 output[f'{self.source} Objective'].append(item['Quota'])
                 output[f'{self.source} Frequency'].append(item['Frequence'])
                 output[f'{self.source} To Do'].append((item['Quota'] - item['Frequence']) if item['Quota'] > 0 else 0)
@@ -110,9 +109,9 @@ class DataManagement(API):
                     output['panel']['Panel Status'].append(item['Status'])
                     output['panel']['Panel Label'].append(item['Label'])
                     output['panel']['Criterion'].append(item['Criterion']
-                                               .replace(" AND STYPE>2", '')
-                                               .replace(" AND STYPE=3", '')
-                                               .replace(" AND STYPE=4", ''))
+                                                        .replace(" AND STYPE>2", '')
+                                                        .replace(" AND STYPE=3", '')
+                                                        .replace(" AND STYPE=4", ''))
                     output['panel']['Panel Objective'].append(item['Objective'])
                     output['panel']['Panel Frequency'].append(item['Frequency'])
                     output['panel']['Panel To Do'].append((item['Objective'] - item['Frequency']) if item['Objective'] > 0 else 0)
@@ -122,9 +121,10 @@ class DataManagement(API):
                     output['t2w']['T2W Status'].append(item['Status'])
                     output['t2w']['T2W Label'].append(item['Label'])
                     output['t2w']['Criterion'].append(item['Criterion']
-                                               .replace(" AND STYPE>2", '')
-                                               .replace(" AND STYPE=3", '')
-                                               .replace(" AND STYPE=4", ''))
+                                                      .replace(" AND STYPE>2", '')
+                                                      .replace(" AND STYPE=3", '')
+                                                      .replace(" AND STYPE=4", '')
+                                                      .replace("STYPE=4 AND ", ''))
                     output['t2w']['T2W Objective'].append(item['Objective'])
                     output['t2w']['T2W Frequency'].append(item['Frequency'])
                     output['t2w']['T2W To Do'].append((item['Objective'] - item['Frequency']) if item['Objective'] > 0 else 0)
@@ -249,5 +249,3 @@ class DataManagement(API):
         self._landline_data = pd.DataFrame()
         self._cell_data = pd.DataFrame()
         self._source = None
-
-

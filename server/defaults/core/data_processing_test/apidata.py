@@ -287,9 +287,13 @@ class VoxcoDataGrabber:
         data = self.add_default_fields()
         preload = self.fetch_preload()
         question = None
+        fill_blocks = {}
 
         for block in self.variables:
             to_append = {}
+            if "FIL" in block['Name']:
+                fill_blocks[block['Name']] = block['Choices'][0]['Text']
+                continue
 
             # Check if preload value exists and has selections
             if block['QuestionText']:
@@ -299,16 +303,22 @@ class VoxcoDataGrabber:
                     fill_name = question[fill_location[0] + 1:fill_location[1]]
                     fill = question[fill_location[0]:fill_location[1] + 1]
                     if preload.get(fill_name):
-                        # TODO Fix partyid fill, selections shows 1.
-                        # sample output from ID 507 - 12854 Ohio Statewide
-                        # {'selection_variable': 'PARTYFIL1', 'selections': '1', 'condition': '1>0'}
-                        if preload[fill_name].get('selections'):
-                            question = question.replace(fill, preload[fill_name]['selections'])
+                        fill_text = preload[fill_name].get('selections')
+                        if fill_text:
+                            try:
+                                fill_integer = int(fill_text)
+                            except ValueError:
+                                fill_integer = None
+                            if fill_integer:
+                                question = question.replace(fill, fill_blocks[fill_name])
+                            else:
+                                question = question.replace(fill, preload[fill_name]['selections'])
                         else:
                             question = self.has_fill(block['Name'], block['QuestionText'])
+                    else:
+                        pass
 
             # do this for only selected block variables. Otherwise, column may have to be calculated later.
-
             if question:
                 to_append['question'] = question
 
@@ -690,7 +700,7 @@ class VoxcoDataGrabber:
             return
 
         totals = [
-            f"R *D//S ({totals_list[choice][0].upper()} - {totals_list[choice][1].upper()}) ;NONE ;EX (R3-R4)",
+            f"R *D/S ({totals_list[choice][0].upper()} - {totals_list[choice][1].upper()}) ;NONE ;EX (R3-R4)",
             f"R &UT-TOTAL {totals_list[choice][0].upper()} ;{que['start_column']}-1:2",
             f"R &UT-TOTAL {totals_list[choice][1].upper()} ;{que['start_column']}-3:4",
         ]
@@ -714,7 +724,7 @@ class VoxcoDataGrabber:
             return "QPARTYID not found."
 
         totals = [
-            "R *D//S (REPUBLICAN - DEMOCRAT) ;NONE ;EX (R3-R5)",
+            "R *D/S (REPUBLICAN - DEMOCRAT) ;NONE ;EX (R3-R5)",
             f"R &UT-TOTAL REPUBLICAN ;{partyid['start_column']}-1:2",
             f"R &UT-TOTAL INDEPENDENT ;{partyid['start_column']}-3:5",
             f"R &UT-TOTAL DEMOCRAT ;{partyid['start_column']}-6:7",
@@ -739,7 +749,7 @@ class VoxcoDataGrabber:
             return "QIDEOLOGY not found."
 
         totals = [
-            "R *D//S (CONSERVATIVE - LIBERAL) ;NONE ;EX (R3-R4)",
+            "R *D/S (CONSERVATIVE - LIBERAL) ;NONE ;EX (R3-R4)",
             f"R &UT-TOTAL CONSERVATIVE ;{ideology['start_column']}-1:2",
             f"R &UT-TOTAL LIBERAL ;{ideology['start_column']}-4:5",
         ]

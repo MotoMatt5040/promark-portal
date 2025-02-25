@@ -1,38 +1,24 @@
-<b>texting-platform:</b>
+Things to update when moving from local machine to server
 
-<b>sub-directories:</b>\
-    &emsp;<b>core:</b>\
-        &emsp;&emsp;Core texting program\
-    &emsp;<b>utils:</b>\
-        &emsp;&emsp;Utilities involved to determine whether messages can be sent, also used for databasing\
-    &emsp;<b>static:</b>\
-        &emsp;&emsp;css styling directory\
-    &emsp;<b>templates:</b>\
-        &emsp;&emsp;html web page templates
+All the imports that include "server.defaults" on the local machine need to have "server." removed from the import</br>
 
-<b>Usage:</b>\
-    &emsp;A user will connect to a webpage that is used to send/receive SMS or MMS texts.
+Files include:</br>
+___
+Routes:<br/>
+&emsp;defaultRoutes.py &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/server_routes/defaultRoutes.py</br>
+&emsp;dataProcessingRoutes.py &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/server_routes/dataProcessingRoutes.py</br>
+&emsp;interviewerRoutes.py &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/server_routes/interviewerRoutes.py</br>
+&emsp;periodicUpdateRoutes.py &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&emsp; -> server/defaults/core/server_routes/periodicUpdateRoutes.py</br>
+&emsp;quotaManagementModuleRoutes.py &emsp; -> server/defaults/core/server_routes/quotaManagementModuleRoutes.py</br>
+<br/>
+Files:<br/>
+&emsp;periodicUpdate.py &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/dashboard/periodic_update/periodicUpdate.py</br>
+___
 
-<b>app.py:</b>\
-    &emsp;Flask server used to handle requests
+Change from 'testing' for 'dev' or 'prod':</br>
+&emsp;config.py -> server/defaults/core/server_routes/config.py </br>
+&emsp;&emsp;Change allowed_domain</br>
+&emsp;&emsp;Change SESSION_REDIS
 
-<b>Dockerfile:</b>\
-    &emsp;Used to create image built with dependencies for docker container
-
-<b>DockerfileCode:</b>\
-    &emsp;Used to package code for Dockerfile
-
-<b>Pipfile.lock:</b>\
-    &emsp;Used to create virtual environment
-
-<b>requirements.txt:</b>\
-    &emsp;Used to install proper requirements (called from Dockerfile)
-
-<b>Things to be added:</b>\
-    &emsp;- 3 (Opt-out / Do Not Contact / Do Not Disturb) database checked for every project to remove bad numbers\
-    &emsp;- 2 Texter display window should contain MESSAGE being sent and display the recipient's info that was imported\
-    &emsp;-Timezone checking BEFORE texts get queued so messages won't get sent outside allowed texting times\
-    &emsp;- 1 Response handling\
-    &emsp;-Database that stores time message was queued and sent\
-    &emsp;-Database used to check our phone number productivity\
-        &emsp;&emsp;if 50k sent and 1k response on one number but 25k sent and 2k response on another number, may signify bad number
+Client Directory:<br/>
+&emsp;axios.js -> client/src/axios.js</br>
