@@ -101,7 +101,8 @@ function Quotas() {
       })
       .catch((error) => {
         console.error('Error fetching merged data:', error);
-      });
+      })
+        .finally(() => {console.log("DATA HERE"); console.log(data)});
   };
 
   const checkData = () => {
@@ -436,11 +437,38 @@ function Quotas() {
             </div>
           </div>
           <Button onClick={handleRun}>Run</Button>
-          {/*<Button onClick={handleDownload}>Download</Button>*/}
+          <Button onClick={checkData}>Check Data</Button>
+        </div>
+        {/*{typeof webData !== {}*/}
+        <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
+          <Table style={{width: "10%", border: '1px solid black'}} striped>
+            <thead>
+            <tr>
+              <th scope='col' colSpan='7'
+                  style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Legend
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr style={{border: '1px solid black'}}>
+              <td style={{backgroundColor: "#43B17B", color: "white", border: '1px solid black'}}>Open</td>
+              <td style={{backgroundColor: "#ED211C", color: "white", border: '1px solid black'}}>Closed</td>
+              <td style={{color: "crimson", border: '1px solid black'}}>+2% below</td>
+              <td style={{color: "darkorange", border: '1px solid black'}}>~2% below</td>
+              <td style={{backgroundColor: "lightgreen", border: '1px solid black'}}>Within 1%</td>
+              <td style={{backgroundColor: "lightyellow", border: '1px solid black', color: 'darkorange'}}>~2% above
+              </td>
+              <td style={{backgroundColor: "lightpink", border: '1px solid black', color: 'crimson'}}>+2% above</td>
+            </tr>
+            </tbody>
+          </Table>
+        </div>
+        <div className='checkbox-container' style={{ position: 'sticky', top: '0', zIndex: 10 }}>
+          <label>Show/Hide Columns:</label>
           <Button onClick={downloadExcel}>Download Excel</Button>
         </div>
-        <div className='checkbox-container'>
-        <label>Show/Hide Columns:</label>
+        <div>
+          <label>Show/Hide Columns:</label>
           <div>
             <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')}/> Web
           </div>
@@ -460,101 +488,115 @@ function Quotas() {
             <input type="checkbox" checked={showColumns.cell} onChange={() => toggleColumn('cell')}/> Cell
           </div>
         </div>
-        {/*{typeof webData !== {}*/}
-        <div className="upper-container">
-
-          {/*style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}*/}
-          <div className="legend-container">
-            <Table className="legend-table" style={{width: "10%"}} striped>
-              <thead>
-              <tr>
-                <th scope='col' colSpan='7' className="legend-header">Legend</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td className="status-open">Open</td>
-                <td className="status-closed">Closed</td>
-                <td className="below-10">+10 below</td>
-                <td className="near-10-below">~10 below</td>
-                <td className="within-1">Within 1</td>
-                <td className="near-10-above">~10 above</td>
-                <td className="above-10">+10 above</td>
-              </tr>
-              </tbody>
-            </Table>
-          </div>
-        </div>
         <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
           {Object.keys(data).length > 0 && (
-              <Table className="separator-left" style={{width: "50%", border: '1px solid black'}} striped>
-                <thead className="sticky-header">
+              <Table style={{width: "50%", border: '1px solid black'}} striped>
+                <thead>
                 <tr>
-                  <th className="mid-header separator" scope="col" colSpan="6"></th>
-                  {showColumns.web && <th className="mid-header separator" scope="col"
-                                          colSpan={showColumns.panel && showColumns.t2w ? "7" : (!showColumns.panel && !showColumns.t2w ? "1" : "4")}>Web</th>}
-                  {showColumns.phone && <th className="mid-header separator" scope="col"
-                                            colSpan={showColumns.landline && showColumns.cell ? "7" : (!showColumns.landline && !showColumns.cell ? "1" : "4")}>Phone</th>}
+                  <th scope="col" colSpan="5"
+                      style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}></th>
+                  {showColumns.web && <th scope="col"
+                                          colSpan={showColumns.panel && showColumns.t2w ? "8" : (!showColumns.panel && !showColumns.t2w ? "2" : "5")}
+                                          style={{
+                                            border: '1px solid black',
+                                            background: "lightgrey",
+                                            textAlign: "center"
+                                          }}>Web</th>}
+                  {showColumns.phone && <th scope="col"
+                                            colSpan={showColumns.landline && showColumns.cell ? "8" : (!showColumns.landline && !showColumns.cell ? "2" : "5")}
+                                            style={{
+                                              border: '1px solid black',
+                                              background: "lightgrey",
+                                              textAlign: "center"
+                                            }}>Phone</th>}
                 </tr>
                 <tr>
-                  <th className="mid-header separator" scope="col" colSpan="6">Global</th>
+                  <th scope="col" colSpan="5"
+                      style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Global
+                  </th>
                   {showColumns.web && <>
-                    <th className="mid-header separator" scope="col" colSpan="1">Total</th>
-                    {showColumns.panel && <th className="mid-header separator" scope="col" colSpan="3">Panel</th>}
-                    {showColumns.t2w && <th className="mid-header separator" scope="col" colSpan="3">T2W</th>}
+                    <th scope="col" colSpan="2"
+                        style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Total
+                    </th>
+                    {showColumns.panel && <th scope="col" colSpan="3" style={{
+                      border: '1px solid black',
+                      background: "lightgrey",
+                      textAlign: "center"
+                    }}>Panel</th>}
+                    {showColumns.t2w && <th scope="col" colSpan="3" style={{
+                      border: '1px solid black',
+                      background: "lightgrey",
+                      textAlign: "center"
+                    }}>T2W</th>}
                   </>}
                   {showColumns.phone && <>
-                    <th className="mid-header separator" scope="col" colSpan="1">Total</th>
-                    {showColumns.landline && <th className="mid-header separator" scope="col" colSpan="3">Landline</th>}
-                    {showColumns.cell && <th className="mid-header separator" scope="col" colSpan="3">Cell</th>}
+                    <th scope="col" colSpan="2"
+                        style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Total
+                    </th>
+                    {showColumns.landline && <th scope="col" colSpan="3" style={{
+                      border: '1px solid black',
+                      background: "lightgrey",
+                      textAlign: "center"
+                    }}>Landline</th>}
+                    {showColumns.cell && <th scope="col" colSpan="3" style={{
+                      border: '1px solid black',
+                      background: "lightgrey",
+                      textAlign: "center"
+                    }}>Cell</th>}
                   </>}
                 </tr>
+
                 <tr>
-                  <th>Criterion</th>
-                  <th>Label</th>
-                  <th>Obj</th>
-                  <th>Freq</th>
-                  <th>ToDo</th>
-                  <th className="separator">DONE%</th>
+                  <th style={{border: '1px solid black'}}>Criterion</th>
+                  <th style={{border: '1px solid black'}}>Label</th>
+                  <th style={{border: '1px solid black'}}>Obj</th>
+                  <th style={{border: '1px solid black'}}>Freq</th>
+                  <th style={{border: '1px solid black'}}>ToDo</th>
+
                   {showColumns.web && <>
-                    <th className="separator">%</th>
+                    <th style={{border: '1px solid black'}}>%</th>
+                    <th style={{border: '1px solid black'}}>Freq</th>
                     {showColumns.panel && <>
-                      <th>Obj</th>
-                      <th>Freq</th>
-                      <th className="separator">%</th>
+                      <th style={{border: '1px solid black'}}>Obj</th>
+                      <th style={{border: '1px solid black'}}>Freq</th>
+                      <th style={{border: '1px solid black'}}>%</th>
                     </>}
                     {showColumns.t2w && <>
-                      <th>Obj</th>
-                      <th>Freq</th>
-                      <th className="separator">%</th>
+                      <th style={{border: '1px solid black'}}>Obj</th>
+                      <th style={{border: '1px solid black'}}>Freq</th>
+                      <th style={{border: '1px solid black'}}>%</th>
                     </>}
                   </>}
                   {showColumns.phone && <>
-                    <th className="separator">%</th>
+                    <th style={{border: '1px solid black'}}>%</th>
+                    <th style={{border: '1px solid black'}}>Freq</th>
                     {showColumns.landline && <>
-                      <th>Obj</th>
-                      <th>Freq</th>
-                      <th className="separator">%</th>
+                      <th style={{border: '1px solid black'}}>Obj</th>
+                      <th style={{border: '1px solid black'}}>Freq</th>
+                      <th style={{border: '1px solid black'}}>%</th>
                     </>}
                     {showColumns.cell && <>
-                      <th>Obj</th>
-                      <th>Freq</th>
-                      <th className="separator">%</th>
+                      <th style={{border: '1px solid black'}}>Obj</th>
+                      <th style={{border: '1px solid black'}}>Freq</th>
+                      <th style={{border: '1px solid black'}}>%</th>
                     </>}
                   </>}
                 </tr>
                 </thead>
                 <tbody>
                 {Object.keys(data.Criterion).map((key, index) => (
+
                     <tr key={index}>
                       <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
                       <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
                       <td>{data['COM Objective'][index]}</td>
                       <td>{data['COM Frequency'][index]}</td>
-                      <td>{data['COM To Do'][index]}</td>
-                      <td className="separator">{data['G%'][index]}%</td>
+                      <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
+                      {/*<td style={{borerLeft: "1px solid black"}}>{data['Web Label'][index]}</td>*/}
+
                       {showColumns.web && <>
-                        <td className="separator">{data['W%'][index]}%</td>
+                        <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}%</td>
+                        <td style={{borderRight: "1px solid black"}}>{data['Web Frequency'][index]}</td>
                         {/*PANEL*/}
                         {showColumns.panel && <>
                           <td style={{
@@ -578,9 +620,10 @@ function Quotas() {
                               }}>
                             {data['Panel Frequency'][index]}
                           </td>
-                          <td className="separator">{data['P%'][index]}%</td>
+                          <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
                           {/*END PANEL*/}
                         </>}
+
                         {showColumns.t2w && <>
                           {/*T2W*/}
                           <td style={{
@@ -604,13 +647,15 @@ function Quotas() {
                               }}>
                             {data['T2W Frequency'][index]}
                           </td>
-                          <td className="separator">{data['T%'][index]}%</td>
+                          <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
                           {/*END T2W*/}
                         </>}
                       </>}
+
                       {showColumns.phone && <>
                         {/*PHONE*/}
-                        <td className="separator">{data['Phone%'][index]}%</td>
+                        <td style={{borderRight: "1px solid black"}}>{data['Phone%'][index]}%</td>
+                        <td style={{borderRight: "1px solid black"}}>{data['Phone Frequency'][index]}</td>
                         {showColumns.landline && <>
                           {/*LANDLINE*/}
                           <td style={{
@@ -632,7 +677,7 @@ function Quotas() {
                               }}>
                             {data['LL Frequency'][index]}
                           </td>
-                          <td className="separator">{data['L%'][index]}%</td>
+                          <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}%</td>
                           {/*END LANDLINE*/}
                         </>}
                         {showColumns.cell && <>
@@ -657,18 +702,23 @@ function Quotas() {
                               }}>
                             {data['Cell Frequency'][index]}
                           </td>
-                          <td className="separator">{data['C%'][index]}%</td>
+                          <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}%</td>
                           {/*END CELL*/}
                         </>}
+
                         {/*END PHONE*/}
                       </>}
+
                     </tr>
-                ))}
+                  )
+                )}
                 </tbody>
               </Table>
           )}
         </div>
+
       </div>
+      // </div>
   )
 }
 

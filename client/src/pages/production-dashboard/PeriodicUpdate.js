@@ -52,7 +52,7 @@ export default function PeriodicUpdate() {
     setProductionSummaryTableButton(() => {if(!productionSummaryIsOpen) return <VisibilityIcon/>; else return <VisibilityOffIcon/>;})
   }
 
-  const handleLocationSelect = (event: SelectChangeEvent) => {
+  const handleLocationSelect = (event) => {
     if (event.target.value !== "All") {
       setLocation(event.target.value);
       setLocationID(locations[event.target.value]);
@@ -77,7 +77,7 @@ export default function PeriodicUpdate() {
     });
   };
 
-  const handleProjectIDSelect = (event: SelectChangeEvent) => {
+  const handleProjectIDSelect = (event) => {
     setProjectID(event.target.value);
   }
 

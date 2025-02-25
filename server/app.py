@@ -15,6 +15,14 @@ from waitress import serve
 #  sample formatting automation
 #  COM File update automation (CC3 Completes)
 
+# INDIVIDUAL METRICS: LIVE PERIODIC UPDATE PROJECT LEVEL
+#   - HOURS
+#   - CPH
+#   - LEN
+#   - MPH
+#   - DPH
+#   - SAMPLE UTILIZATION
+
 if __name__ == '__main__':
     print("http://localhost:5000/")
     serve(
