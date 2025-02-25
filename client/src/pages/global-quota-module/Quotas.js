@@ -467,7 +467,8 @@ function Quotas() {
           <label>Show/Hide Columns:</label>
           <Button onClick={downloadExcel}>Download Excel</Button>
         </div>
-        <label>Show/Hide Columns:</label>
+        <div>
+          <label>Show/Hide Columns:</label>
           <div>
             <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')}/> Web
           </div>
