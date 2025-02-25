@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import requests
 import json
+from server.defaults.utils.logger_config import logger
 
 
 class DataManagement(API):
@@ -177,18 +178,16 @@ class DataManagement(API):
                 return
 
     def merge_data(self):
+        df = self._com_data
         df_com = self._com_data
-        df_web = self._web_data
         df_panel = self._panel_data
         df_t2w = self._t2w_data
         df_ll = self._landline_data
         df_cell = self._cell_data
 
+
         # print("\033[93m\ncom\033[0m")
         # print(df_com.to_string())
-        #
-        # print("\033[93m\nweb\033[0m")
-        # print(df_web.to_string())
         #
         # print("\033[93m\npanel\033[0m")
         # print(df_panel.to_string())
@@ -198,50 +197,61 @@ class DataManagement(API):
         #
         # print("\033[93m\nlandline\033[0m")
         # print(df_ll.to_string())
+        #
         # print("\033[93m\ncell\033[0m")
         # print(df_cell.to_string())
-
+        #
         # print(df_com.to_string())
-        # print(df_web.to_string())
+        
+        df = pd.merge(df, df_panel, on=["Criterion"], how='left')
+        df = pd.merge(df, df_t2w, on=["Criterion"], how='left')
+        df = pd.merge(df, df_ll, on=["Criterion"], how='left')
+        df = pd.merge(df, df_cell, on=["Criterion"], how='left')
+        df = df[df["COM Objective"] != 0].reset_index(drop=True)
+            
 
-        try:
-            df_com_panel_merge = pd.merge(df_com, df_panel, on=["Criterion"], how='left')
-            df_com_panel_tw2_merge = pd.merge(df_com_panel_merge, df_t2w, on=["Criterion"], how='left')
-            df_cptll_merge = pd.merge(df_com_panel_tw2_merge, df_ll, on=["Criterion"], how='left')
-            df_cptllc = pd.merge(df_cptll_merge, df_cell, on=["Criterion"], how='left')
-            # df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
-            # df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
-            # df_cptllc = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
-        except Exception as err:
-            print(traceback.format_exc())
-            print(err)
+        # try:
+        #     df_com_panel_merge = pd.merge(df_com, df_panel, on=["Criterion"], how='left')
+        #     df_com_panel_tw2_merge = pd.merge(df_com_panel_merge, df_t2w, on=["Criterion"], how='left')
+        #     df_cptll_merge = pd.merge(df_com_panel_tw2_merge, df_ll, on=["Criterion"], how='left')
+        #     df = pd.merge(df_cptll_merge, df_cell, on=["Criterion"], how='left')
+        #     df_comweb = pd.merge(df_com, df_web, on=["Criterion"], how='left')
+        #     df_cwll = pd.merge(df_comweb, df_ll, on=["Criterion"], how='left')
+        #     df = pd.merge(df_cwll, df_cell, on="Criterion", how='left')
+        # except Exception as err:
+        #     print(traceback.format_exc())
+        #     print(err)
 
-        df_cptllc.fillna(0, inplace=True)
+        df.fillna(0, inplace=True)
 
         # Web Percent
-        df_cptllc['Web Frequency'] = df_cptllc['Panel Frequency'] + df_cptllc['T2W Frequency']
+        df['Web Frequency'] = df['Panel Frequency'] + df['T2W Frequency']
+        df['Phone Frequency'] = df['LL Frequency'] + df['Cell Frequency']
 
         # COM Calculated Frequency
-        df_cptllc['COM Frequency'] = df_cptllc['Web Frequency'] + df_cptllc['LL Frequency'] + df_cptllc['Cell Frequency']
-        df_cptllc['COM To Do'] = df_cptllc['COM Objective'] - df_cptllc['COM Frequency']
+        df['COM Frequency'] = df['Web Frequency'] + df['Phone Frequency']
+        df['COM To Do'] = df['COM Objective'] - df['COM Frequency']
 
-        df_cptllc['W%'] = np.round(df_cptllc['Web Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
-        df_cptllc['P%'] = np.round(df_cptllc['Panel Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
-        df_cptllc['T%'] = np.round(df_cptllc['T2W Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
-        # df_cptllc['Phone%'] = np.round((df_cptllc['LL Frequency'] + df_cptllc['Cell Frequency']) * 100 / df_cptllc['COM Frequency'], 2)
+        df['W%'] = np.round(df['Web Frequency'] * 100 / df['COM Frequency'], 2)
+        df['P%'] = np.round(df['Panel Frequency'] * 100 / df['COM Frequency'], 2)
+        df['T%'] = np.round(df['T2W Frequency'] * 100 / df['COM Frequency'], 2)
+        df['Phone%'] = np.round((df['LL Frequency'] + df['Cell Frequency']) * 100 / df['COM Frequency'], 2)
 
         #Phone %
-        df_cptllc['L%'] = np.round(df_cptllc['LL Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
-        df_cptllc['C%'] = np.round(df_cptllc['Cell Frequency'] * 100 / df_cptllc['COM Frequency'], 2)
-        df_cptllc['Phone%'] = np.round((df_cptllc['LL Frequency'] + df_cptllc['Cell Frequency']) * 100 / df_cptllc['COM Frequency'], 2)
+        df['L%'] = np.round(df['LL Frequency'] * 100 / df['COM Frequency'], 2)
+        df['C%'] = np.round(df['Cell Frequency'] * 100 / df['COM Frequency'], 2)
+        df['Phone%'] = np.round((df['LL Frequency'] + df['Cell Frequency']) * 100 / df['COM Frequency'], 2)
 
 
 
         self.reset()
 
-        # print(df_cptllc.to_string())
+        print(df.to_string())
+        print()
+        print()
+        print(df.shape[0])
 
-        return df_cptllc
+        return df
 
     @property
     def source(self):
