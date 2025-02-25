@@ -91,10 +91,10 @@ def data_processing_questions():
     dg.fetch_questions()
 
     # Used to write data to files for error checking
-    # with open("variables.txt", 'w', encoding='utf-8') as f:
-    #     json.dump(dg.variables, f, ensure_ascii=False, indent=4)
-    # with open("questions.txt", 'w', encoding='utf-8') as f:
-    #     json.dump(dg.questions, f, ensure_ascii=False, indent=4)
+    with open("variables.txt", 'w', encoding='utf-8') as f:
+        json.dump(dg.variables, f, ensure_ascii=False, indent=4)
+    with open("questions.txt", 'w', encoding='utf-8') as f:
+        json.dump(dg.questions, f, ensure_ascii=False, indent=4)
 
     return questions
 

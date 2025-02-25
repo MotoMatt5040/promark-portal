@@ -254,8 +254,10 @@ class VoxcoDataGrabber:
         """
         data = {}
         for block in self._questions['blocks']:
+            # print(block)
             for item in block['questions']:
                 data[item['name']] = {}
+                # print(item)
 
                 if 'displayLogic' in item:
                     data.setdefault(item['name'], {})['display_logic'] = item['displayLogic'].replace('logic:adv;', '')
@@ -287,27 +289,46 @@ class VoxcoDataGrabber:
         data = self.add_default_fields()
         preload = self.fetch_preload()
         question = None
+        # print(json.dumps(self.variables, indent=2))
 
         for block in self.variables:
             to_append = {}
 
-            # Check if preload value exists and has selections
+            if block['Name'] in preload:
+                # print(preload[block['Name']])
+                try:
+                    preload[block['Name']]['selections'] = block['Choices'][0]['Text']
+                except:
+                    pass
+
+            # Check and replace in QuestionText
             if block['QuestionText']:
                 question = block['QuestionText']
-                if "[" in question:
-                    fill_location = question.find("["), question.find("]")
-                    fill_name = question[fill_location[0] + 1:fill_location[1]]
-                    fill = question[fill_location[0]:fill_location[1] + 1]
-                    if preload.get(fill_name):
-                        # TODO Fix partyid fill, selections shows 1.
-                        # sample output from ID 507 - 12854 Ohio Statewide
-                        # {'selection_variable': 'PARTYFIL1', 'selections': '1', 'condition': '1>0'}
-                        if preload[fill_name].get('selections'):
-                            question = question.replace(fill, preload[fill_name]['selections'])
-                        else:
-                            question = self.has_fill(block['Name'], block['QuestionText'])
 
-            # do this for only selected block variables. Otherwise, column may have to be calculated later.
+                # Find and replace all placeholders in QuestionText
+                question = self.replace_fills_in_text(question, preload, block['Name'])
+
+                # Debugging - show modified QuestionText
+                # print("Modified QuestionText:", question)
+
+            # Check and replace in Choices.Text
+            if 'Choices' in block:
+                for choice in block['Choices']:
+                    if choice['Text']:
+                        # Find and replace all placeholders in Choices.Text
+                        if '[' not in choice['Text']:
+                            continue
+                        matches = re.findall(r'\[([^\]"]+)\]', choice['Text'])
+                        # print(choice['Text'])
+                        # print(matches)
+                        for match_to_replace in matches:
+                            # print(match_to_replace)
+                            for n in self.variables:
+                                if n['Name'] == match_to_replace:
+                                    choice['Text'] = choice['Text'].replace(f"[{match_to_replace}]", n['Choices'][0]['Text'])
+                                    block['Choices'][0]['Text'] = choice['Text']
+                                    # print(json.dumps(block, indent=2))
+                                    # print(block['Name'], choice['Text'])
 
             if question:
                 to_append['question'] = question
@@ -332,14 +353,39 @@ class VoxcoDataGrabber:
         self._raw_data = data
         self.replace_fill()
 
+    def replace_fills_in_choice(selfself, choice, fill_names):
+        ...
+
+    def replace_fills_in_text(self, text, preload, question_name):
+        """
+        This method finds and replaces [something] placeholders in the given text
+        using the preload data.
+        """
+        # Find all instances of [something] using regex
+        matches = re.findall(r'\[([^\]]+)\]', text)
+
+        # Loop through each match and replace if there's a corresponding preload
+        for match in matches:
+            fill = f"[{match}]"
+            if preload.get(match):
+                sel = preload[match].get('selections')
+                if sel:
+                    fills = re.findall(r'\[([^\]]+)\]', sel)
+                    for f in fills:
+                        for n in self.variables:
+                            if n['Name'] == f:
+                                sel = sel.replace(F"[{f}]", n['Choices'][0]['Text'])
+                    text = text.replace(fill, sel)
+                    # print(text)
+                else:
+                    text = self.has_fill(question_name, text)
+
+        return text
+
     def has_fill(self, question, text):
         """
-        Store fill data
-        :param question: Question name
-        :param text: Question text
-        :return: Unmodified question text
+        This method finds and stores fill data for later replacement.
         """
-        # This shouldn't include SEX2, this will only happen if it is included in the dat file
         if text is None \
                 or question not in self._order \
                 or question.lower() == 'sex2':
@@ -347,29 +393,124 @@ class VoxcoDataGrabber:
         if "[" not in text:  # this is a redundant check for safety
             return
 
-        fill_location = text.find("["), text.find("]")
-        fill_name = text[fill_location[0] + 1:fill_location[1]]
-        fill = text[fill_location[0]:fill_location[1] + 1]
+        # Find all instances of [something] using regex
+        matches = re.findall(r'\[([^\]]+)\]', text)
 
-        self._has_fill[question] = {"text": text, "fill": fill, 'fill_name': fill_name}
+        # If matches are found, store them
+        if matches:
+            self._has_fill[question] = {
+                "text": text,
+                "fills": [{"fill": f"[{m}]", "fill_name": m} for m in matches]
+            }
+
         return text
 
     def replace_fill(self):
         """
-        Replace all fills with the actual text from the fill choices
-        :return: None
+        This method replaces all stored [something] fills in the raw data.
         """
-        # print(json.dumps(self._has_fill, indent=4))
-        print("\033[93mWarning: apidata.VoxcoDataGrabber.replace_fill() may be deprecated in the future!\033[0m")
         for question in self._has_fill:
             try:
-                self._raw_data[question]['question'] = self._raw_data[question]['question'].\
-                    replace(
-                        self._has_fill[question]['fill'],
-                        self._raw_data[self._has_fill[question]['fill_name']]['choices']["1"]
+                # Loop over each fill for the current question
+                for fill_info in self._has_fill[question]['fills']:
+                    fill = fill_info['fill']
+                    fill_name = fill_info['fill_name']
+
+                    # Get the corresponding choice text instead of just the "1" code
+                    fill_choice_text = self._raw_data[fill_name]['Choices']['0']['Text']
+
+                    # Replace the fill in the raw data question with the corresponding choice text
+                    self._raw_data[question]['question'] = self._raw_data[question]['question'].replace(
+                        fill, fill_choice_text
                     )
-            except:
-                print("Error on: ", question, self._has_fill[question]['fill'], self._raw_data[self._has_fill[question]['fill_name']]['choices'])
+
+
+            except KeyError as e:
+                print(f"Error on: {question}, Fill: {fill}, Fill Name: {fill_name}, Error: {str(e)}")
+
+    # def has_fill(self, question, text):
+    #     """
+    #     Store fill data
+    #     :param question: Question name
+    #     :param text: Question text
+    #     :return: Unmodified question text
+    #     """
+    #     # This shouldn't include SEX2, this will only happen if it is included in the dat file
+    #     # if text is None \
+    #     #         or question not in self._order \
+    #     #         or question.lower() == 'sex2':
+    #     #     return
+    #     # if "[" not in text:  # this is a redundant check for safety
+    #     #     return
+    #     #
+    #     # fill_location = text.find("["), text.find("]")
+    #     # fill_name = text[fill_location[0] + 1:fill_location[1]]
+    #     # fill = text[fill_location[0]:fill_location[1] + 1]
+    #     #
+    #     # self._has_fill[question] = {"text": text, "fill": fill, 'fill_name': fill_name}
+    #     # return text
+    #
+    #     if text is None \
+    #             or question not in self._order \
+    #             or question.lower() == 'sex2':
+    #         return
+    #     if "[" not in text:  # this is a redundant check for safety
+    #         return
+    #
+    #     # Find all instances of [something] using regex
+    #     matches = re.findall(r'\[([^\]]+)\]', text)
+    #
+    #     # If matches are found, store them
+    #     if matches:
+    #         print(text)
+    #         print(json.dumps(matches, indent=4))
+    #         # print(json.dumps(
+    #         #     {
+    #         #         "text": text,
+    #         #         "fills": [{"fill": f"[{m}]", "fill_name": m} for m in matches]
+    #         #     },
+    #         #     indent=4
+    #         # ))
+    #         self._has_fill[question] = {
+    #             "text": text,
+    #             "fills": [{"fill": f"[{m}]", "fill_name": m} for m in matches]
+    #         }
+    #
+    #     return text
+    #
+    # def replace_fill(self):
+    #     """
+    #     Replace all fills with the actual text from the fill choices
+    #     :return: None
+    #     """
+    #     # print(json.dumps(self._has_fill, indent=4))
+    #     print("\033[93mWarning: apidata.VoxcoDataGrabber.replace_fill() may be deprecated in the future!\033[0m")
+    #     # print(json.dumps(self._has_fill, indent=4))
+    #     # for question in self._has_fill:
+    #     #     try:
+    #     #         self._raw_data[question]['question'] = self._raw_data[question]['question'].\
+    #     #             replace(
+    #     #                 self._has_fill[question]['fill'],
+    #     #                 self._raw_data[self._has_fill[question]['fill_name']]['choices']["1"]
+    #     #             )
+    #     #     except:
+    #     #         print("Error on: ", question, self._has_fill[question]['fill'], self._raw_data[self._has_fill[question]['fill_name']]['choices'])
+    #
+    #     for question in self._has_fill:
+    #         try:
+    #             # Loop over each fill for the current question
+    #             for fill_info in self._has_fill[question]['fills']:
+    #                 fill = fill_info['fill']
+    #                 fill_name = fill_info['fill_name']
+    #
+    #                 # Replace the fill in the raw data question with the corresponding choice
+    #                 self._raw_data[question]['question'] = self._raw_data[question]['question'].replace(
+    #                     fill,
+    #                     self._raw_data[fill_name]['choices']["1"]
+    #                 )
+    #
+    #         except KeyError as e:
+    #             print(f"Error on: {question}, Fill: {fill}, Fill Name: {fill_name}, Error: {str(e)}")
 
     def restructure(self):
         restructure = {}
@@ -380,7 +521,9 @@ class VoxcoDataGrabber:
         x_file = [[], []]
         first_M_encountered = False
 
+        print(self._order)
         for i, question in enumerate(self._order):
+            # print(question)
             self._layout['variable'].append(question)
             x_file[0].append(question)
 
@@ -426,15 +569,25 @@ class VoxcoDataGrabber:
                 if not create_rows_called:
                     self.create_rows(q)
 
+            if "_M1" in question:
+                first_M_encountered = False
+
             if "_M" in question and not first_M_encountered:
                 self._layout['table'].append(table_number)
                 first_M_encountered = True
                 table_number += 1
             elif self._raw_data[q].get('table'):
-                self._layout['table'].append(table_number)
-                table_number += 1
+                # print(question)
+                if "_M" not in question:
+                    self._layout['table'].append(table_number)
+                    table_number += 1
+                else:
+                    print(question)
+                    self._layout['table'].append(np.nan)
             else:
                 self._layout['table'].append(np.nan)
+
+            # print(self._layout['table'])
 
             prev = q
 
@@ -449,7 +602,7 @@ class VoxcoDataGrabber:
     def has_table(self, tables):
         for name, table in tables.items():
             if table:
-                self._raw_data[name]['table'] = True
+                self._raw_data.setdefault(name, {})['table'] = True
 
     def identify_qualifiers(self):
         for question in self._raw_data:
@@ -768,6 +921,10 @@ class VoxcoDataGrabber:
             for qname in self._order:
                 try:
                     exists = self._raw_data.get(qname)
+
+                    if "_M1" in qname:
+                        first_M_encounter = False
+
                     if not exists:
                         if "_M" in qname and not first_M_encounter:
                             first_M_encounter = True

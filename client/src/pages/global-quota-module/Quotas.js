@@ -464,7 +464,7 @@ function Quotas() {
                 {Object.keys(data.Criterion).map((key, index) => (
 
                     <tr key={index}>
-                      <td style={{borderLeft: "1px solid black"}}>{index} {data.Criterion[index]}</td>
+                      <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
                       <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
                       <td>{data['COM Objective'][index]}</td>
                       <td>{data['COM Frequency'][index]}</td>
