@@ -5,7 +5,16 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Table from 'react-bootstrap/Table';
-// import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import './styles.css';
+import Cookies from "js-cookie";
+import * as XLSX from 'xlsx';
+
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRF-Token': Cookies.get("csrf_token")
+  }
+};
 
 function Quotas() {
 
@@ -47,7 +56,18 @@ function Quotas() {
   };
 
   useEffect(() => {
-
+    // const com = localStorage.getItem('comSurveyID')
+    // const web = localStorage.getItem('webSurveyID')
+    // const ll = localStorage.getItem('landlineSurveyID')
+    // const cell = localStorage.getItem('cellSurveyID')
+    // setComSurveyID(com)
+    // setWebSurveyID(web)
+    // setLandlineSurveyID(ll)
+    // setCellSurveyID(cell)
+    // getSurveyName('COM', com)
+    // getSurveyName('Web', web)
+    // getSurveyName('LL', ll)
+    // getSurveyName('Cell', cell)
   }, []);
 
   const handleRun = async () => {
@@ -99,6 +119,7 @@ function Quotas() {
         setComSurveyID(value);
         setComSurveyIDError(value.length <5);
         if(value.length > 4) {
+          localStorage.setItem("comSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -106,6 +127,7 @@ function Quotas() {
         setWebSurveyID(value);
         setWebSurveyIDError(value.length < 3);
         if(value.length > 2) {
+          localStorage.setItem("webSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -113,6 +135,7 @@ function Quotas() {
         setLandlineSurveyID(value);
         setLandlineSurveyIDError(value.length < 5);
         if(value.length > 4) {
+          localStorage.setItem("landlineSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -120,6 +143,7 @@ function Quotas() {
         setCellSurveyID(value);
         setCellSurveyIDError(value.length < 5);
         if(value.length > 4) {
+          localStorage.setItem("cellSurveyID", value)
           getSurveyName(source_id, value);
         }
         break;
@@ -129,6 +153,7 @@ function Quotas() {
   }
 
   const getSurveyName = async (source, surveyID) => {
+    console.log(source, surveyID)
     axios.post(
       '/quotas/survey_name',
       { source, surveyID },
@@ -218,6 +243,103 @@ function Quotas() {
         console.error("Error fetching survey quotas", error)
       })
   }
+
+  const handleErrors = (error) => {
+    if (!error?.response) {
+      console.error('No Server Response');
+    } else if (error.response.status === 401) {
+      console.error('Invalid Credentials');
+    } else {
+      console.error('Request Failed');
+    }
+  };
+
+  const downloadExcel = () => {
+    // Create a worksheet
+    const ws = XLSX.utils.aoa_to_sheet([]);
+
+    // Headers
+    let header1 = ["Criterion", "Label", "Obj", "Freq", "ToDo", "DONE%"];
+    if (showColumns.web) {
+      header1.push("Web Total%");
+      if (showColumns.panel) {
+        header1.push("Panel Objective");
+        header1.push("Panel Frequency");
+        header1.push("Panel%");
+      }
+      if (showColumns.t2w){
+        header1.push("T2W Objective");
+        header1.push("T2W Frequency");
+        header1.push("T2W%");
+      }
+    }
+    if (showColumns.phone) {
+      header1.push("Phone Total %");
+      if (showColumns.landline){
+        header1.push("Landline Objective");
+        header1.push("Landline Frequency");
+        header1.push("Landline%");
+      if (showColumns.cell) {
+        header1.push("Cell Objective");
+        header1.push("Cell Frequency");
+        header1.push("Cell%");}
+      }
+    }
+
+    // Add headers to the worksheet
+    XLSX.utils.sheet_add_aoa(ws, [header1], { origin: "A1" });
+
+    // Add data to the worksheet
+    Object.keys(data.Criterion).forEach((key, index) => {
+      let row = [
+        data.Criterion[index],
+        data['COM Label'][index],
+        data['COM Objective'][index],
+        data['COM Frequency'][index],
+        data['COM To Do'][index],
+        data['G%'][index] + "%"
+      ];
+
+      if (showColumns.web) {
+        row.push(data['W%'][index] + "%");
+        if (showColumns.panel) {
+          row.push(data['Panel Objective'][index]);
+          row.push(data['Panel Frequency'][index]);
+          row.push(data['P%'][index] + "%");
+        }
+        if (showColumns.t2w) {
+          row.push(data['T2W Objective'][index]);
+          row.push(data['T2W Frequency'][index]);
+          row.push(data['T%'][index] + "%");
+        }
+      }
+      if (showColumns.phone) {
+        row.push(data['Phone%'][index] + "%");
+        if (showColumns.landline) {
+          row.push(data['LL Objective'][index]);
+          row.push(data['LL Frequency'][index]);
+          row.push(data['L%'][index] + "%");
+        }
+        if (showColumns.cell) {
+          row.push(data['Cell Objective'][index]);
+          row.push(data['Cell Frequency'][index]);
+          row.push(data['C%'][index] + "%");
+        }
+      }
+
+      XLSX.utils.sheet_add_aoa(ws, [row], { origin: -1 });
+    });
+
+    // Create a workbook and add the worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Table Data");
+
+    // Generate and download the Excel file
+    const survey_n = comSurveyName.split(' ')[0];
+    XLSX.writeFile(wb, `${survey_n} Quotas.xlsx`);
+  };
+
+  // functionality for a search bar for criteria for data filtering
 
   return (
       <div>
@@ -343,6 +465,9 @@ function Quotas() {
         </div>
         <div className='checkbox-container' style={{ position: 'sticky', top: '0', zIndex: 10 }}>
           <label>Show/Hide Columns:</label>
+          <Button onClick={downloadExcel}>Download Excel</Button>
+        </div>
+        <label>Show/Hide Columns:</label>
           <div>
             <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')}/> Web
           </div>
@@ -362,7 +487,6 @@ function Quotas() {
             <input type="checkbox" checked={showColumns.cell} onChange={() => toggleColumn('cell')}/> Cell
           </div>
         </div>
-
         <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
           {Object.keys(data).length > 0 && (
               <Table style={{width: "50%", border: '1px solid black'}} striped>
@@ -442,7 +566,6 @@ function Quotas() {
                       <th style={{border: '1px solid black'}}>%</th>
                     </>}
                   </>}
-
                   {showColumns.phone && <>
                     <th style={{border: '1px solid black'}}>%</th>
                     <th style={{border: '1px solid black'}}>Freq</th>
@@ -457,7 +580,6 @@ function Quotas() {
                       <th style={{border: '1px solid black'}}>%</th>
                     </>}
                   </>}
-
                 </tr>
                 </thead>
                 <tbody>
@@ -517,7 +639,7 @@ function Quotas() {
                                         (-10 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 10 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "darkorange" :
                                             "crimson",
                                 backgroundColor:
-                                    (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                                    (-1 > data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
                                         (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightgreen" :
                                             (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
                                                 "lightpink"
