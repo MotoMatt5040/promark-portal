@@ -439,35 +439,8 @@ function Quotas() {
           <Button onClick={handleRun}>Run</Button>
           <Button onClick={checkData}>Check Data</Button>
         </div>
-        {/*{typeof webData !== {}*/}
-        <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
-          <Table style={{width: "10%", border: '1px solid black'}} striped>
-            <thead>
-            <tr>
-              <th scope='col' colSpan='7'
-                  style={{border: '1px solid black', background: "lightgrey", textAlign: "center"}}>Legend
-              </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr style={{border: '1px solid black'}}>
-              <td style={{backgroundColor: "#43B17B", color: "white", border: '1px solid black'}}>Open</td>
-              <td style={{backgroundColor: "#ED211C", color: "white", border: '1px solid black'}}>Closed</td>
-              <td style={{color: "crimson", border: '1px solid black'}}>+2% below</td>
-              <td style={{color: "darkorange", border: '1px solid black'}}>~2% below</td>
-              <td style={{backgroundColor: "lightgreen", border: '1px solid black'}}>Within 1%</td>
-              <td style={{backgroundColor: "lightyellow", border: '1px solid black', color: 'darkorange'}}>~2% above
-              </td>
-              <td style={{backgroundColor: "lightpink", border: '1px solid black', color: 'crimson'}}>+2% above</td>
-            </tr>
-            </tbody>
-          </Table>
-        </div>
-        <div className='checkbox-container' style={{ position: 'sticky', top: '0', zIndex: 10 }}>
-          <label>Show/Hide Columns:</label>
-          <Button onClick={downloadExcel}>Download Excel</Button>
-        </div>
-        <div>
+
+        <div className='checkbox-container'>
           <label>Show/Hide Columns:</label>
           <div>
             <input type="checkbox" checked={showColumns.web} onChange={() => toggleColumn('web')}/> Web
@@ -488,6 +461,30 @@ function Quotas() {
             <input type="checkbox" checked={showColumns.cell} onChange={() => toggleColumn('cell')}/> Cell
           </div>
         </div>
+
+        <div className="upper-container">
+          <div className="legend-container">
+            <Table className="legend-table" style={{width: "10%"}} striped>
+              <thead>
+              <tr>
+                <th scope='col' colSpan='7' className="legend-header">Legend</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td className="status-open">Open</td>
+                <td className="status-closed">Closed</td>
+                <td className="below-10">+10 below</td>
+                <td className="near-10-below">~10 below</td>
+                <td className="within-1">Within 1</td>
+                <td className="near-10-above">~10 above</td>
+                <td className="above-10">+10 above</td>
+              </tr>
+              </tbody>
+            </Table>
+          </div>
+        </div>
+
         <div style={{display: 'flex', width: "100%", alignItems: "center", justifyContent: "center"}}>
           {Object.keys(data).length > 0 && (
               <Table style={{width: "50%", border: '1px solid black'}} striped>
@@ -586,131 +583,131 @@ function Quotas() {
                 <tbody>
                 {Object.keys(data.Criterion).map((key, index) => (
 
-                    <tr key={index}>
-                      <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
-                      <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
-                      <td>{data['COM Objective'][index]}</td>
-                      <td>{data['COM Frequency'][index]}</td>
-                      <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
-                      {/*<td style={{borerLeft: "1px solid black"}}>{data['Web Label'][index]}</td>*/}
+                        <tr key={index}>
+                          <td style={{borderLeft: "1px solid black"}}>{data.Criterion[index]}</td>
+                          <td style={{borerLeft: "1px solid black"}}>{data['COM Label'][index]}</td>
+                          <td>{data['COM Objective'][index]}</td>
+                          <td>{data['COM Frequency'][index]}</td>
+                          <td style={{borderRight: "1px solid black"}}>{data['COM To Do'][index]}</td>
+                          {/*<td style={{borerLeft: "1px solid black"}}>{data['Web Label'][index]}</td>*/}
 
-                      {showColumns.web && <>
-                        <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}%</td>
-                        <td style={{borderRight: "1px solid black"}}>{data['Web Frequency'][index]}</td>
-                        {/*PANEL*/}
-                        {showColumns.panel && <>
-                          <td style={{
-                            backgroundColor: (data['Panel Status'][index] === "Open") ? "#43B17B" : "#ED211C",
-                            color: "white"
-                          }}
-                          >
-                            {data['Panel Objective'][index]}
-                          </td>
-                          <td
-                              style={{
-                                color:
-                                    (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                                        (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
-                                            "crimson",
-                                backgroundColor:
-                                    (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
-                                        (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
-                                            (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
-                                                "lightpink"
-                              }}>
-                            {data['Panel Frequency'][index]}
-                          </td>
-                          <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
-                          {/*END PANEL*/}
-                        </>}
-
-                        {showColumns.t2w && <>
-                          {/*T2W*/}
-                          <td style={{
-                            backgroundColor: (data['T2W Status'][index] === "Open") ? "#43B17B" : "#ED211C",
-                            color: "white"
-                          }}
-                          >
-                            {data['T2W Objective'][index]}
-                          </td>
-                          <td
-                              style={{
-                                color:
-                                    (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
-                                        (-10 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 10 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "darkorange" :
-                                            "crimson",
-                                backgroundColor:
-                                    (-1 > data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
-                                        (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightgreen" :
-                                            (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
-                                                "lightpink"
-                              }}>
-                            {data['T2W Frequency'][index]}
-                          </td>
-                          <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
-                          {/*END T2W*/}
-                        </>}
-                      </>}
-
-                      {showColumns.phone && <>
-                        {/*PHONE*/}
-                        <td style={{borderRight: "1px solid black"}}>{data['Phone%'][index]}%</td>
-                        <td style={{borderRight: "1px solid black"}}>{data['Phone Frequency'][index]}</td>
-                        {showColumns.landline && <>
-                          {/*LANDLINE*/}
-                          <td style={{
-                            backgroundColor: (data['LL Status'][index] === "Open") ? "#43B17B" : "#ED211C",
-                            color: "white"
-                          }}
-                          >
-                            {data['LL Objective'][index]}
-                          </td>
-                          <td
-                              style={{
-                                color:
-                                    (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
-                                        (-10 <= data["LL Frequency"][index] - data["LL Objective"][index] && 10 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "darkorange" : "crimson",
-                                backgroundColor:
-                                    (-1 > data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
-                                        (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightgreen" :
-                                            (10 >= data["LL Frequency"][index] - data["LL Objective"][index] && 2 <= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightyellow" : "lightpink"
-                              }}>
-                            {data['LL Frequency'][index]}
-                          </td>
-                          <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}%</td>
-                          {/*END LANDLINE*/}
-                        </>}
-                        {showColumns.cell && <>
-                          {/*CELL*/}
-                          <td
-                              style={{
-                                backgroundColor: (data['Cell Status'][index] === "Open") ? "#43B17B" : "#ED211C",
-                                color: 'white'
+                          {showColumns.web && <>
+                            <td style={{borderRight: "1px solid black"}}>{data['W%'][index]}%</td>
+                            <td style={{borderRight: "1px solid black"}}>{data['Web Frequency'][index]}</td>
+                            {/*PANEL*/}
+                            {showColumns.panel && <>
+                              <td style={{
+                                backgroundColor: (data['Panel Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                                color: "white"
                               }}
-                          >
-                            {data['Cell Objective'][index]}
-                          </td>
-                          <td
-                              style={{
-                                color:
-                                    (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
-                                        (-10 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 10 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "darkorange" : "crimson",
-                                backgroundColor:
-                                    (-1 > data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
-                                        (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightgreen" :
-                                            (10 >= data["Cell Frequency"][index] - data["Cell Objective"][index] && 2 <= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightyellow" : "lightpink"
-                              }}>
-                            {data['Cell Frequency'][index]}
-                          </td>
-                          <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}%</td>
-                          {/*END CELL*/}
-                        </>}
+                              >
+                                {data['Panel Objective'][index]}
+                              </td>
+                              <td
+                                  style={{
+                                    color:
+                                        (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                                            (-10 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 10 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "darkorange" :
+                                                "crimson",
+                                    backgroundColor:
+                                        (-1 > data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "" :
+                                            (-1 <= data["Panel Frequency"][index] - data["Panel Objective"][index] && 1 >= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightgreen" :
+                                                (10 >= data["Panel Frequency"][index] - data["Panel Objective"][index] && 2 <= data["Panel Frequency"][index] - data["Panel Objective"][index]) ? "lightyellow" :
+                                                    "lightpink"
+                                  }}>
+                                {data['Panel Frequency'][index]}
+                              </td>
+                              <td style={{borderRight: "1px solid black"}}>{data['P%'][index]}%</td>
+                              {/*END PANEL*/}
+                            </>}
 
-                        {/*END PHONE*/}
-                      </>}
+                            {showColumns.t2w && <>
+                              {/*T2W*/}
+                              <td style={{
+                                backgroundColor: (data['T2W Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                                color: "white"
+                              }}
+                              >
+                                {data['T2W Objective'][index]}
+                              </td>
+                              <td
+                                  style={{
+                                    color:
+                                        (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
+                                            (-10 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 10 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "darkorange" :
+                                                "crimson",
+                                    backgroundColor:
+                                        (-1 > data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "" :
+                                            (-1 <= data["T2W Frequency"][index] - data["T2W Objective"][index] && 1 >= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightgreen" :
+                                                (10 >= data["T2W Frequency"][index] - data["T2W Objective"][index] && 2 <= data["T2W Frequency"][index] - data["T2W Objective"][index]) ? "lightyellow" :
+                                                    "lightpink"
+                                  }}>
+                                {data['T2W Frequency'][index]}
+                              </td>
+                              <td style={{borderRight: "1px solid black"}}>{data['T%'][index]}%</td>
+                              {/*END T2W*/}
+                            </>}
+                          </>}
 
-                    </tr>
-                  )
+                          {showColumns.phone && <>
+                            {/*PHONE*/}
+                            <td style={{borderRight: "1px solid black"}}>{data['Phone%'][index]}%</td>
+                            <td style={{borderRight: "1px solid black"}}>{data['Phone Frequency'][index]}</td>
+                            {showColumns.landline && <>
+                              {/*LANDLINE*/}
+                              <td style={{
+                                backgroundColor: (data['LL Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                                color: "white"
+                              }}
+                              >
+                                {data['LL Objective'][index]}
+                              </td>
+                              <td
+                                  style={{
+                                    color:
+                                        (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
+                                            (-10 <= data["LL Frequency"][index] - data["LL Objective"][index] && 10 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "darkorange" : "crimson",
+                                    backgroundColor:
+                                        (-1 > data["LL Frequency"][index] - data["LL Objective"][index]) ? "" :
+                                            (-1 <= data["LL Frequency"][index] - data["LL Objective"][index] && 1 >= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightgreen" :
+                                                (10 >= data["LL Frequency"][index] - data["LL Objective"][index] && 2 <= data["LL Frequency"][index] - data["LL Objective"][index]) ? "lightyellow" : "lightpink"
+                                  }}>
+                                {data['LL Frequency'][index]}
+                              </td>
+                              <td style={{borderRight: "1px solid black"}}>{data['L%'][index]}%</td>
+                              {/*END LANDLINE*/}
+                            </>}
+                            {showColumns.cell && <>
+                              {/*CELL*/}
+                              <td
+                                  style={{
+                                    backgroundColor: (data['Cell Status'][index] === "Open") ? "#43B17B" : "#ED211C",
+                                    color: 'white'
+                                  }}
+                              >
+                                {data['Cell Objective'][index]}
+                              </td>
+                              <td
+                                  style={{
+                                    color:
+                                        (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
+                                            (-10 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 10 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "darkorange" : "crimson",
+                                    backgroundColor:
+                                        (-1 > data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "" :
+                                            (-1 <= data["Cell Frequency"][index] - data["Cell Objective"][index] && 1 >= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightgreen" :
+                                                (10 >= data["Cell Frequency"][index] - data["Cell Objective"][index] && 2 <= data["Cell Frequency"][index] - data["Cell Objective"][index]) ? "lightyellow" : "lightpink"
+                                  }}>
+                                {data['Cell Frequency'][index]}
+                              </td>
+                              <td style={{borderRight: "1px solid black"}}>{data['C%'][index]}%</td>
+                              {/*END CELL*/}
+                            </>}
+
+                            {/*END PHONE*/}
+                          </>}
+
+                        </tr>
+                    )
                 )}
                 </tbody>
               </Table>
