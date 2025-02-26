@@ -1,10 +1,11 @@
 import traceback
+import os
 
 import pandas
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
-from .database import Database
+from .database import Database, DataBaseAccessInfo
 from .sqldictionary import SQLDictionary
 
 
@@ -28,6 +29,7 @@ class DataPuller:
 
         #  initialize database access info to connect to database
         self.dbai = Database()
+        self.dbai2 = DataBaseAccessInfo()
 
         #  Build the connection string
         self.SQL_CONNECTION = 'DRIVER={};SERVER={};DATABASE={};UID={};PWD={}'.format(
@@ -77,3 +79,14 @@ class DataPuller:
 
         dbcon = f'mssql+pyodbc:///?odbc_connect={SQL_CONNECTION}'
         self.engine = create_engine(dbcon)
+
+    def get_voxco_project_database(self, project_number: str):
+        try:
+            self.dbai2.find_voxco_project_database()
+            cnxn = self.dbai2.connect_engine()
+            df = pd.read_sql_query(text(f"{os.environ['voxco_project_database']}{project_number}'"), cnxn)
+            cnxn.close()
+            del cnxn
+            return df
+        except Exception as err:
+            raise err

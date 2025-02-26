@@ -70,15 +70,15 @@ def survey_name():
 
     match source:
         case "COM":
-            dm.com_sid = sid
+            dm.set_sid_for("com", sid)
         case "Web":
-            dm.web_sid = sid
+            dm.set_sid_for("web", sid)
         case "LL":
-            dm.landline_sid = sid
+            dm.set_sid_for("landline", sid)
         case "Cell":
-            dm.cell_sid = sid
+            dm.set_sid_for("cell", sid)
         case _:
-            return ''
+            return {}
     name = dm.survey_name()
     return name
 

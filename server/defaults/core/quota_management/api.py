@@ -1,6 +1,7 @@
 import os
 import requests
 from dataclasses import dataclass
+from server.defaults.utils.logger_config import logger
 
 @dataclass
 class SurveyType:
@@ -19,7 +20,7 @@ class SurveyType:
             self.survey_url = f"{os.environ['voxco_survey_url']}{sid}"
 
 
-class API2:
+class API:
     def __init__(self):
         self._acuity_access_token = os.environ['access_token']
         self._voxco_access_token = None  # this token must be refreshed every hour, easier to do upon update

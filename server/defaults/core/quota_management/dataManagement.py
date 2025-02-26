@@ -2,7 +2,7 @@ import os
 import time
 import traceback
 
-from .api import API, API2
+from .api import API
 import pandas as pd
 import numpy as np
 import requests
@@ -10,7 +10,7 @@ import json
 from server.defaults.utils.logger_config import logger
 
 
-class DataManagement(API2):
+class DataManagement(API):
 
     def __init__(self):
         super().__init__()
@@ -162,6 +162,7 @@ class DataManagement(API2):
                 return self.set_data()
 
     def survey_name(self):
+        logger.debug(f"Source: {self.source}")
         match self.source:
             case "COM":
                 r = requests.get(self.get_survey_url_for('com'), headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
