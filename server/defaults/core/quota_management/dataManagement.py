@@ -2,7 +2,7 @@ import os
 import time
 import traceback
 
-from .api import API
+from .api import API, API2
 import pandas as pd
 import numpy as np
 import requests
@@ -10,7 +10,7 @@ import json
 from server.defaults.utils.logger_config import logger
 
 
-class DataManagement(API):
+class DataManagement(API2):
 
     def __init__(self):
         super().__init__()
@@ -140,22 +140,22 @@ class DataManagement(API):
         match self.source:
             case "COM":
                 return requests.get(
-                    self.com_quotas_url,
+                    self.get_quotas_url_for('com'),
                     headers={"Authorization": f"Client {self.voxco_access_token}"}
                 ).json()
             case "Web":
                 return requests.get(
-                    self.web_quotas_url,
+                    self.get_quotas_url_for('web'),
                     headers={"Authorization": f"Client {self._acuity_access_token}"}
                 ).json()
             case "LL":
                 return requests.get(
-                    self.landline_quotas_url,
+                    self.get_quotas_url_for('landline'),
                     headers={"Authorization": f"Client {self.voxco_access_token}"}
                 ).json()
             case "Cell":
                 return requests.get(
-                    self.cell_quotas_url,
+                    self.get_quotas_url_for('cell'),
                     headers={"Authorization": f"Client {self.voxco_access_token}"}
                 ).json()
             case _:
@@ -164,15 +164,15 @@ class DataManagement(API):
     def survey_name(self):
         match self.source:
             case "COM":
-                r = requests.get(self.com_survey_url, headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
+                r = requests.get(self.get_survey_url_for('com'), headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
                 return f"{r['Name']} {r['Description']}"
             case "Web":
-                return requests.get(self.web_survey_url, headers={"Authorization": f"Client {self._acuity_access_token}"}).json()['Name']
+                return requests.get(self.get_survey_url_for('web'), headers={"Authorization": f"Client {self._acuity_access_token}"}).json()['Name']
             case "LL":
-                r = requests.get(self.landline_survey_url, headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
+                r = requests.get(self.get_survey_url_for('landline'), headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
                 return f"{r['Name']} {r['Description']}"
             case "Cell":
-                r = requests.get(self.cell_survey_url, headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
+                r = requests.get(self.get_survey_url_for('cell'), headers={"Authorization": f"Client {self.voxco_access_token}"}).json()
                 return f"{r['Name']} {r['Description']}"
             case _:
                 return

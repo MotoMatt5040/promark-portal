@@ -1,27 +1,36 @@
 import os
 import requests
+from dataclasses import dataclass
 
-class API:
+@dataclass
+class SurveyType:
+    name: str
+    sid: str = None
+    quotas_url: str = None
+    survey_url: str = None
 
+    def set_sid(self, sid, survey_type):
+        self.sid = sid
+        if survey_type == "web":
+            self.quotas_url = f"{os.environ['web_quotas_url']}{sid}"
+            self.survey_url = f"{os.environ['web_survey_url']}{sid}"
+        else:
+            self.quotas_url = f"{os.environ['voxco_survey_url']}{sid}/stratas?status=All"
+            self.survey_url = f"{os.environ['voxco_survey_url']}{sid}"
+
+
+class API2:
     def __init__(self):
         self._acuity_access_token = os.environ['access_token']
         self._voxco_access_token = None  # this token must be refreshed every hour, easier to do upon update
 
-        self._com_sid = None
-        self._com_quotas_url = None
-        self._com_survey_url = None
-
-        self._web_sid = None
-        self._web_quotas_url = None
-        self._web_survey_url = None
-
-        self._landline_sid = None
-        self._landline_quotas_url = None
-        self._landline_survey_url = None
-
-        self._cell_sid = None
-        self._cell_quotas_url = None
-        self._cell_survey_url = None
+        # Using dataclass instances for each survey type
+        self.survey_types = {
+            "com": SurveyType(name="com"),
+            "web": SurveyType(name="web"),
+            "landline": SurveyType(name="landline"),
+            "cell": SurveyType(name="cell")
+        }
 
         self._project_base_url = os.environ['voxco_survey_url']
 
@@ -29,86 +38,33 @@ class API:
     def project_base_url(self):
         return self._project_base_url
 
-    '----------com----------'
-
-    @property
-    def com_sid(self):
-        return self._com_sid
-
-    @property
-    def com_quotas_url(self):
-        return self._com_quotas_url
-
-    @com_sid.setter
-    def com_sid(self, sid):
-        self._com_sid = sid
-        self._com_quotas_url = f"{os.environ['voxco_survey_url']}{sid}/stratas?status=All"
-        self._com_survey_url = f"{os.environ['voxco_survey_url']}{sid}"
-
-    @property
-    def com_survey_url(self):
-        return self._com_survey_url
-
-    '----------web----------'
-
-    @property
-    def web_sid(self):
-        return self._web_sid
-
-    @property
-    def web_quotas_url(self):
-        return self._web_quotas_url
-
-    @web_sid.setter
-    def web_sid(self, sid):
-        self._web_sid = sid
-        self._web_quotas_url = f"{os.environ['web_quotas_url']}{sid}"
-        self._web_survey_url = f"{os.environ['web_survey_url']}{sid}"
-
-    @property
-    def web_survey_url(self):
-        return self._web_survey_url
-
-    '----------landline----------'
-
-    @property
-    def landline_sid(self):
-        return self._landline_sid
-
-    @property
-    def landline_quotas_url(self):
-        return self._landline_quotas_url
-
-    @landline_sid.setter
-    def landline_sid(self, sid):
-        self._landline_sid = sid
-        self._landline_quotas_url = f"{os.environ['voxco_survey_url']}{sid}/stratas?status=All"
-        self._landline_survey_url = f"{os.environ['voxco_survey_url']}{sid}"
-
-    @property
-    def landline_survey_url(self):
-        return self._landline_survey_url
-
-    '----------cell----------'
-
-    @property
-    def cell_sid(self):
-        return self._cell_sid
-
-    @property
-    def cell_quotas_url(self):
-        return self._cell_quotas_url
-
-    @cell_sid.setter
-    def cell_sid(self, sid):
-        self._cell_sid = sid
-        self._cell_quotas_url = f"{os.environ['voxco_survey_url']}{sid}/stratas?status=All"
-        self._cell_survey_url = f"{os.environ['voxco_survey_url']}{sid}"
-
-    @property
-    def cell_survey_url(self):
-        return self._cell_survey_url
-
     @property
     def voxco_access_token(self):
         return requests.get(os.environ['voxco_access_token_url']).json()['Token']
+
+    def set_sid_for(self, survey_type, sid):
+        if survey_type in self.survey_types:
+            self.survey_types[survey_type].set_sid(sid, survey_type)
+        else:
+            raise ValueError(f"Invalid survey type: {survey_type}")
+
+    def get_sid_for(self, survey_type):
+        if survey_type in self.survey_types:
+            print(self.survey_types[survey_type].sid)
+            return self.survey_types[survey_type].sid
+        else:
+            raise ValueError(f"Invalid survey type: {survey_type}")
+
+    def get_quotas_url_for(self, survey_type):
+        if survey_type in self.survey_types:
+            print(self.survey_types[survey_type].quotas_url)
+            return self.survey_types[survey_type].quotas_url
+        else:
+            raise ValueError(f"Invalid survey type: {survey_type}")
+
+    def get_survey_url_for(self, survey_type):
+        if survey_type in self.survey_types:
+            print(self.survey_types[survey_type].survey_url)
+            return self.survey_types[survey_type].survey_url
+        else:
+            raise ValueError(f"Invalid survey type: {survey_type}")
