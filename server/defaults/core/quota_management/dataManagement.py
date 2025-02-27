@@ -139,6 +139,7 @@ class DataManagement(API):
     def get_data(self):
         match self.source:
             case "COM":
+                logger.debug(self.get_quotas_url_for('com'))
                 return requests.get(
                     self.get_quotas_url_for('com'),
                     headers={"Authorization": f"Client {self.voxco_access_token}"}
@@ -208,7 +209,7 @@ class DataManagement(API):
         df = pd.merge(df, df_t2w, on=["Criterion"], how='left')
         df = pd.merge(df, df_ll, on=["Criterion"], how='left')
         df = pd.merge(df, df_cell, on=["Criterion"], how='left')
-        df = df[df["COM Objective"] != 0].reset_index(drop=True)
+        # df = df[df["COM Objective"] != 0].reset_index(drop=True)
             
 
         # try:

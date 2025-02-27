@@ -7,6 +7,8 @@ from server.defaults.utils.database.datapuller import DataPuller
 from ..quota_management.dataManagement import DataManagement
 from .config import allowed_domain
 from flask_login import login_required, current_user
+from server.defaults.utils.logger_config import logger
+import asyncio
 
 quotas = Blueprint('quota_management', __name__)
 dp = DataPuller()
@@ -23,32 +25,37 @@ dm = DataManagement()
 def survey_quotas():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
-    source = request.json['source']
-    sid = request.json['surveyID']
+    # source = request.json['source']
+    # sid = request.json['surveyID']
 
-    dm.source = source
+    # dm.source = source
+    # logger.debug(source)
 
-    match source:
-        case "COM":
-            dm.set_sid_for("com", sid)
-        case "Web":
-            dm.set_sid_for("web", sid)
-        case "LL":
-            dm.set_sid_for("landline", sid)
-        case "Cell":
-            dm.set_sid_for("cell", sid)
-        case "project":
-            d = dp.dbai2.find_voxco_project_database(sid)
-            print(d)
-            return {'message', "Project database found"}
-        case _:
-            return {}
+    # match source:
+    #     case "COM":
+    #         dm.set_sid_for("com", sid)
+    #     case "Web":
+    #         dm.set_sid_for("web", sid)
+    #     case "LL":
+    #         dm.set_sid_for("landline", sid)
+    #     case "Cell":
+    #         dm.set_sid_for("cell", sid)
+    #     case "project":
+    #         d = dp.dbai2.find_voxco_project_database(sid)
+    #         print(d)
+    #         return {'message', "Project database found"}
+    #     case _:
+    #         return {}
+    # ['COM', 'Web', 'LL', 'Cell']
+    for source in ['COM', 'Web', 'LL', 'Cell']:
+        dm.source = source
+        data = dm.set_data()
+    # data = asyncio.run(dm.set_data())
 
-    data = dm.set_data()
-
-    if source == 'Web':
-        return [data[0].to_json(), data[1].to_json()]
-    return data.to_json()
+    #     if source == 'Web':
+    #         return [data[0].to_json(), data[1].to_json()]
+    # return data.to_json()
+    return {}
 
 
 @quotas.route('/check', methods=['GET'])
@@ -60,6 +67,26 @@ def check():
 @quotas.route('/merge', methods=['GET'])
 def merge():
     return dm.merge_data().to_json()
+
+
+@quotas.route('/surveyIDs', methods=['POST', 'OPTIONS'])
+def surveyIDs():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+    source = request.json['source']
+    sid = request.json['surveyID']
+
+    dm.source = source
+
+    voxco_ids = dp.get_voxco_project_database(sid)
+
+    dm.set_sid_for("com", voxco_ids['com'])
+    dm.set_sid_for("web", voxco_ids['web'])
+    dm.set_sid_for("landline", voxco_ids['ll'])
+    dm.set_sid_for("cell", voxco_ids['cell'])
+
+    return voxco_ids
 
 
 @quotas.route('/survey_name', methods=['POST', 'OPTIONS'])
@@ -84,9 +111,8 @@ def survey_name():
         case "Cell":
             dm.set_sid_for("cell", sid)
         case "project":
-            d = dp.get_voxco_project_database(sid)
-            print(d)
-            return ''
+            voxco_ids = dp.get_voxco_project_database(sid)
+            return voxco_ids
         case _:
             return {}
     name = dm.survey_name()

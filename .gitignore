@@ -5,3 +5,4 @@ logs
 .idea
 *.env
 *.txt
+*.pyc

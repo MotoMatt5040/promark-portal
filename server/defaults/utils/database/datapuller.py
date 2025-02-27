@@ -83,12 +83,10 @@ class DataPuller:
         self.engine = create_engine(dbcon)
 
     def get_voxco_project_database(self, project_number: str):
-        voxco_ids = []
+        voxco_ids = {}
         try:
             self.dbai2.find_voxco_project_database()
-            cnxn = self.dbai2.connect_engine()
-            sql = text(f"{os.environ['voxco_project_database']} (name = '{project_number}' or name = '{project_number}C')")
-            logger.debug(sql)
+            # cnxn = self.dbai2.connect_engine()
 
             # df = pd.read_sql_query(sql, cnxn)
             #
@@ -102,19 +100,21 @@ class DataPuller:
             # del cnxn
 
             with self.dbai2.connect_engine() as conn:
+                sql = text(f"{os.environ['voxco_project_database']}{project_number}'")
                 result = conn.execute(sql)
-                dbs = [row[0] for row in result]  # Extracting the ProjectDatabase values
+                voxco_ids['ll'] = result.scalar()
 
-            voxco_ids = []
-            for db in dbs:
-                sql = text(f"SELECT MIN(projectId) FROM [{db}].[dbo].[Installation]")
-                with self.dbai2.connect_engine() as conn:
-                    result = conn.execute(sql)
-                    pid = result.scalar()  # Fetching the single value
-                    voxco_ids.append(pid)
+                sql = text(f"{os.environ['voxco_project_database']}{project_number}C'")
+                result = conn.execute(sql)
+                voxco_ids['cell'] = result.scalar()
 
-            logger.debug(voxco_ids)
+                sql = text(f"{os.environ['voxco_project_database']}{project_number}COM'")
+                result = conn.execute(sql)
+                voxco_ids['com'] = result.scalar()
 
+                sql = text(f"{os.environ['acuity_project_database']}{project_number}%'")
+                result = conn.execute(sql)
+                voxco_ids['web'] = result.scalar()
 
             return voxco_ids
         except Exception as err:
