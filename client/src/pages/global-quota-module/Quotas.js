@@ -3,7 +3,7 @@ import axios from "../../api/axios";
 import Button from '@mui/material/Button';
 import SurveyForm from './components/SurveyForm';
 import QuotaTable from './components/QuotaTable';
-import { getSurveyName, getSurveyQuotas, handleErrors, downloadExcel } from './utils/quotaUtils';
+import { getSurveyName, getSurveyQuotas, handleErrors, downloadExcel, setAllIDs } from './utils/quotaUtils';
 import './styles.css';
 import Cookies from "js-cookie";
 import Table from 'react-bootstrap/Table';
@@ -16,29 +16,10 @@ const config = {
 };
 
 function Quotas() {
-  const [comSurveyID, setComSurveyID] = useState();
-  const [webSurveyID, setWebSurveyID] = useState();
-  const [landlineSurveyID, setLandlineSurveyID] = useState();
-  const [cellSurveyID, setCellSurveyID] = useState();
-
-  const [comSurveyName, setComSurveyName] = useState('COM Survey ID');
-  const [webSurveyName, setWebSurveyName] = useState('Web Survey ID');
-  const [landlineSurveyName, setLandlineSurveyName] = useState('Landline Survey ID');
-  const [cellSurveyName, setCellSurveyName] = useState('Cell Survey ID');
-
-  const [isComSurveyIDError, setComSurveyIDError] = useState(false);
-  const [isWebSurveyIDError, setWebSurveyIDError] = useState(false);
-  const [isLandlineSurveyIDError, setLandlineSurveyIDError] = useState(false);
-  const [isCellSurveyIDError, setCellSurveyIDError] = useState(false);
-
   const [promarkSurveyID, setPromarkSurveyID] = useState();
   const [promarkSurveyName, setPromarkSurveyName] = useState('Survey ID');
   const [isPromarkSurveyIDError, setPromarkSurveyIDError] = useState(false);
 
-  const [comData, setComData] = useState({});
-  const [webData, setWebData] = useState({});
-  const [landlineData, setLandlineData] = useState({});
-  const [cellData, setCellData] = useState({});
   const [data, setData] = useState({});
 
   const [showColumns, setShowColumns] = useState({
@@ -58,52 +39,13 @@ function Quotas() {
   };
 
   useEffect(() => {
-    if (comSurveyID && comSurveyID.length > 4) {
-      getSurveyName('COM', comSurveyID, setComSurveyName, setComSurveyIDError);
-    }
-  }, [comSurveyID]);
-
-  useEffect(() => {
-    if (webSurveyID && webSurveyID.length > 2) {
-      getSurveyName('Web', webSurveyID, setWebSurveyName, setWebSurveyIDError);
-    }
-  }, [webSurveyID]);
-
-  useEffect(() => {
-    if (landlineSurveyID && landlineSurveyID.length > 4) {
-      getSurveyName('LL', landlineSurveyID, setLandlineSurveyName, setLandlineSurveyIDError);
-    }
-  }, [landlineSurveyID]);
-
-  useEffect(() => {
-    if (cellSurveyID && cellSurveyID.length > 4) {
-      getSurveyName('Cell', cellSurveyID, setCellSurveyName, setCellSurveyIDError);
-    }
-  }, [cellSurveyID]);
-
-  useEffect(() => {
     if (promarkSurveyID && promarkSurveyID.length > 4) {
-      getSurveyName('project', promarkSurveyID, setPromarkSurveyName, setPromarkSurveyIDError);
+      setAllIDs('project', promarkSurveyID);
     }
   })
 
   const handleRun = async () => {
-    setComData({});
-    setWebData({});
-    setLandlineData({});
-    setCellData({});
-    if (!isComSurveyIDError) {
-      await getSurveyQuotas('COM', comSurveyID, setComData);
-    }
-    if (!isWebSurveyIDError) {
-      await getSurveyQuotas('Web', webSurveyID, setWebData);
-    }
-    if (!isLandlineSurveyIDError) {
-      await getSurveyQuotas('LL', landlineSurveyID, setLandlineData);
-    }
-    if (!isCellSurveyIDError) {
-      await getSurveyQuotas('Cell', cellSurveyID, setCellData);
-    }
+    await getSurveyQuotas();
     await axios.get("/quotas/merge", config)
       .then((response) => {
         setData(response.data);
@@ -116,44 +58,10 @@ function Quotas() {
     const source_id = e.target.id;
     console.log(`Quotas.js - handleSurveyIDChange - ${source_id} ${value}`);
 
-    switch (source_id) {
-      case "COM":
-        setComSurveyID(value);
-        setComSurveyIDError(value.length < 5);
-        if (value.length > 4) {
-          localStorage.setItem("comSurveyID", value);
-        }
-        break;
-      case "Web":
-        setWebSurveyID(value);
-        setWebSurveyIDError(value.length < 3);
-        if (value.length > 2) {
-          localStorage.setItem("webSurveyID", value);
-        }
-        break;
-      case "LL":
-        setLandlineSurveyID(value);
-        setLandlineSurveyIDError(value.length < 5);
-        if (value.length > 4) {
-          localStorage.setItem("landlineSurveyID", value);
-        }
-        break;
-      case "Cell":
-        setCellSurveyID(value);
-        setCellSurveyIDError(value.length < 5);
-        if (value.length > 4) {
-          localStorage.setItem("cellSurveyID", value);
-        }
-        break;
-      case "project":
-        setPromarkSurveyID(value);
-        setPromarkSurveyIDError(value.length < 5);
-        if (value.length > 4) {
-          localStorage.setItem("promarkSurveyID", value);
-        }
-        break;
-      default:
-        break;
+    setPromarkSurveyID(value);
+    setPromarkSurveyIDError(value.length < 5);
+    if (value.length > 4) {
+      localStorage.setItem("promarkSurveyID", value);
     }
   };
 
@@ -163,42 +71,12 @@ function Quotas() {
         <div className='dp-form' style={formDiv}>
           <div style={formStyle}>
             <SurveyForm
-                id="COM"
-              surveyID={comSurveyID}
-              surveyName={comSurveyName}
-              isSurveyIDError={isComSurveyIDError}
-              handleSurveyIDChange={handleSurveyIDChange}
-            />
-            <div style={formTextBox}>
-              <SurveyForm
-              id="Web"
-                surveyID={webSurveyID}
-                surveyName={webSurveyName}
-                isSurveyIDError={isWebSurveyIDError}
-                handleSurveyIDChange={handleSurveyIDChange}
-              />
-              <SurveyForm
-              id="LL"
-                surveyID={landlineSurveyID}
-                surveyName={landlineSurveyName}
-                isSurveyIDError={isLandlineSurveyIDError}
-                handleSurveyIDChange={handleSurveyIDChange}
-              />
-              <SurveyForm
-                id="Cell"
-                surveyID={cellSurveyID}
-                surveyName={cellSurveyName}
-                isSurveyIDError={isCellSurveyIDError}
-                handleSurveyIDChange={handleSurveyIDChange}
-              />
-              <SurveyForm
                 id="project"
                 surveyID={promarkSurveyID}
                 surveyName={promarkSurveyName}
                 isSurveyIDError={isPromarkSurveyIDError}
                 handleSurveyIDChange={handleSurveyIDChange}
               />
-            </div>
           </div>
         </div>
         <Button onClick={handleRun}>Run</Button>

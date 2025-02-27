@@ -1,12 +1,18 @@
 import axios from "../../../api/axios";
 import * as XLSX from 'xlsx';
 
-export const getSurveyName = async (source, surveyID, setSurveyName, setSurveyIDError) => {
+export const getSurveyName = async (
+    source,
+    surveyID,
+    setSurveyName,
+    setSurveyIDError,
+) => {
   try {
     const response = await axios.post('/quotas/survey_name', { source, surveyID }, {
       headers: { 'Content-Type': 'application/json', 'X-Csrftoken': localStorage.getItem('csrftoken') }
     });
-    setSurveyName(response.data);
+    console.log(response.data)
+    setSurveyName('testing');
   } catch (error) {
     console.error("Error fetching survey name", error);
     setSurveyName(`Invalid ${source} Survey ID`);
@@ -14,12 +20,25 @@ export const getSurveyName = async (source, surveyID, setSurveyName, setSurveyID
   }
 };
 
-export const getSurveyQuotas = async (source, surveyID, setData) => {
-  try {
-    const response = await axios.post('/quotas/survey_quotas', { source, surveyID }, {
+export const setAllIDs = async (
+    source,
+    surveyID
+) => {
+    try {
+    const response = await axios.post('/quotas/surveyIDs', { source, surveyID }, {
       headers: { 'Content-Type': 'application/json', 'X-Csrftoken': localStorage.getItem('csrftoken') }
     });
-    setData(response.data);
+    console.log(response.data)
+  } catch (error) {
+    console.error("Error fetching survey name", error);
+  }
+}
+
+export const getSurveyQuotas = async (source) => {
+  try {
+    const response = await axios.post('/quotas/survey_quotas', { source }, {
+      headers: { 'Content-Type': 'application/json', 'X-Csrftoken': localStorage.getItem('csrftoken') }
+    });
   } catch (error) {
     console.error("Error fetching survey quotas", error);
   }
