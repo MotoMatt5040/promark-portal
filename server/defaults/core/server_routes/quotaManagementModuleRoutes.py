@@ -8,7 +8,6 @@ from ..quota_management.dataManagement import DataManagement
 from .config import allowed_domain
 from flask_login import login_required, current_user
 from server.defaults.utils.logger_config import logger
-import asyncio
 
 quotas = Blueprint('quota_management', __name__)
 dp = DataPuller()
@@ -25,36 +24,9 @@ dm = DataManagement()
 def survey_quotas():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
-    # source = request.json['source']
-    # sid = request.json['surveyID']
-
-    # dm.source = source
-    # logger.debug(source)
-
-    # match source:
-    #     case "COM":
-    #         dm.set_sid_for("com", sid)
-    #     case "Web":
-    #         dm.set_sid_for("web", sid)
-    #     case "LL":
-    #         dm.set_sid_for("landline", sid)
-    #     case "Cell":
-    #         dm.set_sid_for("cell", sid)
-    #     case "project":
-    #         d = dp.dbai2.find_voxco_project_database(sid)
-    #         print(d)
-    #         return {'message', "Project database found"}
-    #     case _:
-    #         return {}
-    # ['COM', 'Web', 'LL', 'Cell']
     for source in ['COM', 'Web', 'LL', 'Cell']:
         dm.source = source
         data = dm.set_data()
-    # data = asyncio.run(dm.set_data())
-
-    #     if source == 'Web':
-    #         return [data[0].to_json(), data[1].to_json()]
-    # return data.to_json()
     return {}
 
 
@@ -73,11 +45,6 @@ def merge():
 def surveyIDs():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
-
-    source = request.json['source']
-    sid = request.json['surveyID']
-
-    dm.source = source
 
     voxco_ids = dp.get_voxco_project_database(sid)
 

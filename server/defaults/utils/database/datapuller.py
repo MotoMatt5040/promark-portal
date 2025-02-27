@@ -86,18 +86,6 @@ class DataPuller:
         voxco_ids = {}
         try:
             self.dbai2.find_voxco_project_database()
-            # cnxn = self.dbai2.connect_engine()
-
-            # df = pd.read_sql_query(sql, cnxn)
-            #
-            # dbs = df['ProjectDatabase'].tolist()
-            # for db in dbs:
-            #     sql = text(f"SELECT MIN(projectId) FROM [{db}].[dbo].[Installation]")
-            #     pid = pd.read_sql_query(sql, cnxn)
-            #     voxco_ids.append(pid[0])
-            # logger.debug(voxco_ids)
-            # cnxn.close()
-            # del cnxn
 
             with self.dbai2.connect_engine() as conn:
                 sql = text(f"{os.environ['voxco_project_database']}{project_number}'")
