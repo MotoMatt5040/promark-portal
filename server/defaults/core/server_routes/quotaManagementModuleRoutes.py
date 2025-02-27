@@ -1,13 +1,19 @@
 import json
 import shutil
+import os
 
 from flask import Blueprint, request, make_response, send_file, session
 
-from server.defaults.utils.database.datapuller import DataPuller
+
 from ..quota_management.dataManagement import DataManagement
 from .config import allowed_domain
 from flask_login import login_required, current_user
-from server.defaults.utils.logger_config import logger
+if os.environ['environment'] == 'dev':
+    from server.defaults.utils.database.datapuller import DataPuller
+    from server.defaults.utils.logger_config import logger
+else:
+    from defaults.utils.database.datapuller import DataPuller
+    from defaults.utils.logger_config import logger
 
 quotas = Blueprint('quota_management', __name__)
 dp = DataPuller()

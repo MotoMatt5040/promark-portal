@@ -1,11 +1,14 @@
 import json
 import shutil
+import os
 from datetime import datetime
 
 from flask import Blueprint, request, make_response, send_file
 from flask_login import login_required, current_user
-
-from server.defaults.utils.database.datapuller import DataPuller
+if os.environ['environment'] == 'dev':
+    from server.defaults.utils.database.datapuller import DataPuller
+else:
+    from defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
 from ..auth.models import db, User, DataProcessingChecklist
 # from ..data_processing.reader import Reader

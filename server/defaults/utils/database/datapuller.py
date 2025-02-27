@@ -8,7 +8,10 @@ from sqlalchemy import create_engine, text
 from .database import Database, DataBaseAccessInfo
 from .sqldictionary import SQLDictionary
 
-from server.defaults.utils.logger_config import logger
+if os.environ['environment'] == 'dev':
+    from server.defaults.utils.logger_config import logger
+else:
+    from defaults.utils.logger_config import logger
 
 
 def error_log(err):

@@ -1,7 +1,12 @@
+import os
 from flask import Blueprint, request, make_response
 
-from server.defaults.core.dashboard.periodic_update.periodicUpdate import PeriodicUpdate
-from server.defaults.utils.database.datapuller import DataPuller
+if os.environ['environment'] == 'dev':
+    from server.defaults.core.dashboard.periodic_update.periodicUpdate import PeriodicUpdate
+    from server.defaults.utils.database.datapuller import DataPuller
+else:
+    from defaults.core.dashboard.periodic_update.periodicUpdate import PeriodicUpdate
+    from defaults.utils.database.datapuller import DataPuller
 from .config import allowed_domain
 
 pu = PeriodicUpdate()

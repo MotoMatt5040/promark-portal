@@ -13,6 +13,9 @@ Routes:<br/>
 <br/>
 Files:<br/>
 &emsp;periodicUpdate.py &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/dashboard/periodic_update/periodicUpdate.py</br>
+&emsp;dataManagement.py &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/quota_management/dataManagement.py</br>
+&emsp;api.py &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/core/quota_management/api.py</br>
+&emsp;datapuller.py &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; -> server/defaults/utils/database/datapuller.py</br>
 ___
 
 Change from 'testing' for 'dev' or 'prod':</br>

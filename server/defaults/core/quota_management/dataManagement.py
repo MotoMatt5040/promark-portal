@@ -7,7 +7,10 @@ import pandas as pd
 import numpy as np
 import requests
 import json
-from server.defaults.utils.logger_config import logger
+if os.environ['environment'] == 'dev':
+    from server.defaults.utils.logger_config import logger
+else:
+    from defaults.utils.logger_config import logger
 
 
 class DataManagement(API):
