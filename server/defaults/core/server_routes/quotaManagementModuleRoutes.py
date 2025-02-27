@@ -37,6 +37,10 @@ def survey_quotas():
             dm.set_sid_for("landline", sid)
         case "Cell":
             dm.set_sid_for("cell", sid)
+        case "project":
+            d = dp.dbai2.find_voxco_project_database(sid)
+            print(d)
+            return {'message', "Project database found"}
         case _:
             return {}
 
@@ -68,6 +72,8 @@ def survey_name():
 
     dm.source = source
 
+    print(source)
+
     match source:
         case "COM":
             dm.set_sid_for("com", sid)
@@ -77,6 +83,10 @@ def survey_name():
             dm.set_sid_for("landline", sid)
         case "Cell":
             dm.set_sid_for("cell", sid)
+        case "project":
+            d = dp.get_voxco_project_database(sid)
+            print(d)
+            return ''
         case _:
             return {}
     name = dm.survey_name()

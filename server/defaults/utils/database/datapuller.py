@@ -8,6 +8,8 @@ from sqlalchemy import create_engine, text
 from .database import Database, DataBaseAccessInfo
 from .sqldictionary import SQLDictionary
 
+from server.defaults.utils.logger_config import logger
+
 
 def error_log(err):
     print("\n\n\n")
@@ -81,12 +83,39 @@ class DataPuller:
         self.engine = create_engine(dbcon)
 
     def get_voxco_project_database(self, project_number: str):
+        voxco_ids = []
         try:
             self.dbai2.find_voxco_project_database()
             cnxn = self.dbai2.connect_engine()
-            df = pd.read_sql_query(text(f"{os.environ['voxco_project_database']}{project_number}'"), cnxn)
-            cnxn.close()
-            del cnxn
-            return df
+            sql = text(f"{os.environ['voxco_project_database']} (name = '{project_number}' or name = '{project_number}C')")
+            logger.debug(sql)
+
+            # df = pd.read_sql_query(sql, cnxn)
+            #
+            # dbs = df['ProjectDatabase'].tolist()
+            # for db in dbs:
+            #     sql = text(f"SELECT MIN(projectId) FROM [{db}].[dbo].[Installation]")
+            #     pid = pd.read_sql_query(sql, cnxn)
+            #     voxco_ids.append(pid[0])
+            # logger.debug(voxco_ids)
+            # cnxn.close()
+            # del cnxn
+
+            with self.dbai2.connect_engine() as conn:
+                result = conn.execute(sql)
+                dbs = [row[0] for row in result]  # Extracting the ProjectDatabase values
+
+            voxco_ids = []
+            for db in dbs:
+                sql = text(f"SELECT MIN(projectId) FROM [{db}].[dbo].[Installation]")
+                with self.dbai2.connect_engine() as conn:
+                    result = conn.execute(sql)
+                    pid = result.scalar()  # Fetching the single value
+                    voxco_ids.append(pid)
+
+            logger.debug(voxco_ids)
+
+
+            return voxco_ids
         except Exception as err:
             raise err
