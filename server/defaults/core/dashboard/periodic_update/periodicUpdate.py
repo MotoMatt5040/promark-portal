@@ -1,6 +1,11 @@
 import pandas
+import os
 
-from server.defaults.utils.database.datapuller import DataPuller  # need to remove "server" from import
+if os.environ['environment'] == 'dev':
+    from server.defaults.utils.database.datapuller import DataPuller  # need to remove "server" from import
+else:
+    from defaults.utils.database.datapuller import DataPuller
+
 from .queryBuilder import QueryBuilder
 from ..defaultQueries import active_location_query, active_projectIDs_query, project_summary_query
 from ..config import DATABASE

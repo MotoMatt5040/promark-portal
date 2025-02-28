@@ -24,6 +24,9 @@ elif env == 'prod':
 ch.setFormatter(CustomFormatter())
 logger.addHandler(ch)
 
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+
 # File handler with monthly rotation
 fh = TimedRotatingFileHandler('logs/logs.log', when='W0', interval=1, backupCount=3)
 if env == 'dev':
